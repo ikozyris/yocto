@@ -11,7 +11,7 @@ int main()
     char fname[12];
     char wname[12];
 
-    printf("Text editor made by IKozy-2\nChoose between reading-1 writing-2: ");
+    printf("Text editor made by ikozyris\nChoose between reading-1 writing-2: ");
     scanf("%d",&m);
     printf("%d\n",m);
 
