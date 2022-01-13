@@ -8,9 +8,10 @@ int main()
     char txt[30];
     FILE* fp;
     int m;
-    char fname[10];
+    char fname[12];
+    char wname[12];
 
-    printf("\nChoose between reading-1 writing-2: ");
+    printf("Text editor made by IKozy-2\nChoose between reading-1 writing-2: ");
     scanf("%d",&m);
     printf("%d\n",m);
 
@@ -19,23 +20,26 @@ int main()
     printf("Instructions below:\nuse_for space\nuse up to 30 characters\n\nEnter text: ");
     scanf("%s", txt); //sets char-txt to the entered text
     printf("%s\n", txt);
+        //naming file
+    printf("Enter file name to write: ");
+        scanf("%s", &wname);
         //creates file
-    fp = fopen ("text.txt", "w");
-    fp = fopen("text.txt", "w+");
+    fp = fopen (wname, "w");
+    fp = fopen(wname, "w+");
         fputs(txt, fp);
         fclose(fp); //closes file
     }
 
     else
     {
-        printf("Enter file name: ");
-        scanf("%s", &fname);
-        printf("text contains:\n");
+        printf("Enter file name to read: ");
+        scanf("%s", &fname); //naming the file to read
+        printf("text contains:\n"); //listing the contents of th file
         fp = fopen(fname,"r");
 
         fscanf(fp,"%s",txt);
         printf("%s",txt);
-        fclose(fp);
+        fclose(fp); //closing file
 
     }
 }
