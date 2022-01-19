@@ -7,39 +7,60 @@ int main()
     //declaring
     char txt[30];
     FILE* fp;
-    int m;
+    int m, n;
     char fname[12];
     char wname[12];
 
-    printf("Text editor made by ikozyris\nChoose between reading-1 writing-2: ");
+
+    printf("Text editor made by IKozy-2\nChoose between reading-1 overwriting-2 writing-3: ");
     scanf("%d",&m);
     printf("%d\n",m);
 
     if (m == 2)
     {
-    printf("Instructions below:\nuse_for space\nuse up to 30 characters\n\nEnter text: ");
-    scanf("%s", txt); //sets char-txt to the entered text
-    printf("%s\n", txt);
+        printf("Instructions below:\nuse_for space\nuse up to 30 characters\n\nEnter text: ");
+        scanf("%s", txt); //sets char-txt to the entered text
+        printf("%s\n", txt);
         //naming file
-    printf("Enter file name to write: ");
+        printf("Enter file name to write: ");
         scanf("%s", &wname);
         //creates file
-    fp = fopen (wname, "w");
-    fp = fopen(wname, "w+");
-        fputs(txt, fp);
+        fp = fopen(wname, "w+");
+        fputs(txt, fp); //creates file
         fclose(fp); //closes file
+        return 0;
+    }
+
+    else if (m == 1)
+    {
+        printf("Enter file name to read: ");
+        scanf("%s", &fname);
+        printf("text contains:\n");
+        fp = fopen(fname,"r");
+        fscanf(fp,"%s",txt);
+        printf("%s\n",txt);
+        fclose(fp);
+        return 0;
+    }
+
+    else if (m == 3)
+    {
+        printf("Instructions below:\nuse_for space\nuse up to 30 characters\n\nEnter text: ");
+        scanf("%s", txt); //sets char-txt to the entered text
+            //naming file
+        printf("Enter file name to write: ");
+        scanf("%s", &fname);
+        //processing file
+        fp = fopen(fname,"a"); //opens file in write mode
+        fprintf(fp,"%s",txt); //writes to file without overwriting
+        fclose(fp); //closes file
+        printf("%s\n", txt,"%s",n);
+        return 0;
     }
 
     else
     {
-        printf("Enter file name to read: ");
-        scanf("%s", &fname); //naming the file to read
-        printf("text contains:\n"); //listing the contents of th file
-        fp = fopen(fname,"r");
-
-        fscanf(fp,"%s",txt);
-        printf("%s",txt);
-        fclose(fp); //closing file
-
+        printf("Invalid option use 1 or 2 or 3\n");
+        return 0;
     }
 }
