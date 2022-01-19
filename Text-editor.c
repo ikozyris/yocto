@@ -12,7 +12,7 @@ int main()
     char wname[12];
 
 
-    printf("Text editor made by IKozy-2\nChoose between reading-1 overwriting-2 writing-3: ");
+    printf("Text editor made by ikozyris and gkozyris\nChoose between reading-1 overwriting-2 writing-3: ");
     scanf("%d",&m);
     printf("%d\n",m);
 
