@@ -10,7 +10,7 @@ gcc -o text-editor Downloads/Text-editor.c
 ./text-editor
 ```
 # For windows:
-([acording to this guide](URL 'https://docs.microsoft.com/en-us/cpp/build/walkthrough-compile-a-c-program-on-the-command-line?view=msvc-170'))
+([acording to this guide](https://docs.microsoft.com/en-us/cpp/build/walkthrough-compile-a-c-program-on-the-command-line?view=msvc-170))
 Open cmd and type:
 ```
 cl Downloads\Text-editor.c
