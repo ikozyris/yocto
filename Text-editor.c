@@ -34,7 +34,7 @@ int main()
 
             while((ch=fgetc(fp))!=EOF)//getting number of lines (works)
             {
-                if(ch=='\n')    
+                if(ch=='\n')
                 lines++;
             }
             fclose(fp);
@@ -42,7 +42,7 @@ int main()
             printf("\nlines:%d\n", lines);
             fscanf(fp,"%[^\n]",txt);
             printf("text contains:\n%s\n",txt);
-            for (i = 0; i < lines; i++)
+            for (i = 1; i < lines; i++)
             {
                 fscanf(fp,"\n%[^\n]\n",txt);
                 printf("%s\n",txt);
@@ -59,7 +59,7 @@ int main()
             scanf("%s", &fname);
                 //processing file
             fp = fopen(fname,"a"); //opens file in write mode and enters text in the end of the line
-            fprintf(fp,"%s",txt); //writes to file without overwriting
+            fprintf(fp,"%s",txt); //writes to file
             fclose(fp); //closes file
             printf("%s\n", txt);
         }
