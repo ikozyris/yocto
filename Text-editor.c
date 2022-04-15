@@ -34,7 +34,7 @@ int main()
 
             while((ch=fgetc(fp))!=EOF)//getting number of lines (works)
             {
-                if(ch=='\n')    //but destroys the fscanf
+                if(ch=='\n')    
                 lines++;
             }
             fclose(fp);
