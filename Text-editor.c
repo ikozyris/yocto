@@ -29,6 +29,7 @@ int main()
     while(1)
     {
 ////////MODE-SELECTOR////////////////////        
+        lines=0;
         printf("\nChoose between reading-1 overwriting-2 writing-3 quit-4: ");
         scanf("%d",&m);
         while ((getchar()) != '\n');
@@ -85,16 +86,14 @@ int main()
 ////////WRITING/////////////////////////////////
         else if (m == 3)
         {
-            printf("Instructions below:\nUse_for space\nUse up to 30 characters for file content\nUse up to 12 characters for file name\n\nEnter text: ");
-            scanf("%29s", txt); //sets char txt to the entered text
-                //naming file
+            printf("Instructions below:\nUse_for space\nUse up to 30 characters\nUse up to 12 characters for file name\n\nEnter text: ");
+            scanf("%[^\n]", txt); //sets char-txt to the entered text
+            printf("%s\n", txt);
             printf("Enter file name to write: ");
-            scanf("%19s", fname);
-                //processing file
-            fp = fopen(fname,"a"); //opens file in write mode and enters text in the end of the line
-            fprintf(fp,"%29s",txt); //writes to file without overwriting
+            scanf("%s", &fname); //naming the file
+            fp = fopen(fname, "a");
+            fputs(txt, fp); //creates file
             fclose(fp); //closes file
-            printf("%s29s", txt);
         }
 ////////EXITING/////////////////////////////////
         else if (m == 4)
