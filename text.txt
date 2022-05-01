@@ -1,0 +1,7 @@
+THE START
+Line 2
+Line 3
+
+Line 5
+Line 6
+THE END

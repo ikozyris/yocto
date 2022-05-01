@@ -22,13 +22,15 @@ int main()
 
     char txt[100];
     FILE* fp;
-    int m, i, lines=0;
-    char fname[20],ch;
+    int m, i, g, ch, lines=0;
+    char fname[20];
 
     printf("Text editor made by ikozyris and gkozyris");
     while(1)
     {
+
 ////////MODE-SELECTOR////////////////////        
+
         lines=0;
         printf("\nChoose between reading-1 overwriting-2 writing-3 quit-4: ");
         scanf("%d",&m);
@@ -41,7 +43,9 @@ int main()
             printf("Enter file name to read: ");
             scanf("%19s", fname);
             fp = fopen(fname,"r");
-            if(fp  == NULL)
+
+           if (fp  == NULL) // return if there is no such file
+
             {
                 fclose(fp);
                 return 0;
@@ -57,6 +61,12 @@ int main()
                 fclose(fp);
                 fp = fopen(fname,"r"); //open file in read mode
                 printf("\nlines:%d\n", lines);
+                printf("text contains:\n%s\n",txt);
+                for (i = 2; i < lines; i++)
+                {
+                    while ((ch = getc(fp)) != EOF)
+                        putc(ch, stdout);
+                    printf("%c",txt);
             // getline (cin, text, '\n');
                 fscanf(fp,"%[^\n]",txt); //scan untill 'newline' character
                 printf("text contains:\n%s\n",txt);
