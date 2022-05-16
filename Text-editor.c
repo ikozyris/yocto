@@ -59,11 +59,11 @@ int main()
 //////OVERWRITING/////////////////////////////////
         else if (m == 2)
         {
-            printf("Instructions below:\nUse_for space\nUse up to 30 characters\nUse up to 12 characters for file name\n\nEnter text: ");
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\n\nEnter text: ");
             scanf("%[^\n]", txt); //sets char-txt to the entered text
             printf("%s\n", txt);
             printf("Enter file name to write: ");
-            scanf("%s", &fname); //naming the file
+            scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "w");
             fputs(txt, fp); //creates file
             fclose(fp); //closes file
@@ -72,11 +72,11 @@ int main()
 ////////WRITING/////////////////////////////////
         else if (m == 3)
         {
-            printf("Instructions below:\nUse_for space\nUse up to 30 characters\nUse up to 12 characters for file name\n\nEnter text: ");
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\n\nEnter text: ");
             scanf("%[^\n]", txt); //sets char-txt to the entered text
             printf("%s\n", txt);
             printf("Enter file name to write: ");
-            scanf("%s", &fname); //naming the file
+            scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "a");
             fputs(txt, fp); //creates file
             fclose(fp); //closes file
