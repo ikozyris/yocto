@@ -1,5 +1,5 @@
 # txt-editor
-A very simple text editor on C as a command-line tool (CLI command line interface).
+A very simple text editor on C as a command-line tool (CLI command line interface). more on the [wiki](https://github.com/ikozyris/txt-editor/wiki)
 
 Still under development.
 # How to use for linux:
