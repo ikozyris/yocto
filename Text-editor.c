@@ -22,14 +22,13 @@ int main()
 
     char txt[100];
     FILE* fp;
-    int m, i, lines=0;
+    int m, i, lines=0, index=0;
     char fname[20],ch;
 
     printf("Text editor made by ikozyris and gkozyris");
     while(1)
     {
 ////////MODE-SELECTOR////////////////////
-        lines=0;
         printf("\nChoose between reading-1 overwriting-2 writing-3 quit-4: ");
         scanf("%d",&m);
         while ((getchar()) != '\n');
@@ -57,12 +56,9 @@ int main()
                 fclose(fp);
                 fp = fopen(fname,"r"); //open file in read mode
                 printf("\nlines:%d\n", lines);
-            // getline (cin, text, '\n');
-                fscanf(fp,"%[^\n]",txt); //scan untill 'newline' character
                 printf("text contains:\n%s\n",txt);
                 for (i = 2; i < lines; i++)
                 {
-                // getline (cin, text, '\n');
                     while ((ch = getc(fp)) != EOF)
                         putc(ch, stdout);
                         printf("%c",txt);
@@ -75,12 +71,11 @@ int main()
         else if (m == 2)
         {
             printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press ';'\n\nEnter text: ");
-            while((ch = getchar()) != ';')//reads until ;
+            while((ch = getchar()) != ';')//reads until ';'
             {
                 txt[index++] = ch;
             }
             txt[index] = '\0';
-            printf("%s\n", txt);
             printf("Enter file name to write: ");
             scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "w");
@@ -92,12 +87,11 @@ int main()
         else if (m == 3)
         {
             printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press ';'\n\nEnter text: ");
-            while((ch = getchar()) != ';')// reads until ;
+            while((ch = getchar()) != ';')// reads until ';'
             {
                 txt[index++] = ch;
             }
             txt[index] = '\0';
-            printf("%s\n", txt);
             printf("Enter file name to write: ");
             scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "a");
