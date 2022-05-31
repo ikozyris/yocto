@@ -1,5 +1,4 @@
 /*
-    Text Editor
     Copyright (C) 2022  Ioannis Kozyris
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,7 +18,6 @@
 int main()
 {
     //declaring
-
     char txt[100];
     FILE* fp;
     int m, i, lines=0, index=0;
@@ -71,7 +69,7 @@ int main()
         else if (m == 2)
         {
             printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press ';'\n\nEnter text: ");
-            while((ch = getchar()) != ';')//reads until ';'
+            while((ch = getchar()) != '`')//reads until '`'
             {
                 txt[index++] = ch;
             }
@@ -87,7 +85,7 @@ int main()
         else if (m == 3)
         {
             printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press ';'\n\nEnter text: ");
-            while((ch = getchar()) != ';')// reads until ';'
+            while((ch = getchar()) != '`')// reads until '`'
             {
                 txt[index++] = ch;
             }
