@@ -26,7 +26,7 @@ Ctrl+O  and locate the file
 and click build and run
 
 
-### Licence
+### License
 
 Copyright (C) 2021 - 2022  Ioannis Kozyris
 
