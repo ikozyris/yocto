@@ -18,10 +18,10 @@
 int main()
 {
     //declaring
-    char txt[100];
+    
     FILE* fp;
     int m, i, lines=0, index=0;
-    char fname[20],ch;
+    char fname[20],ch txt[100];
 
     printf("Text editor made by ikozyris and gkozyris");
     while(1)
@@ -59,7 +59,7 @@ int main()
                 {
                     while ((ch = getc(fp)) != EOF)
                         putc(ch, stdout);
-                        printf("%c",txt);
+                        printf("%s",txt);
                 }
                 fclose(fp);
             }
@@ -77,7 +77,7 @@ int main()
             printf("Enter file name to write: ");
             scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "w");
-            fprintf("txt = %s", txt, fp); //creates file
+            fprintf(fp, "txt = %s", txt); //creates file
             fclose(fp); //closes file
         }
 
@@ -93,7 +93,7 @@ int main()
             printf("Enter file name to write: ");
             scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "a");
-            fprintf("txt = %s", txt, fp); //creates file
+            fprintf(fp, "txt = %s", txt); //creates file
             fclose(fp); //closes file
         }
 ////////EXITING/////////////////////////////////
