@@ -21,7 +21,7 @@ int main()
     
     FILE* fp;
     int m, i, lines=0, index=0;
-    char fname[20],ch txt[100];
+    char fname[20],ch, txt[100];
 
     printf("Text editor made by ikozyris and gkozyris");
     while(1)
@@ -58,8 +58,10 @@ int main()
                 for (i = 2; i < lines; i++)
                 {
                     while ((ch = getc(fp)) != EOF)
+                    {
                         putc(ch, stdout);
                         printf("%s",txt);
+                    }
                 }
                 fclose(fp);
             }
