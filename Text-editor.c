@@ -13,7 +13,7 @@
 */
 
 #include <stdio.h>
-
+#include <string.h>
 
 int main()
 {
@@ -35,42 +35,41 @@ int main()
 ///////READING/////////////////////////////////
         if (m == 1)
         {
+            memset(txt, 0, sizeof(txt));
+            lines = 0;
             printf("Enter file name to read: ");
             scanf("%19s", fname);
             fp = fopen(fname,"r");
-            if(fp  == NULL)
+            if(fp == NULL)
             {
-                fclose(fp);
-                return 0;
+                perror("fopen()");
+                return -1;
             }
 
-            else
+            while((ch=fgetc(fp))!=EOF)//getting number of lines
             {
-                while((ch=fgetc(fp))!=EOF)//getting number of lines
-                {
-                    if(ch=='\n')
-                    lines++;
-                }
-                fclose(fp);
-                fp = fopen(fname,"r"); //open file in read mode
-                printf("\nlines:%d\n", lines);
-                printf("text contains:\n%s\n",txt);
-                for (i = 2; i < lines; i++)
-                {
-                    while ((ch = getc(fp)) != EOF)
-                    {
-                        putc(ch, stdout);
-                        printf("%s",txt);
-                    }
-                }
-                fclose(fp);
+                if(ch=='\n')
+                lines++;
             }
+            fclose(fp);
+            fp = fopen(fname,"r"); //open file in read mode
+            lines++;
+            printf("\nlines:%d\n", lines);
+            printf("text contains:\n%s\n",txt);
+            for (i = 0; i < lines; i++)
+            {
+                while ((ch = getc(fp)) != EOF)
+                    putc(ch, stdout);
+                printf("%s",txt);
+            }
+            fclose(fp);
         }
 
 //////OVERWRITING/////////////////////////////////
         else if (m == 2)
         {
-            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press ';'\n\nEnter text: ");
+            index =0;
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text: ");
             while((ch = getchar()) != '`')//reads until '`'
             {
                 txt[index++] = ch;
@@ -79,14 +78,15 @@ int main()
             printf("Enter file name to write: ");
             scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "w");
-            fprintf(fp, "txt = %s", txt); //creates file
+            fprintf(fp, "%s", txt); //creates file
             fclose(fp); //closes file
         }
 
 ////////WRITING/////////////////////////////////
         else if (m == 3)
         {
-            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press ';'\n\nEnter text: ");
+            index = 0;
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text: ");
             while((ch = getchar()) != '`')// reads until '`'
             {
                 txt[index++] = ch;
@@ -95,7 +95,7 @@ int main()
             printf("Enter file name to write: ");
             scanf("%19s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "a");
-            fprintf(fp, "txt = %s", txt); //creates file
+            fprintf(fp, "%s", txt); //creates file
             fclose(fp); //closes file
         }
 ////////EXITING/////////////////////////////////
