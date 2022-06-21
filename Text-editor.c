@@ -56,12 +56,9 @@ int main()
             lines++;
             printf("\nlines:%d\n", lines);
             printf("text contains:\n%s\n",txt);
-            for (i = 0; i < lines; i++)
-            {
-                while ((ch = getc(fp)) != EOF)
-                    putc(ch, stdout);
-                printf("%s",txt);
-            }
+            while ((ch = getc(fp)) != EOF)
+                putc(ch, stdout);
+            printf("%s",txt);
             fclose(fp);
         }
 
