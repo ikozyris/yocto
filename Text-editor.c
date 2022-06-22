@@ -55,7 +55,7 @@ int main()
             fp = fopen(fname,"r"); //open file in read mode
             lines++;
             printf("\nlines:%d\n", lines);
-            printf("text contains:\n%s\n",txt);
+            printf("text contains:\n%s\n");
             while ((ch = getc(fp)) != EOF)
                 putc(ch, stdout);
             printf("%s",txt);
