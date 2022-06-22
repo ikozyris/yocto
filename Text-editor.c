@@ -40,28 +40,22 @@ int main()
             printf("Enter file name to read: ");
             scanf("%19s", fname);
             fp = fopen(fname,"r");
-            if(fp == NULL)
-            {
-                perror("fopen()");
+            fp = fopen(fname,"r");
+            if(fp  == NULL)
+           {
+                perror("fopen(): ");
                 return -1;
             }
-
-            while((ch=fgetc(fp))!=EOF)//getting number of lines
+            
+            printf ("%03zu ", ln++);
+            while ((ch = getc(fp)) != EOF) 
             {
-                if(ch=='\n')
-                lines++;
+                putchar (ch);
+                if (ch == '\n')               /* test if last is newline */
+                    printf ("%03zu ", ln++);
             }
-            fclose(fp);
-            fp = fopen(fname,"r"); //open file in read mode
-            lines++;
-            printf("\nlines:%d\n", lines);
-            printf("text contains:\n%s\n");
-            while ((ch = getc(fp)) != EOF)
-                putc(ch, stdout);
-            printf("%s",txt);
-            fclose(fp);
+            printf("\n");
         }
-
 //////OVERWRITING/////////////////////////////////
         else if (m == 2)
         {
