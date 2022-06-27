@@ -20,7 +20,8 @@ int main()
     //declaring
     
     FILE* fp;
-    int m, i, lines=0, index=0;
+    size_t  lines=0;
+    int m, i, index=0;
     char fname[20],ch, txt[100];
 
     printf("Text editor made by ikozyris and gkozyris");
@@ -46,12 +47,12 @@ int main()
                 return -1;
             }
             
-            printf ("%03zu| ", ln++);
+            printf ("%03zu| ", lines++);
             while ((ch = getc(fp)) != EOF) 
             {
                 putchar (ch);
                 if (ch == '\n')              
-                    printf ("%03zu| ", ln++); //print line number with 001 format
+                    printf ("%03zu| ", lines++); //print line number with 001 format
             }
             printf("\n");
         }
