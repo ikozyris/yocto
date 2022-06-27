@@ -35,11 +35,10 @@ int main()
 ///////READING/////////////////////////////////
         if (m == 1)
         {
-            memset(txt, 0, sizeof(txt));
+            memset(txt, 0, sizeof(txt));//reset txt
             lines = 0;
             printf("Enter file name to read: ");
             scanf("%19s", fname);
-            fp = fopen(fname,"r");
             fp = fopen(fname,"r");
             if(fp  == NULL)
            {
@@ -47,12 +46,12 @@ int main()
                 return -1;
             }
             
-            printf ("%03zu ", ln++);
+            printf ("%03zu| ", ln++);
             while ((ch = getc(fp)) != EOF) 
             {
                 putchar (ch);
-                if (ch == '\n')               /* test if last is newline */
-                    printf ("%03zu ", ln++);
+                if (ch == '\n')              
+                    printf ("%03zu| ", ln++); //print line number with 001 format
             }
             printf("\n");
         }
