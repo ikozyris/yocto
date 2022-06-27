@@ -30,14 +30,12 @@ int main()
 ////////MODE-SELECTOR////////////////////
         printf("\nChoose between reading-1 overwriting-2 writing-3 quit-4: ");
         scanf("%d",&m);
-        while ((getchar()) != '\n');
-        ch = getchar();
 
 ///////READING/////////////////////////////////
         if (m == 1)
         {
             memset(txt, 0, sizeof(txt));//reset txt
-            lines = 0;
+            lines = 1;
             printf("Enter file name to read: ");
             scanf("%19s", fname);
             fp = fopen(fname,"r");
