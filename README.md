@@ -6,7 +6,7 @@ Still under development.
 Ctrl+Alt+T and type:
 ```
 sudo apt install gcc -y 
-gcc -o text-editor Downloads/Text-editor.c
+gcc -o text-editor Downloads/Text-editor*.c
 ./text-editor
 ```
 # For windows:
