@@ -28,7 +28,8 @@ and click build and run
 
 ### License
 
-Copyright (C) 2022  Ioannis Kozyris
+Copyright (C) 2022  ikozyris
+Copyright (C) 2022  gkozyris
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
