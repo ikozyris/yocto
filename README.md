@@ -1,15 +1,15 @@
-# txt-editor
-A very simple text editor on C as a command-line tool (CLI command line interface). more on the [wiki](https://github.com/ikozyris/txt-editor/wiki)
+# Yocto
+A very simple and small (less than 350 lines of code!) text editor on C as a command-line tool (CLI command line interface). more on the [wiki](https://github.com/ikozyris/yocto/wiki)
 
 Still under development.
-# How to use for linux:
+## How to use for linux:
 Ctrl+Alt+T and type:
 ```
 sudo apt install gcc -y 
 gcc -o text-editor Downloads/Text-editor*.c
 ./text-editor
 ```
-# For windows:
+## For windows:
 ([acording to this guide](https://docs.microsoft.com/en-us/cpp/build/walkthrough-compile-a-c-program-on-the-command-line?view=msvc-170))
 Open cmd and type:
 ```
