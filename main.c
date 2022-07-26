@@ -21,43 +21,68 @@ int main(int argc, char *argv[])
     //declaring
     char option[20];
 
+
+    if (argc == 1)
+        interative();
+    
+    if (argc == 2)
+    {
+        if (strcmp("--version", argv[1]) == 0) {
+            printf("Yocto Version 0.7 Created by ikozyris and gkozyris\nLicensed under Gnu General Public License v3\nSource code available at: http://github.com/ikozyris/yocto/ \n");
+            return 0;
+        }
+
+        if (strcmp("-i", argv[1]) == 0 || strcmp("--interactive", argv[1]) == 0) {
+            interactive();
+            return 0;
+        }
+    }
+
+    if (argc == 3)
+    {
+	
+        strcpy(fname, argv[1]);
+        strcpy(option, argv[2]);
+
+        if (strcmp("--version", argv[2]) == 0) {
+            printf("Yocto Version 0.7 Created by ikozyris and gkozyris\nLicensed under Gnu General Public License v3\nSource code available at: http://github.com/ikozyris/yocto/ \n");
+            return 0;
+        }
+
+        if (strcmp("-i", option) == 0 || strcmp("--interactive", option) == 0) {
+            interactive();
+            return 0;
+        }
+
+        if (strcmp("-sn", option) == 0 || strcmp("--single-number", option) == 0) {
+            sn();
+            return 0;
+        }
+
+        if (strcmp("-e", option) == 0 || strcmp("--show-ends", option) == 0) {
+            e();
+            return 0;
+        }
+
+        if (strcmp("-r", option) == 0 || strcmp("--read", option) == 0) {
+            r();
+            return 0;
+        }
+
+        if (strcmp("-w", option) == 0 || strcmp("--write", option) == 0) {
+            wrt();
+            return 0;
+        }
+
+        else hlp();
+    }
+
     if (argc > 3)
     {
         printf("Too many arguments\n");
         return 0;
-    } 
-
-    strcpy(fname, argv[1]);
-    strcpy(option, argv[2]);
-
-    if (strcmp("--version", argv[1]) == 0)
-    {
-        printf("program 0.7")
-        return 0;
     }
 
-    if (strcmp("-i", option) == 0 || strcmp("--interactive", option) == 0) {
-    interactive();
-    return 0;
-    }
-
-    if (strcmp("-sn", option) == 0 || strcmp("--single-number", option) == 0) {
-    sn();
-    return 0;}
-
-    if (strcmp("-e", option) == 0 || strcmp("--show-ends", option) == 0) {
-        e();
-    return 0;}
-
-    if (strcmp("-r", option) == 0 || strcmp("--read", option) == 0) {
-        r();
-    return 0;}
-
-    if (strcmp("-w", option) == 0 || strcmp("--write", option) == 0) {
-    wrt();
-    return 0;}
-
-    else hlp();
 
     return 0;
 }
