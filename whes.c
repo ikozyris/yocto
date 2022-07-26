@@ -49,13 +49,13 @@ int r()
         perror("fopen(): ");
         return -1;
     }
-    printf ("%03zu| ", lines++);
+    printf ("%03zu |", lines++);
     while ((ch = getc(fp)) != EOF) 
     {
         putchar(ch);
         if (ch == '\n')
         {            
-            printf ("%03zu| ", lines++);
+            printf ("%03zu |", lines++);
         }
     }
     printf("\n");    
@@ -75,14 +75,14 @@ int wrt()
         perror("fopen(): ");
         return -1;
     }
-    fprintf(fp, "txt = %s", txt); //creates file
+    fprintf(fp, "%s", txt); //writes file
     fclose(fp); //closes file
     return 0;
 }
 
 int hlp() 
 {
-    printf( "Usage: kedit [FILE]... [OPTION]...                                            \n"
+    printf( "Usage: yocto [FILE]... [OPTION]...                                            \n"
             "   -i, --interacive         interactive mode                                  \n"
             "   -w   --write             Write to file                                     \n"
             "   -r   --read              Read file                                         \n"
@@ -91,9 +91,9 @@ int hlp()
             "   --help     display this help and exit                                      \n"
             "   --version  output version information and exit                             \n"
             "Examples:                                                                     \n"
-            "    kedit home/user/text.txt -sn  Read text.txt without printing the lines    \n"
-            "    kedit -i       Start program in interactive mode                          \n"
-            "Full documentation on github.com/ikozyris/txt-editor/wiki                     \n");
+            "    yocto home/user/text.txt -sn  Read text.txt without printing the lines    \n"
+            "    yocto -i       Start program in interactive mode                          \n"
+	    "Documentation can be found on github.com/ikozyris/txt-editor/wiki             \n");
     return 0;
 }
     
@@ -114,7 +114,7 @@ int sn()
     }
     fclose(fp);
     fp = fopen(fname,"r"); //open file in read mode
-    printf("\nlines:%ld\n", lines);
+    printf("lines:%ld\n-------\n", lines);
     while ((ch = getc(fp)) != EOF)
         putc(ch, stdout);
     fclose(fp);
