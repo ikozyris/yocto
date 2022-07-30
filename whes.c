@@ -62,8 +62,10 @@ int r()
     fclose(fp);
     return 0;
 }
+
 int wrt()
 {
+    printf("Yocto 0.7\t Press ` and ENTER to save and exit\n ");
     while((ch = getchar()) != '`')//reads until '`'
     {
         txt[indx++] = ch;
@@ -91,9 +93,10 @@ int hlp()
             "   --help     display this help and exit                                      \n"
             "   --version  output version information and exit                             \n"
             "Examples:                                                                     \n"
-            "    yocto home/user/text.txt -sn  Read text.txt without printing the lines    \n"
+            "    yocto /home/user/text.txt -sn  Read text.txt without printing the lines   \n"
             "    yocto -i       Start program in interactive mode                          \n"
-	    "Documentation can be found on github.com/ikozyris/txt-editor/wiki             \n");
+	    "                                                                              \n"
+	    "Documentation can be found on github.com/ikozyris/yocto/wiki                  \n");
     return 0;
 }
     
