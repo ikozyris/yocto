@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
 
     if (argc == 1)
-        interative();
+        interactive();
     
     if (argc == 2)
     {
@@ -36,6 +36,11 @@ int main(int argc, char *argv[])
             interactive();
             return 0;
         }
+
+	if (strcmp("--help", argv[1]) == 0) {
+            hlp();
+	    return 0;
+	}  
     }
 
     if (argc == 3)
