@@ -25,7 +25,7 @@ int interactive()
     while(1)
     {
 ////////MODE-SELECTOR////////////////////
-        printf("\nChoose between reading-1 overwriting-2 writing-3 quit-4: ");
+        printf("Choose between reading-1 overwriting-2 writing-3 quit-4: ");
         scanf("%d",&m);
 
 ///////READING/////////////////////////////////
@@ -56,7 +56,7 @@ int interactive()
         else if (m == 2)
         {
             index =0;
-            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text: ");
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text:\n");
             while((ch = getchar()) != '`')//reads until '`'
             {
                 txt[index++] = ch;
@@ -73,7 +73,7 @@ int interactive()
         else if (m == 3)
         {
             index = 0;
-            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text: ");
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text:\n");
             while((ch = getchar()) != '`')// reads until '`'
             {
                 txt[index++] = ch;
