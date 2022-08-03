@@ -37,10 +37,12 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-	if (strcmp("--help", argv[1]) == 0) {
+	    if (strcmp("-h", argv[1]) == 0 || strcmp("--help", argv[1]) == 0) {
             hlp();
-	    return 0;
-	}  
+	        return 0;
+	    }
+
+        else printf("Invalid argument %s", argv[1]);  
     }
 
     if (argc == 3)
@@ -48,11 +50,6 @@ int main(int argc, char *argv[])
 	
         strcpy(fname, argv[1]);
         strcpy(option, argv[2]);
-
-        if (strcmp("--version", argv[2]) == 0) {
-            printf("Yocto Version 0.7 Created by ikozyris and gkozyris\nLicensed under Gnu General Public License v3\nSource code available at: http://github.com/ikozyris/yocto/ \n");
-            return 0;
-        }
 
         if (strcmp("-i", option) == 0 || strcmp("--interactive", option) == 0) {
             interactive();
@@ -66,6 +63,11 @@ int main(int argc, char *argv[])
 
         if (strcmp("-e", option) == 0 || strcmp("--show-ends", option) == 0) {
             e();
+            return 0;
+        }
+
+        if (strcmp("-rl", option) == 0 || strcmp("--read-lines", option) == 0) {
+            rl();
             return 0;
         }
 
@@ -91,3 +93,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
