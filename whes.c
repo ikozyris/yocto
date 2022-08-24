@@ -98,7 +98,7 @@ int hlp()
             "   -i,  --interacive        Interactive mode aka legacy                       \n"
             "   -w   --write             Write to file                                     \n"
             "   -r   --read              Read file                                         \n"
-            "   -rl  --read-lines       Read with the line number before each line         \n"
+            "   -rl  --read-lines        Read with the line number before each line        \n"
             "   -e,  --show-ends         Display $ at end of each line                     \n"
             "   -sn  --single-number     Print total line number at the start              \n"
             "   -h   --help              Display this help and exit                        \n"
@@ -119,8 +119,6 @@ int sn()
         perror("fopen(): ");
         return -1;
     }
-    else
-    {
     while((ch=fgetc(fp))!=EOF)//getting number of lines
     {
         if(ch=='\n')
@@ -132,7 +130,6 @@ int sn()
     while ((ch = getc(fp)) != EOF)
         putc(ch, stdout);
     fclose(fp);
-    }
     printf("\n");
     return 0;
 }
