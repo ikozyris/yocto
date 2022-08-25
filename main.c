@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     
     if (argc == 2)
     {
-        if (strcmp("--version", argv[1]) == 0) {
+        if (strcmp("-v", argv[1]) == 0 || strcmp("--version", argv[1]) == 0) {
             printf("Yocto Version 0.7 Created by ikozyris and gkozyris\nLicensed under Gnu General Public License v3\nSource code available at: http://github.com/ikozyris/yocto/ \n");
             return 0;
         }
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	        return 0;
 	    }
 
-        else printf("Invalid argument %s", argv[1]);  
+        else printf("Invalid argument %s\n", argv[1]);  
     }
 
     if (argc == 3)
@@ -93,4 +93,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
