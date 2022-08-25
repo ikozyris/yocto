@@ -19,7 +19,7 @@
     FILE* fp;
     size_t lines = 1;
     int ch, indx, m;
-    char txt[100], fname[20];
+    char txt[500], fname[38];
 
 int e()
 {
