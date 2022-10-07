@@ -12,24 +12,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 #include <stdio.h>
 #include <string.h>
 
-int main()
+int interactive()
 {
-    //declaring
-    
     FILE* fp;
-    size_t  lines=0;
-    int m, i, index=0;
-    char fname[20],ch, txt[100];
+    size_t lines = 1;
+    int ch, index, m;
+    char txt[100], fname[20];
 
-    printf("Text editor made by ikozyris and gkozyris");
     while(1)
     {
 ////////MODE-SELECTOR////////////////////
-        printf("\nChoose between reading-1 overwriting-2 writing-3 quit-4: ");
+        printf("Choose between reading-1 overwriting-2 writing-3 quit-4: ");
         scanf("%d",&m);
 
 ///////READING/////////////////////////////////
@@ -55,11 +51,12 @@ int main()
             }
             printf("\n");
         }
+    
 //////OVERWRITING/////////////////////////////////
         else if (m == 2)
         {
             index =0;
-            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text: ");
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text:\n");
             while((ch = getchar()) != '`')//reads until '`'
             {
                 txt[index++] = ch;
@@ -76,7 +73,7 @@ int main()
         else if (m == 3)
         {
             index = 0;
-            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text: ");
+            printf("Instructions below:\nUse up to 100 characters\nUse up to 18 characters for file name\nTo exit and save press '`'\n\nEnter text:\n");
             while((ch = getchar()) != '`')// reads until '`'
             {
                 txt[index++] = ch;
@@ -88,13 +85,10 @@ int main()
             fprintf(fp, "%s", txt); //creates file
             fclose(fp); //closes file
         }
-////////EXITING/////////////////////////////////
+    
         else if (m == 4)
-            return 0;
-
-        else
-        {
-            printf("Invalid option: %d :( use 1 or 2 or 3 or 4\n", m);
-        }
+        return 0;
     }
+    
+    return 0;
 }
