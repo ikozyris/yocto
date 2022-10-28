@@ -5,21 +5,21 @@
 
 int main() {
     int y, x;
-    int row,col, row1, colmid;				// to store the number of rows and columns
+    int maxy,maxx;				// to store the number of rows and columns
     int ch, i, crow;
+    char buffer[500];
+
     FILE *fp;
 
     // initialize curses
     initscr();
     keypad(stdscr, TRUE);
 
-    getmaxyx(stdscr,row,col);		// get the number of rows and columns
-    row1 = row/row -1;
-    colmid = col/2 -10;
+    getmaxyx(stdscr,maxy,maxx);		// get the number of rows and columns
     attron(A_STANDOUT);
-    for (i = 0;  i < col; i++)
+    for (i = 0;  i < maxx; i++)
         printw(" ");
-    mvprintw(row1,colmid,"Yocto 0.8-alpha1");
+    mvprintw(0, maxx/2 -10,"Yocto 0.8-alpha1");
     attroff(A_STANDOUT);
     wmove(stdscr,1, 0);
     getyx(stdscr,x,y);
@@ -44,51 +44,51 @@ int main() {
     */
     ////END//OF//READING////
 
-    while(ch = getch()) {
+    while((ch = getch())) {
         if(ch == KEY_DOWN) {
             getyx(stdscr,x,y);
             x=x+1;
             wmove(stdscr,x, y);
-            break;
         }
         if(ch == KEY_UP) {
             getyx(stdscr,x,y);
             x=x-1;
             wmove(stdscr,x, y);
-            break;
         }
         if(ch == KEY_LEFT) {
             getyx(stdscr,x,y);
             y=y-1;
             wmove(stdscr,x, y);
-            break;
         }
         if(ch == KEY_RIGHT) {
             getyx(stdscr,x,y);
             y=y+1;
             wmove(stdscr,x, y);
-            break;
         }
         if(ch == KEY_BACKSPACE) {
             getyx(stdscr,x,y);
             delch();
-            break;
         }
         if(ch == 10) { //enter
             getyx(stdscr,x,y);
             wmove(stdscr,x+1,0);
-            break;
         }
-        if(ch == ctrl('X')) {
-            break;
+        if(ch == ctrl('A')) {
+            getyx(stdscr,x,y);
+            wmove(stdscr,x,0);
         }
+        if(ch == ctrl('S')) {
+            mvscanw(1,maxx,"%s",&buffer);
+            fp = fopen("text.txt","w");
+            mvprintw(1,maxx - 6, "Saved");
+            fprintf(fp, "%s", buffer);
+        }
+
         if(ch == ctrl('C')) {
-                endwin();
-                return 0;
-                break;
+            endwin();
+            return 0;
         }
     }
     endwin();
-    refresh();
     return 0;
 }
