@@ -5,15 +5,16 @@
 
 int main() {
     int y, x;
-    int maxy,maxx;				// to store the number of rows and columns
+    int maxy,maxx;				// to store the maximum rows and columns
     int ch, i, crow;
-    char buffer[500];
+    char buffer[2000];
 
     FILE *fp;
 
     // initialize curses
     initscr();
     keypad(stdscr, TRUE);
+    raw();
 
     getmaxyx(stdscr,maxy,maxx);		// get the number of rows and columns
     attron(A_STANDOUT);
@@ -22,7 +23,6 @@ int main() {
     mvprintw(0, maxx/2 -10,"Yocto 0.8-alpha1");
     attroff(A_STANDOUT);
     wmove(stdscr,1, 0);
-    getyx(stdscr,x,y);
 
     ////READING///
     /*
@@ -43,47 +43,58 @@ int main() {
     }
     */
     ////END//OF//READING////
-
+    getmaxyx(stdscr,maxy,maxx);
     while((ch = getch())) {
         if(ch == KEY_DOWN) {
-            getyx(stdscr,x,y);
-            x=x+1;
-            wmove(stdscr,x, y);
+            getyx(stdscr,y,x);
+            wmove(stdscr,y+1, x);
         }
         if(ch == KEY_UP) {
-            getyx(stdscr,x,y);
-            x=x-1;
-            wmove(stdscr,x, y);
+            getyx(stdscr,y,x);
+            wmove(stdscr,y-1, x);
         }
         if(ch == KEY_LEFT) {
-            getyx(stdscr,x,y);
-            y=y-1;
-            wmove(stdscr,x, y);
+            getyx(stdscr,y,x);
+            wmove(stdscr,y, x-1);
         }
         if(ch == KEY_RIGHT) {
-            getyx(stdscr,x,y);
-            y=y+1;
-            wmove(stdscr,x, y);
+            getyx(stdscr,y,x);
+            wmove(stdscr,y, x+1);
         }
         if(ch == KEY_BACKSPACE) {
-            getyx(stdscr,x,y);
+            getyx(stdscr,y,x);
+            if(x == 0)
+                wmove(stdscr,y-1,maxx);
             delch();
         }
-        if(ch == 10) { //enter
+        if(ch == KEY_DC) {
             getyx(stdscr,x,y);
-            wmove(stdscr,x+1,0);
+            wmove(stdscr,y, x+1);
+            delch();
+            wmove(stdscr,y, x-1);
+        }
+        if(ch == 10) { //enter
+            getyx(stdscr,y,x);
+            wmove(stdscr,y+1,0);
+        }
+        if(ch == ctrl('R')) {
+            wmove(stdscr,1,0);
         }
         if(ch == ctrl('A')) {
-            getyx(stdscr,x,y);
-            wmove(stdscr,x,0);
+            getyx(stdscr,y,x);
+            wmove(stdscr,y,0);
+        }
+        if(ch == ctrl('E')) {
+            getyx(stdscr,y,x);
+            wmove(stdscr,y,maxx);
         }
         if(ch == ctrl('S')) {
             mvscanw(1,maxx,"%s",&buffer);
             fp = fopen("text.txt","w");
-            mvprintw(1,maxx - 6, "Saved");
+            fclose(fp);
+            mvprintw(0, maxx -6,"Saved");
             fprintf(fp, "%s", buffer);
         }
-
         if(ch == ctrl('C')) {
             endwin();
             return 0;
