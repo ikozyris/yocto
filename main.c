@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 {
 
     //declaring
-    char option[20];
+    char option[38];
 
 
     if (argc == 1)
