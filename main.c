@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     if (argc > 3)
     {
         printf("Too many arguments\n");
-        return 0;
+        return -1;
     }
 
 
