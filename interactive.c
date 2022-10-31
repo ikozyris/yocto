@@ -20,7 +20,7 @@ int interactive()
     FILE* fp;
     size_t lines = 1;
     int ch, index, m;
-    char txt[100], fname[20];
+    char txt[500], fname[38];
 
     while(1)
     {
@@ -31,10 +31,10 @@ int interactive()
 ///////READING/////////////////////////////////
         if (m == 1)
         {
-            memset(txt, 0, sizeof(txt));//reset txt
+            memset(txt, '\0', sizeof(txt));//reset txt
             lines = 1;
             printf("Enter file name to read: ");
-            scanf("%19s", fname);
+            scanf("%s", fname);
             fp = fopen(fname,"r");
             if(fp  == NULL)
            {
@@ -63,7 +63,7 @@ int interactive()
             }
             txt[index] = '\0';
             printf("Enter file name to write: ");
-            scanf("%19s", fname); //naming the file and allowing up to 19 chars
+            scanf("%s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "w");
             fprintf(fp, "%s", txt); //creates file
             fclose(fp); //closes file
@@ -80,7 +80,7 @@ int interactive()
             }
             txt[index] = '\0';
             printf("Enter file name to write: ");
-            scanf("%19s", fname); //naming the file and allowing up to 19 chars
+            scanf("%s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "a");
             fprintf(fp, "%s", txt); //creates file
             fclose(fp); //closes file
