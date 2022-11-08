@@ -91,9 +91,11 @@ int main() {
         if(ch == ctrl('S')) {
             mvscanw(1,maxx,"%s",&buffer);
             fp = fopen("text.txt","w");
-            fclose(fp);
-            mvprintw(0, maxx -6,"Saved");
             fprintf(fp, "%s", buffer);
+            fclose(fp);
+            attron(A_STANDOUT);
+            mvprintw(0, maxx -6,"Saved");
+            attroff(A_STANDOUT);
         }
         if(ch == ctrl('C')) {
             endwin();
