@@ -17,11 +17,6 @@
 
 int main(int argc, char *argv[])
 {
-
-    //declaring
-    char option[38];
-
-
     if (argc == 1)
         interactive();
     
@@ -49,34 +44,33 @@ int main(int argc, char *argv[])
     {
 	
         strcpy(fname, argv[1]);
-        strcpy(option, argv[2]);
 
-        if (strcmp("-i", option) == 0 || strcmp("--interactive", option) == 0) {
+        if (strcmp("-i", argv[2]) == 0 || strcmp("--interactive", argv[2]) == 0) {
             interactive();
             return 0;
         }
 
-        if (strcmp("-sn", option) == 0 || strcmp("--single-number", option) == 0) {
+        if (strcmp("-sn", argv[2]) == 0 || strcmp("--single-number", argv[2]) == 0) {
             sn();
             return 0;
         }
 
-        if (strcmp("-e", option) == 0 || strcmp("--show-ends", option) == 0) {
+        if (strcmp("-e", argv[2]) == 0 || strcmp("--show-ends", argv[2]) == 0) {
             e();
             return 0;
         }
 
-        if (strcmp("-rl", option) == 0 || strcmp("--read-lines", option) == 0) {
+        if (strcmp("-rl", argv[2]) == 0 || strcmp("--read-lines", argv[2]) == 0) {
             rl();
             return 0;
         }
 
-        if (strcmp("-r", option) == 0 || strcmp("--read", option) == 0) {
+        if (strcmp("-r", argv[2]) == 0 || strcmp("--read", argv[2]) == 0) {
             r();
             return 0;
         }
 
-        if (strcmp("-w", option) == 0 || strcmp("--write", option) == 0) {
+        if (strcmp("-w", argv[2]) == 0 || strcmp("--write", argv[2]) == 0) {
             wrt();
             return 0;
         }
