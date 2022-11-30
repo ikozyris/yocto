@@ -32,12 +32,12 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-	    if (strcmp("-h", argv[1]) == 0 || strcmp("--help", argv[1]) == 0) {
+	if (strcmp("-h", argv[1]) == 0 || strcmp("--help", argv[1]) == 0) {
             hlp();
-	        return 0;
-	    }
+	    return 0;
+        }
 
-        else printf("Invalid argument %s\n", argv[1]);  
+        else printf("Invalid argument %s. If you think the argument is valid, keep in mind that the file goes first.\n", argv[1]);  
     }
 
     if (argc == 3)
