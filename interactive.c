@@ -21,12 +21,17 @@ int interactive()
     size_t lines = 1;
     int ch, index, m;
     char txt[500], fname[38];
+    char choice[2];
 
     while(1)
     {
 ////////MODE-SELECTOR////////////////////
         printf("Choose between reading-1 overwriting-2 writing-3 quit-4: ");
-        scanf("%d",&m);
+        scanf("%c",choice);
+
+        m=atoi(choice);
+
+        while ((getchar()) != '\n'); // clear stdin buffer
 
 ///////READING/////////////////////////////////
         if (m == 1)
