@@ -28,6 +28,8 @@ int interactive()
         printf("Choose between reading-1 overwriting-2 writing-3 quit-4: ");
         scanf("%d",&m);
 
+        while ((getchar()) != '\n'); // clear stdin buffer
+
 ///////READING/////////////////////////////////
         if (m == 1)
         {
