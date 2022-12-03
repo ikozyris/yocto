@@ -6,8 +6,8 @@ Still under development.
 Ctrl+Alt+T and type:
 ```
 sudo apt install gcc -y 
-gcc -o text-editor Downloads/Text-editor*.c -lncurses
-./text-editor
+gcc -o yocto-dev Downloads/main.c -lncurses
+./yocto-dev
 ```
 
 ### License
