@@ -93,9 +93,12 @@ int main() {
             fp = fopen("text.txt","w");
             fprintf(fp, "%s", buffer);
             fclose(fp);
+	        getyx(stdscr,y,x);
             attron(A_STANDOUT);
-            mvprintw(0, maxx -6,"Saved");
+            mvprintw(0, maxx -6,"Saved ");
             attroff(A_STANDOUT);
+	        wmove(stdscr,y,x);
+
         }
         if(ch == ctrl('C')) {
             endwin();
