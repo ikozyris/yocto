@@ -32,45 +32,45 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-	if (strcmp("-h", argv[1]) == 0 || strcmp("--help", argv[1]) == 0) {
+	    if (strcmp("-h", argv[1]) == 0 || strcmp("--help", argv[1]) == 0) {
             hlp();
 	    return 0;
         }
 
-        else printf("Invalid argument %s. If you think the argument is valid, keep in mind that the file goes first.\n", argv[1]);  
+        else printf("Invalid argument %s. If you think the argument is valid, keep in mind that the file goes second.\n", argv[1]);  
     }
 
     if (argc == 3)
     {
 	
-        strcpy(fname, argv[1]);
+        strcpy(fname, argv[2]);
 
-        if (strcmp("-i", argv[2]) == 0 || strcmp("--interactive", argv[2]) == 0) {
+        if (strcmp("-i", argv[1]) == 0 || strcmp("--interactive", argv[1]) == 0) {
             interactive();
             return 0;
         }
 
-        if (strcmp("-sn", argv[2]) == 0 || strcmp("--single-number", argv[2]) == 0) {
+        if (strcmp("-sn", argv[1]) == 0 || strcmp("--single-number", argv[1]) == 0) {
             sn();
             return 0;
         }
 
-        if (strcmp("-e", argv[2]) == 0 || strcmp("--show-ends", argv[2]) == 0) {
+        if (strcmp("-e", argv[1]) == 0 || strcmp("--show-ends", argv[1]) == 0) {
             e();
             return 0;
         }
 
-        if (strcmp("-rl", argv[2]) == 0 || strcmp("--read-lines", argv[2]) == 0) {
+        if (strcmp("-rl", argv[1]) == 0 || strcmp("--read-lines", argv[1]) == 0) {
             rl();
             return 0;
         }
 
-        if (strcmp("-r", argv[2]) == 0 || strcmp("--read", argv[2]) == 0) {
+        if (strcmp("-r", argv[1]) == 0 || strcmp("--read", argv[1]) == 0) {
             r();
             return 0;
         }
 
-        if (strcmp("-w", argv[2]) == 0 || strcmp("--write", argv[2]) == 0) {
+        if (strcmp("-w", argv[1]) == 0 || strcmp("--write", argv[1]) == 0) {
             wrt();
             return 0;
         }
