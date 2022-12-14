@@ -36,7 +36,7 @@ int interactive()
             memset(txt, '\0', sizeof(txt));//reset txt
             lines = 1;
             printf("Enter file name to read: ");
-            scanf("%s", fname);
+            scanf("%37s", fname);
             fp = fopen(fname,"r");
             if(fp  == NULL)
            {
@@ -65,7 +65,7 @@ int interactive()
             }
             txt[index] = '\0';
             printf("Enter file name to write: ");
-            scanf("%s", fname); //naming the file and allowing up to 19 chars
+            scanf("%37s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "w");
             fprintf(fp, "%s", txt); //creates file
             fclose(fp); //closes file
@@ -82,7 +82,7 @@ int interactive()
             }
             txt[index] = '\0';
             printf("Enter file name to write: ");
-            scanf("%s", fname); //naming the file and allowing up to 19 chars
+            scanf("%37s", fname); //naming the file and allowing up to 19 chars
             fp = fopen(fname, "a");
             fprintf(fp, "%s", txt); //creates file
             fclose(fp); //closes file
