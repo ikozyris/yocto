@@ -94,7 +94,7 @@ int wrt()
 
 int hlp()
 {
-    printf( "Usage: yocto [FILE]... [OPTION]...                                            \n"
+    printf( "Usage: yocto [OPTION]... [FILE]...                                            \n"
             "   -i,  --interacive        Interactive mode aka legacy                       \n"
             "   -w   --write             Write to file                                     \n"
             "   -r   --read              Read file                                         \n"
@@ -104,7 +104,7 @@ int hlp()
             "   -h   --help              Display this help and exit                        \n"
             "   -v   --version           Output version information and exit               \n"
             "Examples:                                                                     \n"
-            "    yocto ~/text.txt -sn    Read text.txt without printing the lines          \n"
+            "    yocto  -sn ~/text.txt   Read text.txt without printing the lines          \n"
             "    yocto -i                Start program in interactive mode                 \n"
             "                                                                              \n"
 	    "Documentation can be found on github.com/ikozyris/yocto/wiki                  \n");
