@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     if (argc == 2)
     {
         if (strcmp("-v", argv[1]) == 0 || strcmp("--version", argv[1]) == 0) {
-            printf("Yocto Version 0.7 Created by ikozyris and gkozyris\nLicensed under Gnu General Public License v3\nSource code available at: http://github.com/ikozyris/yocto/ \n");
+            printf("Yocto Version 0.7.1 Created by ikozyris and gkozyris\nLicensed under Gnu General Public License v3\nSource code available at: http://github.com/ikozyris/yocto/ \n");
             return 0;
         }
 
