@@ -80,10 +80,11 @@ int r()
 
 int wrt()
 {
-    printf("Yocto 0.7_\t Press ` and ENTER to save and exit\n");
+    printf("Yocto 0.7.2_\t Press ` and ENTER to save and exit\n");
     while((ch = getchar()) != '`')//reads until '`'
     {
         txt[indx++] = ch;
+        if (indx >= 500) break;
     }   
     txt[indx] = '\0';
     fp = fopen(fname,"w");
@@ -104,10 +105,10 @@ int hlp()
             "   -h   --help              Display this help and exit                        \n"
             "   -v   --version           Output version information and exit               \n"
             "Examples:                                                                     \n"
-            "    yocto  -sn ~/text.txt   Read text.txt without printing the lines          \n"
+            "    yocto -sn ~/text.txt    Read text.txt without printing the lines          \n"
             "    yocto -i                Start program in interactive mode                 \n"
             "                                                                              \n"
-	    "Documentation can be found on github.com/ikozyris/yocto/wiki                  \n");
+	        "Documentation can be found on github.com/ikozyris/yocto/wiki                  \n");
     return 0;
 }
 
