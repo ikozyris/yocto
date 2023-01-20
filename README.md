@@ -20,8 +20,8 @@ make all
 
 ### License
 
-Copyright (C) 2022  ikozyris<br>
-Copyright (C) 2022  gkozyris
+Copyright (C) 2022-2023  ikozyris<br>
+Copyright (C) 2022-2023  gkozyris
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
