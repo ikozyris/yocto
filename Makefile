@@ -10,7 +10,15 @@ CFLAGS  =  -Wall -Wextra
 TARGET = yocto
 
 all:
-		$(CC) $(CFLAGS) main.c -o $(TARGET)
+	$(CC) $(CFLAGS) main.c -o $(TARGET)
+	cp $(TARGET) /usr/local/bin/
+	$(RM) $(TARGET)
+
+build:
+	$(CC) $(CFLAGS) main.c -o $(TARGET)
+
+install:
+	cp $(TARGET) /usr/local/bin/
 
 clean:
-		$(RM) $(TARGET)
+	$(RM) $(TARGET)
