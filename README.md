@@ -9,12 +9,13 @@ sudo apt install gcc -y
 gcc -o yocto main.c
 ./yocto --help
 ```
+> Pro tip: add yocto binary to your $PATH for easier use (No need to type the "./")
 or 
 ```
 sudo apt install gcc make -y 
-make all
+sudo make all
 ```
-> Pro tip: add yocto binary to your $PATH for easier use (No need to type the "./")
+
 
 
 
