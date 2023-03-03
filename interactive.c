@@ -33,7 +33,7 @@ int interactive()
 ///////READING/////////////////////////////////
         if (m == 1)
         {
-            memset(txt, '\0', sizeof(txt));//reset txt
+            memset(txt, '0', sizeof(txt));//reset txt
             lines = 1;
             printf("Enter file name to read: ");
             scanf("%37s", fname);
@@ -51,6 +51,7 @@ int interactive()
                 if (ch == '\n')              
                     printf ("%03zu| ", lines++); //print line number with 001 format
             }
+            fclose(fp);
             printf("\n");
         }
     
