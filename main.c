@@ -20,10 +20,11 @@ int main(int argc, char *argv[])
     if (argc == 1)
         interactive();
     
-    if (argc == 2)
-    {
+    if (argc == 2) {
         if (strcmp("-v", argv[1]) == 0 || strcmp("--version", argv[1]) == 0) {
-            printf("Yocto Version 0.7.2 Created by ikozyris and gkozyris\nLicensed under Gnu General Public License v3\nSource code available at: http://github.com/ikozyris/yocto/ \n");
+            printf("Yocto Version 0.7.2 Created by ikozyris and gkozyris\n"
+		   "Licensed under Gnu General Public License v3\n"
+		   "Source code available at: http://github.com/ikozyris/yocto/ \n");
             return 0;
         }
 
@@ -37,11 +38,10 @@ int main(int argc, char *argv[])
 	    return 0;
         }
 
-        else printf("Invalid argument %s. If you think the argument is valid, keep in mind that the file goes second.\n", argv[1]);  
+        else printf("Invalid argument %s. Run with --help to view the help page.\n", argv[1]);  
     }
 
-    if (argc == 3)
-    {
+    if (argc == 3) {
 	
         strcpy(fname, argv[2]);
 
@@ -78,12 +78,10 @@ int main(int argc, char *argv[])
         else hlp();
     }
 
-    if (argc > 3)
-    {
+    if (argc > 3) {
         printf("Too many arguments\n");
         return -1;
     }
-
 
     return 0;
 }
