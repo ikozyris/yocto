@@ -16,22 +16,20 @@
 #include <stdio.h>
 #include <string.h>
 
-    FILE* fp;
-    size_t lines = 1;
-    int ch, indx, m;
-    char txt[500], fname[38];
+FILE* fp;
+size_t lines = 1;
+int ch, indx, m;
+char txt[2001], fname[51];
 
 int e()
 {
-    fp = fopen(fname,"r");
-    if(fp  == NULL)
-    {
+    fp = fopen(fname, "r");
+    if (fp  == NULL) {
         perror("fopen(): ");
         return -1;
     }
-    while ((ch = getc(fp)) != EOF)
-    {
-        if(ch=='\n')
+    while ((ch = getc(fp)) != EOF) {
+        if (ch == '\n')
             printf("$");
         putc(ch, stdout);
 
@@ -44,17 +42,14 @@ int e()
 int rl()
 {
     fp = fopen(fname,"r");
-    if(fp  == NULL)
-    {
+    if(fp  == NULL) {
         perror("fopen(): ");
         return -1;
     }
     printf ("%03zu |", lines++);
-    while ((ch = getc(fp)) != EOF)
-    {
+    while ((ch = getc(fp)) != EOF) {
         putchar(ch);
-        if (ch == '\n')
-        {
+        if (ch == '\n') {
             printf ("%03zu |", lines++);
         }
     }
@@ -66,8 +61,7 @@ int rl()
 int r()
 {
     fp = fopen(fname,"r");
-    if(fp  == NULL)
-    {
+    if (fp  == NULL) {
         perror("fopen(): ");
         return -1;
     }
@@ -81,8 +75,7 @@ int r()
 int wrt()
 {
     printf("Yocto 0.7.2_\t Press ` and ENTER to save and exit\n");
-    while((ch = getchar()) != '`')//reads until '`'
-    {
+    while ((ch = getchar()) != '`') {//reads until '`'
         txt[indx++] = ch;
         if (indx >= 500) break;
     }   
@@ -95,42 +88,36 @@ int wrt()
 
 int hlp()
 {
-    printf( "Usage: yocto [OPTION]... [FILE]...                                            \n"
-            "   -i,  --interacive        Interactive mode aka legacy                       \n"
-            "   -w   --write             Write to file                                     \n"
-            "   -r   --read              Read file                                         \n"
-            "   -rl  --read-lines        Read with the line number before each line        \n"
-            "   -e,  --show-ends         Display $ at end of each line                     \n"
-            "   -sn  --single-number     Print total line number at the start              \n"
-            "   -h   --help              Display this help and exit                        \n"
-            "   -v   --version           Output version information and exit               \n"
-            "Examples:                                                                     \n"
-            "    yocto -sn ~/text.txt    Read text.txt without printing the lines          \n"
-            "    yocto -i                Start program in interactive mode                 \n"
-            "                                                                              \n"
-	        "Documentation can be found on github.com/ikozyris/yocto/wiki                  \n");
+    printf("Usage: yocto [OPTION]... [FILE]...                                            \n"
+           "   -i,  --interacive        Interactive mode aka legacy                       \n"
+           "   -w   --write             Write to file                                     \n"
+           "   -r   --read              Read file                                         \n"
+           "   -rl  --read-lines        Read with the line number before each line        \n"
+           "   -e,  --show-ends         Display $ at end of each line                     \n"
+           "   -sn  --single-number     Print total line number at the start              \n"
+           "   -h   --help              Display this help and exit                        \n"
+           "   -v   --version           Output version information and exit             \n\n"
+           "Examples:                                                                     \n"
+           "    yocto -sn ~/text.txt    Read text.txt without printing the lines          \n"
+           "    yocto -i                Start program in interactive mode               \n\n"
+	   "Documentation can be found on github.com/ikozyris/yocto/wiki                  \n");
     return 0;
 }
 
 int sn()
 {
-    fp = fopen(fname,"r");
-    if(fp  == NULL)
-    {
+    indx = 0; 
+    fp = fopen(fname, "r");
+    if (fp  == NULL) {
         perror("fopen(): ");
         return -1;
     }
-    while((ch=fgetc(fp))!=EOF)//getting number of lines
-    {
-        if(ch=='\n')
-            lines++;
+    while ((ch = fgetc(fp)) != EOF) {
+        txt[indx++] = ch;
+	if (ch == '\n') lines++;
     }
-    fclose(fp);
-    fp = fopen(fname,"r"); //open file in read mode
     printf("lines:%ld\n-------\n", lines);
-    while ((ch = getc(fp)) != EOF)
-        putc(ch, stdout);
     fclose(fp);
-    printf("\n");
+    printf("%s\n", txt);
     return 0;
 }
