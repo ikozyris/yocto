@@ -20,33 +20,29 @@ int interactive()
     FILE* fp;
     size_t lines = 1;
     int ch, indx, m;
-    char txt[500], fname[38];
+    char txt[2001], fname[51];
 
-    while(1)
-    {
+    while(1) {
 ////////MODE-SELECTOR////////////////////
         printf("Choose between reading-1 overwriting-2 writing-3 quit-4: ");
-        scanf("%d",&m);
+        scanf("%d", &m);
 
         while ((getchar()) != '\n'); // clear stdin buffer
 
 ///////READING/////////////////////////////////
-        if (m == 1)
-        {
+        if (m == 1) {
             memset(txt, '0', sizeof(txt));//reset txt
             lines = 1;
             printf("Enter file name to read: ");
-            scanf("%37s", fname);
+            scanf("%50s", fname);
             fp = fopen(fname,"r");
-            if(fp  == NULL)
-            {
+            if(fp  == NULL) {
                 perror("fopen(): ");
                 return -1;
             }
             
             printf ("%03zu| ", lines++);
-            while ((ch = getc(fp)) != EOF) 
-            {
+            while ((ch = getc(fp)) != EOF) {
                 putchar (ch);
                 if (ch == '\n')              
                     printf ("%03zu| ", lines++); //print line number with 001 format
@@ -56,32 +52,30 @@ int interactive()
         }
     
 //////OVERWRITING/////////////////////////////////
-        else if (m == 2)
-        {
-            indx =0;
-            printf("Instructions below:\nUse up to 500 characters\nUse up to 37 characters for file name\nTo exit and save press '`'\n\nEnter text:\n");
-            while((ch = getchar()) != '`')//reads until '`'
-            {
+        else if (m == 2) {
+            indx = 0;
+            printf("Instructions below:\nUse up to 2000 characters\nUse up to 50 characters for file name\n"
+                   "To exit and save press ` and ENTER\nEnter text:\n");
+            while((ch = getchar()) != '`') { //reads until `
                 txt[indx++] = ch;
-                if (indx >= 500) break;
+                if (indx >= 2000) break;
             }
             txt[indx] = '\0';
             printf("Enter file name to write: ");
-            scanf("%37s", fname); //naming the file and allowing up to 37 chars
+            scanf("%50s", fname); //naming the file and allowing up to 37 chars
             fp = fopen(fname, "w");
             fprintf(fp, "%s", txt); //writes file
             fclose(fp); //closes file
         }
 
 ////////WRITING/////////////////////////////////
-        else if (m == 3)
-        {
+        else if (m == 3) {
             indx = 0;
-            printf("Instructions below:\nUse up to 500 characters\nUse up to 37 characters for file name\nTo exit and save press '`'\n\nEnter text:\n");
-            while((ch = getchar()) != '`')// reads until '`'
-            {
+            printf("Instructions below:\nUse up to 2000 characters\nUse up to 50 characters for file name\n"
+                   "To exit and save press ` and ENTER\nEnter text:\n");
+            while((ch = getchar()) != '`') {// reads until '`'
                 txt[indx++] = ch;
-                if (indx >= 500) break;
+                if (indx >= 2000) break;
             }
             txt[indx] = '\0';
             printf("Enter file name to write: ");
