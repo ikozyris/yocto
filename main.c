@@ -5,19 +5,22 @@
 
 #define ctrl(x)           ((x) & 0x1f)
 
+#define MAX_LINES 2000
+#define MAX_LENGHT 300
+
 int main(int argc, char *argv[])
 {
-    bool max;
+    bool max = false;
     int y = 0, x = 0;
-    int ofy = 0; // offsets: file<->screen y
+    signed int ofy = 0; // offsets: file<->screen y
     int maxy = 0, maxx = 0; // to store the maximum rows and columns
     int ch, i;
-    char text[300][300]; //the file content
+    char text[MAX_LINES][MAX_LENGHT]; //the file content
     //text = (char*[])malloc(300 * sizeof(char*));
     //for (i = 0; i < 300; ++i)
     //    text[i] = NULL;
-    char buffer[300];
-    unsigned len[300]; // lenght of text[x] in line x
+    char buffer[MAX_LENGHT];
+    unsigned int len[MAX_LINES]; // lenght of text[x] in line x
 
     // initialize curses
     initscr();
@@ -27,19 +30,19 @@ int main(int argc, char *argv[])
     raw();
     noecho();
 
-    scrollok(stdscr, TRUE);
     keypad(stdscr, TRUE);
 
-    wmove(stdscr, 0, 0);
+    move(0, 0);
     int index = 0, curnum = 0;
     FILE *fp;
+
     if (argc > 1) {
         fp = fopen(argv[1], "r");
         if (fp == NULL) {
             perror("fopen");
             return -1;
         }
-        while((ch = fgetc(fp)) != EOF) { // read the file till we reach the end
+        while ((ch = fgetc(fp)) != EOF) { // read the file till we reach the end
             //printw("%c", ch);
             buffer[index] = ch;
             text[curnum][index] = ch;
@@ -48,17 +51,20 @@ int main(int argc, char *argv[])
                 //text[curnum] = buffer;
                 len[curnum] = index - 1;
                 y = getcury(stdscr);
-                if (y + 1 < maxy)
-                    printw("%s", text[curnum]);
+                if (!max)
+                    printw("%.*s", maxx, text[curnum]);
+                if (y == maxy - 1)
+                    max = true;
                 //printw("%d|%d: %s", curnum, index, text[curnum]);
                 curnum++;
                 index = 0;
                 bzero(buffer, 299);
             }
         }
-        fclose(fp);
     }
     refresh();
+    max = false;
+    scrollok(stdscr, TRUE);
 
     while ((ch = getch())) {
         getyx(stdscr, y, x);
@@ -68,21 +74,20 @@ int main(int argc, char *argv[])
                 if (y == (maxy - 1) && y + ofy < curnum) { // Are we are at the end of the screen
                     ofy++;
                     scroll(stdscr);
-                    mvprintw(maxy-1, 0, "%s", text[y + ofy]);
+                    mvprintw(maxy - 1, 0, "%.*s", len[y + ofy], text[y + ofy]);
                 } if (len[y] > len[y+1]) {
                     max = true;
                     move(y+1, len[y+1]);
                 } else {
                     move(y+1, x);
                 }
-                y++;
                 break;
 
             case KEY_UP:
-                if (y == 0 && text[y + ofy] != NULL && ofy != 0) {
+                if (y == 0 && ofy != 0) {
                     scrl(-1); // scroll up
                     ofy--;
-                    mvprintw(0, 0, "%s", text[y + ofy]);
+                    mvprintw(0, 0, "%.*s", maxx, text[y + ofy]);
                     move(0, x);
                 } else {
                     wmove(stdscr, y-1, x);
