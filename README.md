@@ -7,7 +7,7 @@ Under development.
 Ctrl+Alt+T and type:
 ```
 sudo apt install gcc -y 
-gcc -o yocto-dev Downloads/main.c -lncurses -Ofast
+gcc -o yocto-dev Downloads/main.c -Ofast -lncurses
 ./yocto-dev text.txt
 ```
 
