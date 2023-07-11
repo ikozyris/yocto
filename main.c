@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
                 return 0;
 
             default:
-                printw("%c", ch);
+                insch(ch);
                 text[y+ofy][x] = ch;
                 break;
         }
