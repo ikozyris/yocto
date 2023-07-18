@@ -5,8 +5,33 @@
 
 #define ctrl(x)           ((x) & 0x1f)
 
+// TODO: do not hardcode these, but malloc according to file size
 #define MAX_LINES 2000
 #define MAX_LENGHT 300
+
+// Inserts a character at a specicified position without overwriting
+// USAGE: size of array, array, character to insert, index to insert to
+char* insert(int n, char arr[], char x, int pos)
+{
+    // shift elements forward
+    for (int i = n + 1; i >= pos; --i)
+        arr[i] = arr[i - 1];
+ 
+    // insert x at pos
+    arr[pos - 1] = x;
+ 
+    return arr;
+}
+
+// Deletes the character at a specicified position and shifts elements back
+// USAGE: size of array, array, index to delete
+char *delIndx(int n, char arr[], int pos)
+{
+    for (int i = pos; i <= n - 1; ++i)
+        arr[i] = arr[i + 1];
+
+    return arr;
+}
 
 int main(int argc, char *argv[])
 {
@@ -15,11 +40,8 @@ int main(int argc, char *argv[])
     signed int ofy = 0; // offsets: file<->screen y
     int maxy = 0, maxx = 0; // to store the maximum rows and columns
     int ch, i;
+    // char ** and malloc do not have the same result as 2d array  
     char text[MAX_LINES][MAX_LENGHT]; //the file content
-    //text = (char*[])malloc(300 * sizeof(char*));
-    //for (i = 0; i < 300; ++i)
-    //    text[i] = NULL;
-    char buffer[MAX_LENGHT];
     unsigned int len[MAX_LINES]; // lenght of text[x] in line x
 
     // initialize curses
@@ -43,14 +65,12 @@ int main(int argc, char *argv[])
             return -1;
         }
         while ((ch = fgetc(fp)) != EOF) { // read the file till we reach the end
-            //printw("%c", ch);
-            buffer[index] = ch;
             text[curnum][index] = ch;
             ++index;
             if (ch == '\n') {
-                //text[curnum] = buffer;
                 len[curnum] = index - 1;
                 y = getcury(stdscr);
+                // print before check to avoid empty line
                 if (!max)
                     printw("%.*s", maxx, text[curnum]);
                 if (y == maxy - 1)
@@ -58,12 +78,13 @@ int main(int argc, char *argv[])
                 //printw("%d|%d: %s", curnum, index, text[curnum]);
                 curnum++;
                 index = 0;
-                bzero(buffer, 299);
             }
         }
     }
     refresh();
     max = false;
+    move(0, 0);
+    // Scrolling is enabled after printing
     scrollok(stdscr, TRUE);
 
     while ((ch = getch())) {
@@ -71,11 +92,11 @@ int main(int argc, char *argv[])
         refresh();
         switch (ch) {
             case KEY_DOWN:
-                if (y == (maxy - 1) && y + ofy < curnum) { // Are we are at the end of the screen
+                if (y == (maxy - 1) && y + ofy < curnum) {
                     ofy++;
                     scroll(stdscr);
                     mvprintw(maxy - 1, 0, "%.*s", len[y + ofy], text[y + ofy]);
-                } if (len[y] > len[y+1]) {
+                } if (len[y+ofy] > len[y+ofy+1]) {
                     max = true;
                     move(y+1, len[y+1]);
                 } else {
@@ -112,24 +133,29 @@ int main(int argc, char *argv[])
 
             case KEY_BACKSPACE:
                 mvdelch(y, x-1);
+                delIndx(len[y]+1, text[y], x-1);
                 break;
 
             case KEY_DC:
                 delch();
+                delIndx(len[y]+1, text[y], x);
                 break;
 
             case 10: //enter
                 wmove(stdscr, y+1, 0);
+                insert(len[y+1]+1, text[y], '\n', x);
                 break;
 
             case ctrl('R'):
                 wmove(stdscr, 0, 0);
                 clear();
                 ofy = 0;
+                max = false;
                 for (i = 0; i < curnum; i++) {
-                    addstr(text[i]);
-                    ofy++;
-                    refresh();
+                    if (!max)
+                        printw("%.*s", maxx, text[curnum]);
+                    if (y == maxy - 1)
+                        max = true;
                 }
                 break;
 
@@ -150,7 +176,6 @@ int main(int argc, char *argv[])
                 FILE *fp2 = fopen("output.txt", "w");
                 for (i = 0; i < curnum; i++)
                     fprintf(fp2, "%s", text[i]);
-                //putwin(stdscr, fp2);
                 fclose(fp2);
                 break;
 
@@ -159,8 +184,10 @@ int main(int argc, char *argv[])
                 return 0;
 
             default:
+                // insert, not overwrite
                 insch(ch);
-                text[y+ofy][x] = ch;
+                move(y, ++x);
+                insert(len[y]+1, text[y], ch, x);
                 break;
         }
     }
