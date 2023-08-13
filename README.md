@@ -1,23 +1,14 @@
 # Yocto
-A very simple and small (less than 350 lines of code!) text editor on C as a command-line tool (CLI command line interface). more on the [wiki](https://github.com/ikozyris/yocto/wiki)
+A very simple and small (less than 350 lines of code!) text editor in C as a command-line tool (CLI command line interface). more on the [wiki](https://github.com/ikozyris/yocto/wiki)
+Under development.
+Note: for a more feature complete program see the ncurses branch and the 0.8 release.
 
-Still under development.
 ## How to use for linux:
 Ctrl+Alt+T and type:
-```
-sudo apt install gcc -y 
-gcc -o yocto main.c
-./yocto --help
-```
-> Pro tip: add yocto binary to your $PATH for easier use (No need to type the "./")
-or 
 ```
 sudo apt install gcc make -y 
 sudo make all
 ```
-
-
-
 
 ### License
 
