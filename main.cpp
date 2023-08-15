@@ -15,15 +15,19 @@ using namespace std;
 vector<list<char>> text(MAX_LINES);
 size_t len[MAX_LINES]; //lenght of each line
 
-int main(int argc, char *argv[]) {
-        int y = 0, x = 0;
-        int ofy = 0, max = -1;
-        int maxy = 0, maxx = 0; // to store the maximum rows and columns
-        int ch, i;
-        const char *name = "Yocto 0.8-alpha1";
-        int index = 0, curnum = 0;
+int y = 0, x = 0;
+// offset in y axis of text and screen 
+signed int ofy = 0;
+int maxy = 0, maxx = 0; // to store the maximum rows and columns
+int ch, i;
+const char *name = "Yocto 0.8-alpha1";
 
-        for (int i = MAX_LINES-1; i > 0; --i) {
+// indx: tmp for lenght of line
+// curnum: total lines
+int indx = 0, curnum = 0, mx = -1;
+
+int main(int argc, char *argv[]) {
+        for (int i = MAX_LINES - 1; i > 0; --i) {
                 len[i] = 0;
         }
 
@@ -57,7 +61,7 @@ int main(int argc, char *argv[]) {
 
         //inititalize text_win window
         WINDOW *text_win;
-        text_win = newwin(maxy-1, maxx, 1, 3);
+        text_win = newwin(maxy - 1, maxx, 1, 3);
         scrollok(text_win, TRUE);
         keypad(text_win, TRUE);
         wmove(text_win, 0, 0);
@@ -73,35 +77,37 @@ int main(int argc, char *argv[]) {
                         perror("fopen");
                         return -1;
                 }
-                while((ch = fgetc(fp)) != EOF) { // read the file till we reach the end
+                while((ch = fgetc(fp)) != EOF) {
                         text[curnum].push_back(ch);
                         //wprintw(text_win, "%c", ch);
-                        if (max == -1 && index < maxx)
+                        if (mx == -1 && indx < maxx)
                                 waddch(text_win, ch);
-                        ++index;
                         if (ch == '\n') {
-                                len[y] = index - 1;
+                                len[y] = indx - 1;
                                 y = getcury(text_win);
                                 if (y == maxy - 1)
-                                        max = 1;
+                                        mx = 1;
                                 ++curnum;
-                                index = 0;
+                                indx = 0;
                         }
+                        ++indx;
                 }
                 fclose(fp);
         }
 
-        max = -1;
+        mx = -1;
         wmove(text_win, 0, 0);
         while ((ch = wgetch(text_win))) {
                 getyx(text_win, y, x);
                 switch (ch) {
                 case KEY_DOWN:
+                        if (y + ofy > curnum)
+                                break;
                         if (y == (maxy - 1) && y + ofy < curnum) { //scroll down
                                 ofy++;
                                 wscrl(text_win, 1);
                                 wscrl(ln_win, 1);
-                                mvwprintw(ln_win, maxy-1, 0, "%2d", y+ofy+1);
+                                mvwprintw(ln_win, maxy - 1, 0, "%2d", y + ofy + 1);
                                 wrefresh(ln_win);
                                 wmove(text_win, y, 0);
                                 for (const char x : text[y+ofy])
@@ -109,47 +115,52 @@ int main(int argc, char *argv[]) {
                                             getcurx(text_win) < maxx-1)
                                                 waddch(text_win, x);
                                 wmove(text_win, y, x);
-                        } if (max != -1) { // go down an go to previous max
-                                if (len[y] > len[y+1])
-                                        wmove(text_win, y+1, len[y+ofy+1]);
+                        } if (mx != -1) { // go down an go to previous mx
+                                if (len[y] > len[y + 1])
+                                        wmove(text_win, y + 1, len[y + ofy + 1]);
                                 else
-                                        wmove(text_win, y+1, x);
+                                        wmove(text_win, y + 1, x);
                         } else {
-                                wmove(text_win, y+1, x);
+                                wmove(text_win, y + 1, x);
                         }
                         break;
 
                 case KEY_UP:
                         if (y == 0 && ofy != 0) {
-                                wscrl(text_win, -1); // scroll up
-                                wscrl(ln_win, -1);
-                                mvwprintw(ln_win, 0, 0, "%2d", y+ofy);
+                                wscrl(text_win, - 1); // scroll up
+                                wscrl(ln_win, - 1);
+                                mvwprintw(ln_win, 0, 0, "%2d", y + ofy);
                                 wrefresh(ln_win);
                                 --ofy;
                                 wmove(text_win, 0, 0);
-                                for (const char x : text[y+ofy])
+                                for (const char x : text[y + ofy])
                                         if (getcurx(text_win) < maxx - 1)
                                                 waddch(text_win, x);
                                 wmove(text_win, 0, x);
-                        } if (len[y+ofy] > len[y-1+ofy]) {
-                                wmove(text_win, y-1, len[y+ofy+1]);
-                                max = getcurx(text_win);
+                        } if (len[y + ofy] > len[y - 1 + ofy]) {
+                                wmove(text_win, y - 1, len[y + ofy + 1]);
+                                mx = getcurx(text_win);
                         } else {
-                                wmove(text_win, y-1, x);
+                                wmove(text_win, y - 1, x);
                         }
                         break;
 
                 case KEY_LEFT:
-                        wmove(text_win, y, x-1);
+                        if (x > 0)
+                                wmove(text_win, y, x - 1);
+                        else
+                                wmove(text_win, y - 1, len[y + ofy - 1]);
                         break;
 
                 case KEY_RIGHT:
-                        if (len[y+ofy] >= (size_t)x)
-                                wmove(text_win, y, x+1);
+                        if (len[y + ofy] >= (size_t)x)
+                                wmove(text_win, y, x + 1);
+                        else if (y + ofy < curnum)
+                                wmove(text_win, y + 1, 0);
                         break;
 
                 case KEY_BACKSPACE:
-                        mvwdelch(text_win, y, x-1);
+                        mvwdelch(text_win, y, x - 1);
                         break;
 
                 case KEY_DC:
@@ -157,7 +168,7 @@ int main(int argc, char *argv[]) {
                         break;
 
                 case 10: //enter
-                        wmove(text_win, y+1, 0);
+                        wmove(text_win, y + 1, 0);
                         break;
 
                 case ctrl('R'):
@@ -204,12 +215,12 @@ int main(int argc, char *argv[]) {
                         winsch(text_win, ch);
                         wmove(text_win, y, ++x);
 
-                        list<char>::iterator it = text[y+ofy].begin();
+                        list<char>::iterator it = text[y + ofy].begin();
                         advance(it, 0);
-                        text[y+ofy].assign(3, 'c');
-                        text[y+ofy].insert(it, (char)ch);
+                        text[y + ofy].assign(3, 'c');
+                        text[y + ofy].insert(it, (char)ch);
 
-                        len[y+ofy]++;
+                        len[y + ofy]++;
                         break;
                 }
         }
