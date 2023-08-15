@@ -13,7 +13,7 @@ CFLAGS  =  -Wall -Wextra -O3
 TARGET = yocto
 
 all:
-	$(CC) main.c -o $(TARGET) $(CFLAGS)
+	$(CC) main.cpp -o $(TARGET) $(CFLAGS)
 	cp $(TARGET) ~/.local/bin/
 	$(RM) $(TARGET)
 
