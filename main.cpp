@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
                         wrefresh(header_win);
                         i = 0;
                         fo = fopen(argv[1], "w");
-                        while (len[i] != 0) {
+                        while (i <= curnum) {
                                 for (const char x : text[i])
                                         fputc(x, fo);
                                 ++i;
@@ -216,8 +216,7 @@ int main(int argc, char *argv[]) {
                         wmove(text_win, y, ++x);
 
                         list<char>::iterator it = text[y + ofy].begin();
-                        advance(it, 0);
-                        text[y + ofy].assign(3, 'c');
+                        advance(it, x);
                         text[y + ofy].insert(it, (char)ch);
 
                         len[y + ofy]++;
