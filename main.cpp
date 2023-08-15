@@ -80,8 +80,8 @@ int main(int argc, char *argv[]) {
                                 waddch(text_win, ch);
                         ++index;
                         if (ch == '\n') {
-                                y = getcury(text_win);
                                 len[y] = index - 1;
+                                y = getcury(text_win);
                                 if (y == maxy - 1)
                                         max = 1;
                                 ++curnum;
