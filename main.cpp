@@ -6,47 +6,54 @@
 #include <vector>
 #include <array>
 #include <unistd.h>
+#include "print_utils.cpp"
+#include <locale>
 
 #define ctrl(x)         ((x) & 0x1f)
 #define MAX_LINES       5000
+#undef KEY_ENTER
+#define KEY_ENTER       10 // overwrite default
+#define SIZE            20
 
 using namespace std;
 
-vector<list<char>> text(MAX_LINES);
+vector<list<wchar_t>> text(MAX_LINES);
 size_t len[MAX_LINES]; //lenght of each line
 
 int y = 0, x = 0;
 // offset in y axis of text and screen 
 signed int ofy = 0;
 int maxy = 0, maxx = 0; // to store the maximum rows and columns
-int ch, i;
-const char *name = "Yocto 0.8-alpha1";
+int i;
+wchar_t ch;
+list<wchar_t>::iterator it; // iterator
+char filename[FILENAME_MAX];
 
 // indx: tmp for lenght of line
 // curnum: total lines
 int indx = 0, curnum = 0, mx = -1;
 
-int main(int argc, char *argv[]) {
-        for (int i = MAX_LINES - 1; i > 0; --i) {
-                len[i] = 0;
-        }
+int main(int argc, char *argv[])
+{
+        setlocale(LC_ALL, "");
+        setlocale(LC_NUMERIC,"C");
+        bzero(len, MAX_LINES);
+        bzero(filename, FILENAME_MAX);
 
         // initialize curses
         initscr();
-        getmaxyx(stdscr, maxy, maxx);	// get the number of rows and columns
         cbreak();
         raw();
         noecho();
         refresh();
 
+        getmaxyx(stdscr, maxy, maxx);
+
         // initialize header window
         WINDOW *header_win;
         header_win = newwin(1, maxx, 0, 0);
         wattrset(header_win, A_STANDOUT);
-        wmove(header_win, 0, 0);
-        for (i = 0;  i < maxx; ++i)
-                wprintw(header_win, " ");
-        mvwprintw(header_win, 0, maxx / 2 - strlen(name) / 2, "%s", name);
+        print_header(header_win, maxx);
         wrefresh(header_win);
 
         //initialize line numbering window
@@ -67,21 +74,26 @@ int main(int argc, char *argv[]) {
         wmove(text_win, 0, 0);
         wrefresh(text_win);
 
-        getmaxyx(text_win, maxy, maxx);	// get the number of rows and columns
+        getmaxyx(text_win, maxy, maxx);
+
+        wchar_t s[2];
+        s[1] = 0;
 
         FILE *fo;
         if (argc > 1) {
+                strcpy(filename, argv[1]);
                 FILE *fp;
-                fp = fopen(argv[1], "r");
+                fp = fopen(filename, "r");
                 if (fp == NULL) {
                         perror("fopen");
-                        return -1;
+                        return -2; // ENOENT
                 }
-                while((ch = fgetc(fp)) != EOF) {
+                while ((ch = fgetwc(fp)) != EOF) {
                         text[curnum].push_back(ch);
-                        //wprintw(text_win, "%c", ch);
+                        s[0] = ch;
                         if (mx == -1 && indx < maxx)
-                                waddch(text_win, ch);
+                                wprintw(text_win, "%ls", s);
+                                //waddch(text_win, ch); 
                         if (ch == '\n') {
                                 len[y] = indx - 1;
                                 y = getcury(text_win);
@@ -97,23 +109,27 @@ int main(int argc, char *argv[]) {
 
         mx = -1;
         wmove(text_win, 0, 0);
-        while ((ch = wgetch(text_win))) {
+        while (1) {
+                wget_wch(text_win, (wint_t*)s);
                 getyx(text_win, y, x);
-                switch (ch) {
+                switch (s[0]) {
                 case KEY_DOWN:
-                        if (y + ofy > curnum)
+                        if (y + ofy > curnum) // do not scroll indefinetly
                                 break;
-                        if (y == (maxy - 1) && y + ofy < curnum) { //scroll down
+                        if (y == (maxy - 1) && y + ofy < curnum) {
                                 ofy++;
                                 wscrl(text_win, 1);
                                 wscrl(ln_win, 1);
                                 mvwprintw(ln_win, maxy - 1, 0, "%2d", y + ofy + 1);
                                 wrefresh(ln_win);
                                 wmove(text_win, y, 0);
-                                for (const char x : text[y+ofy])
-                                        if (x != '\n' && 
-                                            getcurx(text_win) < maxx-1)
-                                                waddch(text_win, x);
+                                for (const wchar_t c : text[y+ofy])
+                                        if (c != '\n' && 
+                                            getcurx(text_win) < maxx - 1) {
+                                                s[0] = c;
+                                                wprintw(text_win, "%ls", s);
+                                        
+                                        }
                                 wmove(text_win, y, x);
                         } if (mx != -1) { // go down an go to previous mx
                                 if (len[y] > len[y + 1])
@@ -127,15 +143,17 @@ int main(int argc, char *argv[]) {
 
                 case KEY_UP:
                         if (y == 0 && ofy != 0) {
-                                wscrl(text_win, - 1); // scroll up
-                                wscrl(ln_win, - 1);
+                                wscrl(text_win, -1); // scroll up
+                                wscrl(ln_win, -1);
                                 mvwprintw(ln_win, 0, 0, "%2d", y + ofy);
                                 wrefresh(ln_win);
                                 --ofy;
                                 wmove(text_win, 0, 0);
-                                for (const char x : text[y + ofy])
-                                        if (getcurx(text_win) < maxx - 1)
-                                                waddch(text_win, x);
+                                for (const char c : text[y + ofy])
+                                        if (getcurx(text_win) < maxx - 1) {
+                                                s[0] = c;
+                                                wprintw(text_win, "%ls", s);
+                                }
                                 wmove(text_win, 0, x);
                         } if (len[y + ofy] > len[y - 1 + ofy]) {
                                 wmove(text_win, y - 1, len[y + ofy + 1]);
@@ -153,7 +171,7 @@ int main(int argc, char *argv[]) {
                         break;
 
                 case KEY_RIGHT:
-                        if (len[y + ofy] >= (size_t)x)
+                        if ((size_t)x < len[y + ofy])
                                 wmove(text_win, y, x + 1);
                         else if (y + ofy < curnum)
                                 wmove(text_win, y + 1, 0);
@@ -161,18 +179,29 @@ int main(int argc, char *argv[]) {
 
                 case KEY_BACKSPACE:
                         mvwdelch(text_win, y, x - 1);
+                        len[y + ofy]--;
                         break;
 
                 case KEY_DC:
                         wdelch(text_win);
+                        len[y + ofy]--;
                         break;
 
-                case 10: //enter
+                case KEY_ENTER:
+                        it = text[y + ofy].begin();
+                        advance(it, x); 
+                        len[y + ofy] -= len[y + ofy] - x;
+                        wclrtoeol(text_win);
                         wmove(text_win, y + 1, 0);
+                        for (const wchar_t c : text[y + ofy])
+                                if (getcurx(text_win) < maxx - 1 ||
+                                    getcurx(text_win))
+                                        waddch(text_win, c);
                         break;
 
                 case ctrl('R'):
                         wclear(text_win);
+                        text.clear();
                         wmove(text_win, 0, 0);
                         break;
 
@@ -182,25 +211,44 @@ int main(int argc, char *argv[]) {
 
                 case ctrl('E'):
                         getmaxyx(text_win, maxy, maxx);
-                        maxx--;
+                        --maxx;
                         wmove(text_win, y, maxx);
-                        while ((winch(text_win) &  A_CHARTEXT) == ' ') {
+                        while ((winch(text_win) & A_CHARTEXT) == ' ')
                            wmove(text_win, y, --maxx);
-                        }
                         wmove(text_win, y, ++maxx);
                         break;
 
                 case ctrl('S'):
-                        mvwprintw(header_win, 0, maxx - 7, "Saved");
-                        wrefresh(header_win);
                         i = 0;
-                        fo = fopen(argv[1], "w");
-                        while (i <= curnum) {
-                                for (const char x : text[i])
-                                        fputc(x, fo);
-                                ++i;
+                        if (strlen(filename) != 0) {
+                                fo = fopen(filename, "w");
+                        } else {
+                                wclear(header_win);
+                                wmove(header_win, 0, 0);
+                                waddstr(header_win, "Enter filename: ");
+                                wrefresh(header_win);
+                                wmove(header_win, 0, 15);
+                                //wscanw(header_win, "%s", filename);
+                                if (wgetnstr(header_win, filename, 
+                                             FILENAME_MAX) == ERR
+                                    || strlen(filename) != 0) {
+                                        print_header(header_win, maxx);
+                                        print2header(header_win, maxx, "ERROR");
+                                        wmove(text_win, y, x);
+                                        break;
+                                }
+                                fo = fopen(filename, "w");
                         }
+
+                        while (i++ <= curnum)
+                                for (const char c : text[i])
+                                        fputc(c, fo);
+
                         fclose(fo);
+
+                        print_header(header_win, maxx);
+                        print2header(header_win, maxx, "Saved");
+                        wmove(text_win, y, x);
                         break;
 
                 case ctrl('C'):
@@ -212,13 +260,12 @@ int main(int argc, char *argv[]) {
 
                 default:
                         //wprintw(text_win, "%c", ch);
-                        winsch(text_win, ch);
+                        wins_nwstr(text_win, s, 1);
                         wmove(text_win, y, ++x);
 
-                        list<char>::iterator it = text[y + ofy].begin();
+                        it = text[y + ofy].begin();
                         advance(it, x);
                         text[y + ofy].insert(it, (char)ch);
-
                         len[y + ofy]++;
                         break;
                 }
