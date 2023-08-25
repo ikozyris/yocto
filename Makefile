@@ -5,9 +5,9 @@ CC = g++
 #  -Wextra    turns on extra warnings
 #  -Wall      turns on most, but not all, compiler warnings
 #  -O3        Optimizes the code
-#  -lncurses  Links to ncurses library
+#  -lncursesw  Links to ncurses library
 
-CFLAGS  =  -Wall -Wextra -O3
+CFLAGS  =  -Wall -Wextra -O3  -lncursesw
 
 # the build target executable:
 TARGET = yocto
