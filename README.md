@@ -1,13 +1,12 @@
 # Yocto
-A very simple and small (less than 200 lines of code!) yet powerful text editor, mostly in C with some C++ using with ncurses. more on the [wiki](https://github.com/ikozyris/yocto/wiki)
+A very simple and small (less than 300 lines of code!) yet powerful text editor, in C++ using ncurses and rope. more on the [wiki](https://github.com/ikozyris/yocto/wiki)
 
 Under development.
 
 ## How to use for linux:
 ```
-g++ -o yocto main.cpp -Wall -O3 -lncurses
-cp yocto ~/.local/bin/yocto
-yocto text.txt
+make build
+make install
 ```
 
 ### License
