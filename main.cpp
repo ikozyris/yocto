@@ -32,8 +32,6 @@ FILE *fo;
 // curnum: total lines
 int indx = 0, curnum = 0, mx = -1;
 
-void newline(WINDOW *&text_win);
-
 int main(int argc, char *argv[])
 {
 	// UTF-8
