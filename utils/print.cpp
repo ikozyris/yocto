@@ -1,6 +1,6 @@
 #include "../headers.h"
 
-const char *name = "Yocto 0.8-alpha1";
+const char *name = "Yocto 0.8-alpha2";
 
 void print_header(WINDOW *&header_win, int &maxx)
 {
