@@ -1,24 +1,24 @@
-# the compiler: gcc for C program
+# The compiler: g++
 CC = g++
 
-# compiler flags:
-#  -Wextra    turns on extra warnings
-#  -Wall      turns on most, but not all, compiler warnings
-#  -O3        Optimizes the code
-#  -lncursesw  Links to ncurses library
+# Compiler flags:
+#  -Wall	Turns on most, but not all, compiler warnings
+#  -Wextra	Turns on extra warnings
+#  -Werror	Warnings will not be tolerated!
+#  -Ofast	Optimizes the code
+#  -lncursesw	Links to ncurses library for wide characters
 
-CFLAGS  =  -Wall -Wextra -O3  -lncursesw
+CXXFLAGS = -Wall -Wextra -Werror -Ofast -lncursesw
 
 # the build target executable:
 TARGET = yocto
 
 all:
-	$(CC) main.cpp -o $(TARGET) $(CFLAGS)
-	cp $(TARGET) ~/.local/bin/
-	$(RM) $(TARGET)
+	$(CC) -g main.cpp -o $(TARGET) $(CXXFLAGS)
+	mv $(TARGET) ~/.local/bin/
 
 build:
-	$(CC) main.c -o $(TARGET) $(CFLAGS)
+	$(CC) -g main.cpp -o $(TARGET) $(CXXFLAGS)
 
 install:
 	cp $(TARGET) ~/.local/bin/
