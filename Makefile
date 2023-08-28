@@ -18,7 +18,7 @@ all:
 	$(RM) $(TARGET)
 
 build:
-	$(CC) main.c -o $(TARGET) $(CFLAGS)
+	$(CC) main.cpp -o $(TARGET) $(CFLAGS)
 
 install:
 	cp $(TARGET) ~/.local/bin/
