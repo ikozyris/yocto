@@ -14,6 +14,7 @@ TARGET = yocto
 
 all:
 	$(CC) main.cpp -o $(TARGET) $(CFLAGS)
+	mkdir -p ~/.local/bin/
 	cp $(TARGET) ~/.local/bin/
 	$(RM) $(TARGET)
 
@@ -21,6 +22,7 @@ build:
 	$(CC) main.cpp -o $(TARGET) $(CFLAGS)
 
 install:
+	mkdir -p ~/.local/bin/
 	cp $(TARGET) ~/.local/bin/
 
 clean:
