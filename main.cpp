@@ -11,12 +11,9 @@ using namespace std;
 using namespace __gnu_cxx;
 
 //vector<crope> text(MAX_LINES);
-//vector<string> text(MAX_LINES);
-//vector<vector<wchar_t>> text (MAX_LINES);
-
 vector<rope<wchar_t>> text(MAX_LINES);
-vector<size_t> len(MAX_LINES, 0); //lenght of each line
-
+rope<size_t> len(MAX_LINES);
+rope<size_t>::iterator it;
 
 int y = 0, x = 0;
 // offset in y axis of text and screen
@@ -35,8 +32,11 @@ FILE *fo;
 // curnum: total lines
 int indx = 0, curnum = 0, mx = -1;
 
+void newline(WINDOW *&text_win);
+
 int main(int argc, char *argv[])
 {
+	// UTF-8
 	setlocale(LC_ALL, "");
 	setlocale(LC_NUMERIC,"C");
 
@@ -71,10 +71,15 @@ int main(int argc, char *argv[])
 		while ((ch = fgetwc(fp)) != EOF) {
 			text[curnum].push_back(ch);
 			s[0] = ch;
-			if (mx != 0 && indx < maxx)
+			if (mx != 0 && indx < maxx - 1)
+				waddnwstr(text_win, s, 1);
+			if (y == maxy - 1 && ch != L'\n')
 				waddnwstr(text_win, s, 1);
 			if (ch == '\n') {
-				len[y++] = indx - 1;
+				it = len.mutable_begin();
+				it += y;
+				*it = indx - 1;
+				++y;
 				if (mx != 0 && y == maxy - 1)
 					mx = 0;
 				indx = 0;
@@ -162,26 +167,50 @@ int main(int argc, char *argv[])
 		case KEY_BACKSPACE:
 			mvwdelch(text_win, y, x - 1);
 			text[ry].erase(x - 1, 1);
-			len[ry]--;
+			it = len.mutable_begin();
+			it += ry;
+			*it--;
 			break;
 
 		case KEY_DC:
 			wdelch(text_win);
 			text[ry].erase(x, 1);
-			len[ry]--;
+			it = len.mutable_begin();
+			it += ry;
+			*it--;
 			break;
 
 		case KEY_ENTER:
-			wclrtoeol(text_win);                    
-			wmove(text_win, y + 1, 0);
 			text[ry].insert(x, '\n');
-			if ((size_t)x != len[ry]) {
-				len[ry] -= len[ry] - x;
-				for (int i = 0; i < (int)len[ry]; ++i) {
-					//s[0] =
-					wprintw(text_win, "%c", (char)text[ry][i]);
+			len.insert(x, (size_t)0);
+
+			wmove(text_win, 0, 0);
+			wclear(text_win);
+
+			// HACK: print text again
+			indx = 0; y = 0; curnum = 0; mx = -1;
+			for (i = 0; i < maxy; ++i) {
+				for (const wchar_t c : text[i]) {
+					s[0] = c;
+					if (mx != 0 && indx < maxx)
+						waddnwstr(text_win, s, 1);
+					if (y == maxy - 1 && c != L'\n')
+						waddnwstr(text_win, s, 1);
+					if (c == '\n') {
+						it = len.mutable_begin();
+						it += y;
+						*it = indx - 1;
+						++y;
+						if (mx != 0 && y == maxy -1)
+							mx = 0;
+						indx = 0;
+						++curnum;
+					}
+					++indx;
 				}
 			}
+			wrefresh(text_win);
+			wmove(header_win, y+1, x);
 			break;
 
 		case ctrl('A'):
@@ -199,12 +228,7 @@ int main(int argc, char *argv[])
 
 		case ctrl('S'):
 			i = 0;
-			if (strlen(filename) != 0) {
-				fo = fopen(filename, "w");
-				for (i = 0; i < curnum; ++i)
-					for (const wchar_t &c : text[i])
-						fputwc(c, fo);
-			} else {
+			if (strlen(filename) == 0) {
 				wclear(header_win);
 				wmove(header_win, 0, 0);
 				waddnstr(header_win, "Enter filename: ", 17);
@@ -219,13 +243,11 @@ int main(int argc, char *argv[])
 					wmove(text_win, y, x);
 					break;
 				}
-				fo = fopen((char*)filename, "w");
-
-				while (text[i++].size() != 0) {
-					//fputws(text[i].c_str(), fo);
-					break;
-				}
 			}
+			fo = fopen(filename, "w");
+			for (i = 0; i < curnum; ++i)
+				for (const auto &c : text[i])
+					fputwc(c, fo);
 
 			fclose(fo);
 
@@ -241,7 +263,8 @@ int main(int argc, char *argv[])
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, x + 1);
 			text[ry].insert(x, s[0]);
-			len[ry]++;
+			it = len.mutable_begin();
+			*it++;
 			break;
 		}
 	}
