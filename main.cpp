@@ -90,9 +90,11 @@ int main(int argc, char *argv[])
 //	goto stop; /*
 
 	while (1) {
-		wget_wch(text_win, (wint_t*)s);
 		getyx(text_win, y, x);
 		ry = y + ofy;
+		if (x > (int)len[ry])
+			wmove(text_win, y, len[ry]);
+		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
 		case KEY_DOWN:
 			if (ry > curnum) // do not scroll indefinetly
