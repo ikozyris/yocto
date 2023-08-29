@@ -74,10 +74,10 @@ int r()
 
 int wrt()
 {
-    printf("Yocto 0.7.2_\t Press ` and ENTER to save and exit\n");
+    printf("Yocto 0.7.3_\t Press ` and ENTER to save and exit\n");
     while ((ch = getchar()) != '`') {//reads until '`'
         txt[indx++] = ch;
-        if (indx >= 500) break;
+        if (indx == 200) break;
     }   
     txt[indx] = '\0';
     fp = fopen(fname,"w");
@@ -118,6 +118,9 @@ int sn()
     }
     printf("lines:%ld\n-------\n", lines);
     fclose(fp);
-    printf("%s\n", txt);
+    if (text[indx] != '\n') // make sure to print newline
+        printf("%s\n", txt);
+    else
+        printf("%s", txt);
     return 0;
 }
