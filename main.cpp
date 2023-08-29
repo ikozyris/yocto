@@ -67,25 +67,24 @@ int main(int argc, char *argv[])
 			return -2; // ENOENT
 		}
 		while ((ch = fgetwc(fp)) != EOF) {
-			text[curnum].push_back(ch);
-			s[0] = ch;
-			if (mx != 0 && indx < maxx - 1)
-				waddnwstr(text_win, s, 1);
-			if (y == maxy - 1 && ch != L'\n')
-				waddnwstr(text_win, s, 1);
+			text[curnum].push_back(ch);		
 			if (ch == '\n') {
 				it = len.mutable_begin();
 				it += y;
 				*it = indx - 1;
 				++y;
-				if (mx != 0 && y == maxy - 1)
-					mx = 0;
 				indx = 0;
 				++curnum;
 			}
 			++indx;
 		}
 		fclose(fp);
+		for (i = 0; i <= maxy; i++) {
+			if (i < maxy - 1)
+				waddnwstr(text_win, text[i].c_str(), maxx);
+			else if (i == maxy - 1)
+				waddnwstr(text_win, text[i].c_str(), len[i]);
+		}
 	}
 
 	mx = -1;
