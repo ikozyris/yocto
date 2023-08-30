@@ -123,8 +123,8 @@ int main(int argc, char *argv[])
 		case UP:
 			if (y == 0 && ofy != 0) {
 				wscrl(text_win, -1); // scroll up
-				wscrl(ln_win, -1);
-				mvwprintw(ln_win, 0, 0, "%2d", ry - 1);
+				wscrl(ln_win, - 1);
+				mvwprintw(ln_win, 0, 0, "%2d", ry);
 				wrefresh(ln_win);
 				--ofy;
 				wmove(text_win, 0, 0);
