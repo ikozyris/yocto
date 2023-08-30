@@ -66,13 +66,12 @@ int main(int argc, char *argv[])
 			perror("fopen");
 			return -2; // ENOENT
 		}
+		it = len.mutable_begin();
 		while ((ch = fgetwc(fp)) != EOF) {
 			text[curnum].push_back(ch);		
 			if (ch == '\n') {
-				it = len.mutable_begin();
-				it += y;
-				*it = indx - 1;
-				++y;
+				//it[curnum] = indx - 1; // seg faults line 95
+				*(it + curnum) = indx - 1;
 				indx = 0;
 				++curnum;
 			}
@@ -87,13 +86,12 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	mx = -1;
 	wmove(text_win, 0, 0);
 //	goto stop; /*
 
 	while (1) {
 		getyx(text_win, y, x);
-		ry = y + ofy;
+		ry = y + ofy; // calculate once
 		if (x > (int)len[ry])
 			wmove(text_win, y, len[ry]);
 		wget_wch(text_win, (wint_t*)s);
@@ -105,10 +103,10 @@ int main(int argc, char *argv[])
 				ofy++;
 				wscrl(text_win, 1);
 				wscrl(ln_win, 1);
-				mvwprintw(ln_win, maxy - 1, 0, "%2d", ry + 1);
+				mvwprintw(ln_win, maxy - 1, 0, "%2d", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
-				for (const auto &c : text[ry]) {
+				for (const auto &c : text[ry + 1]) {
 					if (getcurx(text_win) < maxx - 1 && c != '\n') {
 						s[0] = c;
 						waddnwstr(text_win, s, 1);
@@ -128,12 +126,12 @@ int main(int argc, char *argv[])
 			if (y == 0 && ofy != 0) {
 				wscrl(text_win, -1); // scroll up
 				wscrl(ln_win, -1);
-				mvwprintw(ln_win, 0, 0, "%2d", ry);
+				mvwprintw(ln_win, 0, 0, "%2d", ry - 1);
 				wrefresh(ln_win);
 				--ofy;
 				wmove(text_win, 0, 0);
-				for (const auto &c : text[ry]) {
-					if (getcurx(text_win) < maxx - 1) {
+				for (const auto &c : text[ry - 1]) {
+					if (getcurx(text_win) < maxx) {
 						s[0] = c;
 						waddnwstr(text_win, s, 1);
 					}
@@ -146,6 +144,7 @@ int main(int argc, char *argv[])
 				wmove(text_win, y - 1, x);
 			}
 			break;
+
 
 		case KEY_LEFT:
 			if (x > 0)
