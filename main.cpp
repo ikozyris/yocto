@@ -1,11 +1,9 @@
 #include "headers.h"
 #include "utils/init.cpp"
+#include "keybindings.h"
 
-#define ctrl(x)         ((x) & 0x1f)
 #define MAX_LINES       120'000
 
-#undef 	KEY_ENTER
-#define KEY_ENTER       10 // overwrite default
 
 using namespace std;
 using namespace __gnu_cxx;
@@ -15,7 +13,7 @@ vector<rope<wchar_t>> text(MAX_LINES);
 rope<size_t> len(MAX_LINES);
 rope<size_t>::iterator it;
 
-int y = 0, x = 0;
+int y = 0, x = 0, prevy;
 // offset in y axis of text and screen
 int ofy = 0, ry;
 
@@ -70,7 +68,7 @@ int main(int argc, char *argv[])
 		while ((ch = fgetwc(fp)) != EOF) {
 			text[curnum].push_back(ch);		
 			if (ch == '\n') {
-				//it[curnum] = indx - 1; // seg faults line 95
+				//it[curnum] = indx - 1; // seg faults
 				*(it + curnum) = indx - 1;
 				indx = 0;
 				++curnum;
@@ -96,7 +94,7 @@ int main(int argc, char *argv[])
 			wmove(text_win, y, len[ry]);
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
-		case KEY_DOWN:
+		case DOWN:
 			if (ry > curnum) // do not scroll indefinetly
 				break;
 			if (y == (maxy - 1) && ry < curnum) {
@@ -122,7 +120,7 @@ int main(int argc, char *argv[])
 			wmove(text_win, y + 1, x);
 			break;
 
-		case KEY_UP:
+		case UP:
 			if (y == 0 && ofy != 0) {
 				wscrl(text_win, -1); // scroll up
 				wscrl(ln_win, -1);
@@ -145,22 +143,21 @@ int main(int argc, char *argv[])
 			}
 			break;
 
-
-		case KEY_LEFT:
+		case LEFT:
 			if (x > 0)
 				wmove(text_win, y, x - 1);
 			else
 				wmove(text_win, y - 1, len[ry - 1]);
 			break;
 
-		case KEY_RIGHT:
+		case RIGHT:
 			if ((size_t)x < len[ry])
 				wmove(text_win, y, x + 1);
 			else if (ry < curnum)
 				wmove(text_win, y + 1, 0);
 			break;
 
-		case KEY_BACKSPACE:
+		case BACKSPACE:
 			mvwdelch(text_win, y, x - 1);
 			text[ry].erase(x - 1, 1);
 			it = len.mutable_begin();
@@ -168,7 +165,7 @@ int main(int argc, char *argv[])
 			*it--;
 			break;
 
-		case KEY_DC:
+		case DELETE:
 			wdelch(text_win);
 			text[ry].erase(x, 1);
 			it = len.mutable_begin();
@@ -176,11 +173,11 @@ int main(int argc, char *argv[])
 			*it--;
 			break;
 
-		case KEY_ENTER:
+		case ENTER:
 			text[ry].insert(x, '\n');
 			len.insert(x, (size_t)0);
 
-			wmove(text_win, 0, 0);
+			prevy = y;
 			wclear(text_win);
 
 			// HACK: print text again
@@ -190,7 +187,7 @@ int main(int argc, char *argv[])
 					s[0] = c;
 					if (mx != 0 && indx < maxx)
 						waddnwstr(text_win, s, 1);
-					if (y == maxy - 1 && c != L'\n')
+					if (y == maxy && c != L'\n')
 						waddnwstr(text_win, s, 1);
 					if (c == '\n') {
 						it = len.mutable_begin();
@@ -206,14 +203,14 @@ int main(int argc, char *argv[])
 				}
 			}
 			wrefresh(text_win);
-			wmove(header_win, y+1, x);
+			wmove(text_win, prevy+1, x);
 			break;
 
-		case ctrl('A'):
+		case HOME:
 			wmove(text_win, y, 0);
 			break;
 
-		case ctrl('E'):
+		case END:
 			getmaxyx(text_win, maxy, maxx);
 			--maxx;
 			wmove(text_win, y, maxx);
@@ -222,7 +219,7 @@ int main(int argc, char *argv[])
 			wmove(text_win, y, ++maxx);
 			break;
 
-		case ctrl('S'):
+		case SAVE:
 			i = 0;
 			if (strlen(filename) == 0) {
 				wclear(header_win);
@@ -252,7 +249,7 @@ int main(int argc, char *argv[])
 			wmove(text_win, y, x);
 			break;
 
-		case ctrl('C'):
+		case EXIT:
 			goto stop;
 
 		default:
