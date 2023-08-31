@@ -3,6 +3,6 @@
 #include <cstring>
 #include <ext/rope>
 #include <vector>
-#include <array>
 #include <unistd.h>
 #include <locale>
+#include <sys/stat.h>

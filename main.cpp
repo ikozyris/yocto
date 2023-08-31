@@ -1,9 +1,9 @@
 #include "headers.h"
 #include "utils/init.cpp"
 #include "keybindings.h"
+#include "utils/sizes.cpp"
 
 #define MAX_LINES       120'000
-
 
 using namespace std;
 using namespace __gnu_cxx;
@@ -23,7 +23,8 @@ wchar_t ch;
 char filename[FILENAME_MAX];
 wchar_t s[2]; // tmp array since there are only functions for wchar_t*
 
-// output file
+// file pointers input/output
+FILE *fi;
 FILE *fo;
 
 // indx: tmp for lenght of line
@@ -58,14 +59,13 @@ int main(int argc, char *argv[])
 
 	if (argc > 1) {
 		strcpy(filename, argv[1]);
-		FILE *fp;
-		fp = fopen(argv[1], "r");
-		if (fp == NULL) {
-			perror("fopen");
-			return -2; // ENOENT
+		fi = fopen(argv[1], "r");
+		if (fi == NULL) {
+			fo = fopen(filename, "w");
+			goto read;
 		}
 		it = len.mutable_begin();
-		while ((ch = fgetwc(fp)) != EOF) {
+		while ((ch = fgetwc(fi)) != EOF) {
 			text[curnum].push_back(ch);		
 			if (ch == '\n') {
 				//it[curnum] = indx - 1; // seg faults
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 			}
 			++indx;
 		}
-		fclose(fp);
+		fclose(fi);
 		for (i = 0; i <= maxy; i++) {
 			if (i < maxy - 1)
 				waddnwstr(text_win, text[i].c_str(), maxx);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 
 	wmove(text_win, 0, 0);
 //	goto stop; /*
-
+read:
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate once
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 				ofy++;
 				wscrl(text_win, 1);
 				wscrl(ln_win, 1);
-				mvwprintw(ln_win, maxy - 1, 0, "%2d", ry + 2);
+				mvwprintw(ln_win, maxy - 1, 0, "%3d", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
 				for (const auto &c : text[ry + 1]) {
@@ -123,18 +123,18 @@ int main(int argc, char *argv[])
 		case UP:
 			if (y == 0 && ofy != 0) {
 				wscrl(text_win, -1); // scroll up
-				wscrl(ln_win, - 1);
-				mvwprintw(ln_win, 0, 0, "%2d", ry);
-				wrefresh(ln_win);
+				wscrl(ln_win, -1);
+				mvwprintw(ln_win, 0, 0, "%3d", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
 				for (const auto &c : text[ry - 1]) {
-					if (getcurx(text_win) < maxx) {
+					if (getcurx(text_win) < maxx - 1) {
 						s[0] = c;
 						waddnwstr(text_win, s, 1);
 					}
 				}
 				wmove(text_win, 0, x);
+				wrefresh(ln_win);
 			} if (len[ry] > len[ry - 1]) {
 				wmove(text_win, y - 1, len[ry + 1]);
 				mx = getcurx(text_win);
@@ -161,16 +161,14 @@ int main(int argc, char *argv[])
 			mvwdelch(text_win, y, x - 1);
 			text[ry].erase(x - 1, 1);
 			it = len.mutable_begin();
-			it += ry;
-			*it--;
+			*(it + ry)--;
 			break;
 
 		case DELETE:
 			wdelch(text_win);
 			text[ry].erase(x, 1);
 			it = len.mutable_begin();
-			it += ry;
-			*it--;
+			*(it + ry)--;
 			break;
 
 		case ENTER:
@@ -232,7 +230,7 @@ int main(int argc, char *argv[])
 					     FILENAME_MAX) == ERR ||
 				    strlen(filename) == 0) {
 					print_header(header_win, maxx);
-					print2header(header_win, maxx, "ERROR");
+					print2header(header_win, maxx, "ERROR", 1);
 					wmove(text_win, y, x);
 					break;
 				}
@@ -245,8 +243,20 @@ int main(int argc, char *argv[])
 			fclose(fo);
 
 			print_header(header_win, maxx);
-			print2header(header_win, maxx, "Saved");
+			print2header(header_win, maxx, "Saved", 1);
 			wmove(text_win, y, x);
+			break;
+
+		case INFO:
+			if (strlen(filename) != 0) {
+				struct stat stat_buf;
+				if (stat(filename, &stat_buf) == 0) {
+					char *tmp = hrsize(stat_buf.st_size);
+					print2header(header_win, maxx, tmp, 1);
+				}
+				print2header(header_win, maxx, itoa(curnum), 0);
+				wmove(text_win, y, x);
+			}
 			break;
 
 		case EXIT:
