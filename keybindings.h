@@ -16,3 +16,4 @@
 #define DELETE		KEY_DC
 #define HOME		ctrl('A')
 #define END		ctrl('E')
+#define INFO		ctrl('I')
