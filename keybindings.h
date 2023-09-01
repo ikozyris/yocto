@@ -3,7 +3,7 @@
 #undef 	KEY_ENTER
 #define KEY_ENTER       10 // overwrite default
 
-/* EDIT BELOW to change keybindings*/
+/* EDIT BELOW to change keybindings */
 
 #define ENTER		KEY_ENTER
 #define SAVE		ctrl('S')
@@ -17,3 +17,4 @@
 #define HOME		ctrl('A')
 #define END		ctrl('E')
 #define INFO		ctrl('I')
+#define RESET		ctrl('R')

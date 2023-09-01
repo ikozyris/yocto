@@ -251,12 +251,23 @@ read:
 			if (strlen(filename) != 0) {
 				struct stat stat_buf;
 				if (stat(filename, &stat_buf) == 0) {
-					char *tmp = hrsize(stat_buf.st_size);
-					print2header(header_win, maxx, tmp, 1);
+					print2header(header_win, maxx, hrsize(stat_buf.st_size), 3);
+					print2header(header_win, maxx, itoa(curnum), 1);
 				}
-				print2header(header_win, maxx, itoa(curnum), 0);
-				wmove(text_win, y, x);
 			}
+			char tmp[42];
+			bzero(tmp, 42);
+			strcat(tmp, "y: ");
+			strcat(tmp, itoa(ry + 1));
+			strcat(tmp, " x: ");
+			strcat(tmp, itoa(x + 1));
+			print2header(header_win, maxx, tmp, 2);
+			wmove(text_win, y, x);
+			break;
+
+		case RESET:
+			wmove(text_win, 0, 0);
+			print_header(header_win, maxx);
 			break;
 
 		case EXIT:
