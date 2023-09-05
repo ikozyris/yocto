@@ -15,7 +15,8 @@ rope<size_t>::iterator it;
 
 int y = 0, x = 0, prevy;
 // offset in y axis of text and screen
-int ofy = 0, ry;
+long int ofy = 0;
+size_t ry;
 
 int maxy = 0, maxx = 0; // to store the maximum rows and columns
 uint8_t i;
@@ -29,7 +30,8 @@ FILE *fo;
 
 // indx: tmp for lenght of line
 // curnum: total lines
-int indx = 0, curnum = 0, mx = -1;
+size_t indx = 0, curnum = 0;
+signed mx = -1;
 
 int main(int argc, char *argv[])
 {
@@ -72,8 +74,7 @@ int main(int argc, char *argv[])
 				*(it + curnum) = indx - 1;
 				indx = 0;
 				++curnum;
-				if (curnum > len.size()) {
-					len.resize(len.size() * 2);
+				if (curnum > text.size()) {
 					text.resize(text.size() * 2);
 				}
 			}
@@ -105,7 +106,7 @@ read:
 				ofy++;
 				wscrl(text_win, 1);
 				wscrl(ln_win, 1);
-				mvwprintw(ln_win, maxy - 1, 0, "%3d", ry + 2);
+				mvwprintw(ln_win, maxy - 1, 0, "%3ld", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
 				for (const auto &c : text[ry + 1]) {
@@ -128,7 +129,7 @@ read:
 			if (y == 0 && ofy != 0) {
 				wscrl(text_win, -1); // scroll up
 				wscrl(ln_win, -1);
-				mvwprintw(ln_win, 0, 0, "%3d", ry);
+				mvwprintw(ln_win, 0, 0, "%3ld", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
 				for (const auto &c : text[ry - 1]) {
@@ -187,9 +188,9 @@ read:
 			for (i = 0; i < maxy; ++i) {
 				for (const wchar_t c : text[i]) {
 					s[0] = c;
-					if (mx != 0 && indx < maxx)
+					if (mx != 0 && indx < (size_t)maxx)
 						waddnwstr(text_win, s, 1);
-					if (y == maxy && c != L'\n')
+					else if (y == maxy && c != L'\n')
 						waddnwstr(text_win, s, 1);
 					if (c == '\n') {
 						it = len.mutable_begin();

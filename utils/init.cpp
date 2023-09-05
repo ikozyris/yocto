@@ -1,5 +1,4 @@
 #include "print.cpp"
-#include "../headers.h"
 
 void init_curses()
 {
