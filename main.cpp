@@ -3,7 +3,7 @@
 #include "keybindings.h"
 #include "utils/sizes.cpp"
 
-#define MAX_LINES       120'000
+#define MAX_LINES       1000
 
 using namespace std;
 using namespace __gnu_cxx;
@@ -72,6 +72,10 @@ int main(int argc, char *argv[])
 				*(it + curnum) = indx - 1;
 				indx = 0;
 				++curnum;
+				if (curnum > len.size()) {
+					len.resize(len.size() * 2);
+					text.resize(text.size() * 2);
+				}
 			}
 			++indx;
 		}
