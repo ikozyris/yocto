@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
 				*(it + curnum) = indx - 1;
 				indx = 0;
 				++curnum;
-				if (curnum > text.size()) {
-					text.resize(text.size() * 2);
+				if (curnum >= text.capacity()) {
+					text.resize(text.capacity() * 2);
 				}
 			}
 			++indx;
