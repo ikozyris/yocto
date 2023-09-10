@@ -77,7 +77,8 @@ int wrt()
     printf("Yocto 0.7.3_\t Press ` and ENTER to save and exit\n");
     while ((ch = getchar()) != '`') {//reads until '`'
         txt[indx++] = ch;
-        if (indx == 200) break;
+        if (indx == 2000)
+	    break;
     }   
     txt[indx] = '\0';
     fp = fopen(fname,"w");
@@ -94,11 +95,11 @@ int hlp()
            "   -r   --read              Read file                                         \n"
            "   -rl  --read-lines        Read with the line number before each line        \n"
            "   -e,  --show-ends         Display $ at end of each line                     \n"
-           "   -sn  --single-number     Print total line number at the start              \n"
+           "   -sn  --single-number     Print total lines number                          \n"
            "   -h   --help              Display this help and exit                        \n"
            "   -v   --version           Output version information and exit             \n\n"
            "Examples:                                                                     \n"
-           "    yocto -sn ~/text.txt    Read text.txt without printing the lines          \n"
+           "    yocto -w ~/text.txt     Write text.txt                                    \n"
            "    yocto -i                Start program in interactive mode               \n\n"
 	   "Documentation can be found on github.com/ikozyris/yocto/wiki                  \n");
     return 0;
@@ -106,21 +107,16 @@ int hlp()
 
 int sn()
 {
-    indx = 0; 
     fp = fopen(fname, "r");
     if (fp  == NULL) {
         perror("fopen(): ");
         return -1;
     }
     while ((ch = fgetc(fp)) != EOF) {
-        txt[indx++] = ch;
-	if (ch == '\n') lines++;
+	if (ch == '\n') 
+	    lines++;
     }
-    printf("lines:%ld\n-------\n", lines);
+    printf("%ld", lines);
     fclose(fp);
-    if (text[indx] != '\n') // make sure to print newline
-        printf("%s\n", txt);
-    else
-        printf("%s", txt);
     return 0;
 }
