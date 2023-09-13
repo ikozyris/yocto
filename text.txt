@@ -4,4 +4,29 @@ Line 3
 
 Line 5
 Line 6
+
+Unicode test:
+Γεια σου κόσμε!
+
+Line wrap test:
+this line will exceed the width of 80 columns (standard terminal) to test whether line wrapping works as expected.
+| this line has a width of 38 columns
+
+Line 15
+Line 16
+
+This text has 33 lines including newline at the end
+Line 19
+
+\n \t EOF WEOF EOL WEOL \EOF --> test special characters
+
+--- The terminal usually has a height of 24 lines ---
+This is the 24th line
+
+Line 26
+
+More Unicode:
+Αυτό το ΚΕΙΜΕΝΟ είναι γραμμένο για να βοηθήσει
+στις δοκιμές.
+
 THE END

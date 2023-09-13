@@ -13,16 +13,16 @@ vector<rope<wchar_t>> text(MAX_LINES);
 rope<size_t> len(MAX_LINES);
 rope<size_t>::iterator it;
 
-int y = 0, x = 0, prevy;
+short y = 0, x = 0;
 // offset in y axis of text and screen
 long int ofy = 0;
 size_t ry;
-
+short prevy;
 int maxy = 0, maxx = 0; // to store the maximum rows and columns
 uint8_t i;
 wchar_t ch;
 char filename[FILENAME_MAX];
-wchar_t s[2]; // tmp array since there are only functions for wchar_t*
+wchar_t s[CCHARW_MAX]; // tmp array since there are only functions for wchar_t*
 
 // file pointers input/output
 FILE *fi;
@@ -31,7 +31,7 @@ FILE *fo;
 // indx: tmp for lenght of line
 // curnum: total lines
 size_t indx = 0, curnum = 0;
-signed mx = -1;
+signed int mx = -1;
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	setlocale(LC_ALL, "");
 	setlocale(LC_NUMERIC,"C");
 
-	bzero(s, 2);
+	bzero(s, CCHARW_MAX);
 	bzero(filename, FILENAME_MAX);
 
 	init_curses();
@@ -95,7 +95,7 @@ read:
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate once
-		if (x > (int)len[ry])
+		if (x > (int)len[ry]) // hack
 			wmove(text_win, y, len[ry]);
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
@@ -109,7 +109,7 @@ read:
 				mvwprintw(ln_win, maxy - 1, 0, "%3ld", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
-				for (const auto &c : text[ry + 1]) {
+				for (const wchar_t &c : text[ry + 1]) {
 					if (getcurx(text_win) < maxx - 1 && c != '\n') {
 						s[0] = c;
 						waddnwstr(text_win, s, 1);
@@ -132,7 +132,7 @@ read:
 				mvwprintw(ln_win, 0, 0, "%3ld", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
-				for (const auto &c : text[ry - 1]) {
+				for (const wchar_t &c : text[ry - 1]) {
 					if (getcurx(text_win) < maxx - 1) {
 						s[0] = c;
 						waddnwstr(text_win, s, 1);
@@ -163,50 +163,51 @@ read:
 			break;
 
 		case BACKSPACE:
-			mvwdelch(text_win, y, x - 1);
-			text[ry].erase(x - 1, 1);
 			it = len.mutable_begin();
-			*(it + ry)--;
+			if (x != 0) {
+				mvwdelch(text_win, y, x - 1);
+				text[ry].erase(x - 1, 1);
+				//*(it + ry)--; // see comment on line ~290
+				it += ry;
+				*it = *it + 1;
+			} else { // delete previous line's \n
+				text[ry - 1].erase(len[ry - 1], 1);
+				*(it + ry + 1) = len[ry] + len[ry + 1];
+				len.erase(ry, 1);
+				print_text(text, text_win, maxx, maxy);
+				--curnum;
+			}
+			wmove(text_win, y, x - 1);
 			break;
 
 		case DELETE:
-			wdelch(text_win);
-			text[ry].erase(x, 1);
 			it = len.mutable_begin();
-			*(it + ry)--;
+			if (x != 0) {
+				wdelch(text_win);
+				text[ry].erase(x - 1, 1);
+				//*(it + ry)--;
+				it += ry;
+				*it = *it + 1;
+			} else { // delete previous line's \n
+				text[ry].erase(len[ry], 1);
+				len.erase(ry, 1);
+				print_text(text, text_win, maxx, maxy);
+				--curnum;
+				wmove(text_win, y, x);
+			}
 			break;
 
 		case ENTER:
 			text[ry].insert(x, '\n');
 			len.insert(x, (size_t)0);
-
 			prevy = y;
+			++curnum;
 			wclear(text_win);
 
 			// HACK: print text again
-			indx = 0; y = 0; curnum = 0; mx = -1;
-			for (i = 0; i < maxy; ++i) {
-				for (const wchar_t c : text[i]) {
-					s[0] = c;
-					if (mx != 0 && indx < (size_t)maxx)
-						waddnwstr(text_win, s, 1);
-					else if (y == maxy && c != L'\n')
-						waddnwstr(text_win, s, 1);
-					if (c == '\n') {
-						it = len.mutable_begin();
-						it += y;
-						*it = indx - 1;
-						++y;
-						if (mx != 0 && y == maxy -1)
-							mx = 0;
-						indx = 0;
-						++curnum;
-					}
-					++indx;
-				}
-			}
+			print_text(text, text_win, maxx, maxy);
+			wmove(text_win, prevy + 1, x);
 			wrefresh(text_win);
-			wmove(text_win, prevy+1, x);
 			break;
 
 		case HOME:
@@ -214,12 +215,7 @@ read:
 			break;
 
 		case END:
-			getmaxyx(text_win, maxy, maxx);
-			--maxx;
-			wmove(text_win, y, maxx);
-			while ((winch(text_win) & A_CHARTEXT) == ' ')
-				wmove(text_win, y, --maxx);
-			wmove(text_win, y, ++maxx);
+			wmove(text_win, y, len[ry] + 1);
 			break;
 
 		case SAVE:
@@ -231,8 +227,7 @@ read:
 				wrefresh(header_win);
 				wmove(header_win, 0, 15);
 				//wscanw(header_win, "%s", filename);
-				if (wgetnstr(header_win, filename,
-					     FILENAME_MAX) == ERR ||
+				if (wgetnstr(header_win, filename, FILENAME_MAX) == ERR ||
 				    strlen(filename) == 0) {
 					print_header(header_win, maxx);
 					print2header(header_win, maxx, "ERROR", 1);
@@ -241,10 +236,13 @@ read:
 				}
 			}
 			fo = fopen(filename, "w");
-			for (i = 0; i < curnum; ++i)
-				for (const auto &c : text[i])
+			for (i = 0; i < curnum; ++i) {
+				for (const wchar_t &c : text[i]) {
 					fputwc(c, fo);
-
+					if (i > maxx)
+						break;
+				}
+			}
 			fclose(fo);
 
 			print_header(header_win, maxx);
@@ -253,14 +251,17 @@ read:
 			break;
 
 		case INFO:
+			char tmp[42];
 			if (strlen(filename) != 0) {
 				struct stat stat_buf;
 				if (stat(filename, &stat_buf) == 0) {
+					bzero(tmp, 42);
+					strcat(tmp, itoa(curnum));
+					strcat(tmp, " lines");
 					print2header(header_win, maxx, hrsize(stat_buf.st_size), 3);
-					print2header(header_win, maxx, itoa(curnum), 1);
+					print2header(header_win, maxx, tmp, 1);
 				}
 			}
-			char tmp[42];
 			bzero(tmp, 42);
 			strcat(tmp, "y: ");
 			strcat(tmp, itoa(ry + 1));
@@ -270,9 +271,12 @@ read:
 			wmove(text_win, y, x);
 			break;
 
-		case RESET:
-			wmove(text_win, 0, 0);
+		case REFRESH:
 			print_header(header_win, maxx);
+			print_text(text, text_win, maxx, maxy);
+			init_lines(ln_win, maxy);
+			ofy = 0;
+			wmove(text_win, 0, 0);
 			break;
 
 		case EXIT:
@@ -280,10 +284,13 @@ read:
 
 		default:
 			wins_nwstr(text_win, s, 1);
-			wmove(text_win, y, x + 1);
+			wmove(text_win, y, text_win->_curx + 1);
+
 			text[ry].insert(x, s[0]);
 			it = len.mutable_begin();
-			*it++;
+			//*(it + ry)++; // this does not work 
+			it += ry;
+			*it = *it + 1;
 			break;
 		}
 	}
