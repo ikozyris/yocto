@@ -17,4 +17,4 @@
 #define HOME		ctrl('A')
 #define END		ctrl('E')
 #define INFO		ctrl('I')
-#define RESET		ctrl('R')
+#define REFRESH		ctrl('R')
