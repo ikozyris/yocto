@@ -9,7 +9,7 @@ Unicode test:
 Γεια σου κόσμε!
 
 Line wrap test:
-this line will exceed the width of 80 columns (standard terminal) to test whether line wrapping works as expected.
+this line will exceed the width of 80 columns (width of standard terminal) to test whether line wrapping works as expected.
 | this line has a width of 38 columns
 
 Line 15
@@ -29,4 +29,4 @@ More Unicode:
 Αυτό το ΚΕΙΜΕΝΟ είναι γραμμένο για να βοηθήσει
 στις δοκιμές.
 
-THE END
+THE END (with newline)
