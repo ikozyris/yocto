@@ -13,13 +13,13 @@ vector<rope<wchar_t>> text(MAX_LINES);
 rope<size_t> len(MAX_LINES);
 rope<size_t>::iterator it;
 
-short y = 0, x = 0;
+ushort y = 0, x = 0;
 // offset in y axis of text and screen
-long int ofy = 0;
+long signed int ofy = 0;
 size_t ry;
-short prevy;
+ushort prevy;
 int maxy = 0, maxx = 0; // to store the maximum rows and columns
-uint8_t i;
+ushort i;
 wchar_t ch;
 char filename[FILENAME_MAX];
 wchar_t s[CCHARW_MAX]; // tmp array since there are only functions for wchar_t*
@@ -95,7 +95,7 @@ read:
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate once
-		if (x > (int)len[ry]) // hack
+		if (x > (int)len[ry]) // if out of bounds: move (to avoid bugs)
 			wmove(text_win, y, len[ry]);
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
@@ -204,7 +204,7 @@ read:
 			++curnum;
 			wclear(text_win);
 
-			// HACK: print text again
+			// print text again (find a better way)
 			print_text(text, text_win, maxx, maxy);
 			wmove(text_win, prevy + 1, x);
 			wrefresh(text_win);
@@ -236,7 +236,7 @@ read:
 				}
 			}
 			fo = fopen(filename, "w");
-			for (i = 0; i < curnum; ++i) {
+			for (i = 0; i <= curnum; ++i) {
 				for (const wchar_t &c : text[i]) {
 					fputwc(c, fo);
 					if (i > maxx)
