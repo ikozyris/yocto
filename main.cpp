@@ -1,37 +1,6 @@
-#include "headers.h"
 #include "utils/init.cpp"
-#include "keybindings.h"
+#include "headers/keybindings.h"
 #include "utils/sizes.cpp"
-
-#define MAX_LINES       1000
-
-using namespace std;
-using namespace __gnu_cxx;
-
-//vector<crope> text(MAX_LINES);
-vector<rope<wchar_t>> text(MAX_LINES);
-rope<size_t> len(MAX_LINES);
-rope<size_t>::iterator it;
-
-ushort y = 0, x = 0;
-// offset in y axis of text and screen
-long signed int ofy = 0;
-size_t ry;
-ushort prevy;
-int maxy = 0, maxx = 0; // to store the maximum rows and columns
-ushort i;
-wchar_t ch;
-char filename[FILENAME_MAX];
-wchar_t s[CCHARW_MAX]; // tmp array since there are only functions for wchar_t*
-
-// file pointers input/output
-FILE *fi;
-FILE *fo;
-
-// indx: tmp for lenght of line
-// curnum: total lines
-size_t indx = 0, curnum = 0;
-signed int mx = -1;
 
 int main(int argc, char *argv[])
 {
@@ -39,22 +8,14 @@ int main(int argc, char *argv[])
 	setlocale(LC_ALL, "");
 	setlocale(LC_NUMERIC,"C");
 
-	bzero(s, CCHARW_MAX);
-	bzero(filename, FILENAME_MAX);
-
 	init_curses();
 
 	getmaxyx(stdscr, maxy, maxx);
 
 	// initialize windows
-	WINDOW *header_win;
-	init_header(header_win, maxx);
-
-	WINDOW *ln_win;
-	init_lines(ln_win, maxy);
-
-	WINDOW *text_win;
-	init_text(text_win, maxy, maxx);
+	init_header();
+	init_lines();
+	init_text();
 
 	getmaxyx(text_win, maxy, maxx);
 	wrefresh(ln_win);
@@ -63,30 +24,24 @@ int main(int argc, char *argv[])
 		strcpy(filename, argv[1]);
 		fi = fopen(argv[1], "r");
 		if (fi == NULL) {
-			fo = fopen(filename, "w");
+			fo = fopen(argv[1], "w");
+			print2header("New file", 1);
 			goto read;
 		}
-		it = len.mutable_begin();
-		while ((ch = fgetwc(fi)) != EOF) {
-			text[curnum].push_back(ch);		
-			if (ch == '\n') {
-				//it[curnum] = indx - 1; // seg faults
-				*(it + curnum) = indx - 1;
-				indx = 0;
-				++curnum;
-				if (curnum >= text.capacity()) {
-					text.resize(text.capacity() * 2);
-				}
+		wchar_t tmp[200];
+		while ((fgetws_unlocked(tmp, 200, fi))) {
+			//for (unsigned i = 0; i < wcslen(tmp); ++i)
+			//	text[curnum].push_back(tmp[i]);
+			text[curnum].push_back(tmp, wcslen(tmp));
+			curnum++;
+			//if (text[curnum].capacity == 0) {
+			if (curnum >= txt_cpt) {
+				txt_cpt = text.size() * 2;
+				text.resize(txt_cpt);
 			}
-			++indx;
 		}
 		fclose(fi);
-		for (i = 0; i <= maxy; i++) {
-			if (i < maxy - 1)
-				waddnwstr(text_win, text[i].c_str(), maxx);
-			else if (i == maxy - 1)
-				waddnwstr(text_win, text[i].c_str(), len[i]);
-		}
+		print_text();
 	}
 
 	wmove(text_win, 0, 0);
@@ -95,8 +50,8 @@ read:
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate once
-		if (x > (int)len[ry]) // if out of bounds: move (to avoid bugs)
-			wmove(text_win, y, len[ry]);
+		if (x > text[ry].length) // if out of bounds: move (to avoid bugs)
+			wmove(text_win, y, text[ry].length);
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
 		case DOWN:
@@ -109,20 +64,11 @@ read:
 				mvwprintw(ln_win, maxy - 1, 0, "%3ld", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
-				for (const wchar_t &c : text[ry + 1]) {
-					if (getcurx(text_win) < maxx - 1 && c != '\n') {
-						s[0] = c;
-						waddnwstr(text_win, s, 1);
-					}
-				}
+				print_line_no_nl(ry + 1);
 				wmove(text_win, y, x);
 			} else {
-				if (len[ry] > len[ry + 1])
-					wmove(text_win, y + 1, x);
-				else
-					wmove(text_win, y + 2, len[ry + 1]);
+				wmove(text_win, y + 1, x);
 			}
-			wmove(text_win, y + 1, x);
 			break;
 
 		case UP:
@@ -132,17 +78,9 @@ read:
 				mvwprintw(ln_win, 0, 0, "%3ld", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
-				for (const wchar_t &c : text[ry - 1]) {
-					if (getcurx(text_win) < maxx - 1) {
-						s[0] = c;
-						waddnwstr(text_win, s, 1);
-					}
-				}
+				print_line(ry - 1);
 				wmove(text_win, 0, x);
 				wrefresh(ln_win);
-			} if (len[ry] > len[ry - 1]) {
-				wmove(text_win, y - 1, len[ry + 1]);
-				mx = getcurx(text_win);
 			} else {
 				wmove(text_win, y - 1, x);
 			}
@@ -152,62 +90,57 @@ read:
 			if (x > 0)
 				wmove(text_win, y, x - 1);
 			else
-				wmove(text_win, y - 1, len[ry - 1]);
+				wmove(text_win, y - 1, text[ry - 1].length);
 			break;
 
 		case RIGHT:
-			if ((size_t)x < len[ry])
+			if ((size_t)x < text[ry].length)
 				wmove(text_win, y, x + 1);
 			else if (ry < curnum)
 				wmove(text_win, y + 1, 0);
 			break;
 
 		case BACKSPACE:
-			it = len.mutable_begin();
 			if (x != 0) {
 				mvwdelch(text_win, y, x - 1);
-				text[ry].erase(x - 1, 1);
-				//*(it + ry)--; // see comment on line ~290
-				it += ry;
-				*it = *it + 1;
-			} else { // delete previous line's \n
-				text[ry - 1].erase(len[ry - 1], 1);
-				*(it + ry + 1) = len[ry] + len[ry + 1];
-				len.erase(ry, 1);
-				print_text(text, text_win, maxx, maxy);
+				text[ry].erase(x - 1);
+			} else if (y != 0){ // delete previous line's \n
+				text[ry - 1].erase(text[ry].length);
+				print_text();
 				--curnum;
 			}
 			wmove(text_win, y, x - 1);
 			break;
 
 		case DELETE:
-			it = len.mutable_begin();
 			if (x != 0) {
 				wdelch(text_win);
-				text[ry].erase(x - 1, 1);
-				//*(it + ry)--;
-				it += ry;
-				*it = *it + 1;
+				text[ry].erase(x - 1);
 			} else { // delete previous line's \n
-				text[ry].erase(len[ry], 1);
-				len.erase(ry, 1);
-				print_text(text, text_win, maxx, maxy);
+				text[ry].erase(text[ry].length);
+				print_text();
 				--curnum;
 				wmove(text_win, y, x);
 			}
 			break;
 
 		case ENTER:
+			it = text.begin();
+			it += ry;
+			static gap_buf<wchar_t> a;
+			//a.init();
+			a.resize(20);
+			a.insert(0, L'\n');
+			//a.push_back(L'\n');
+			text.insert(it, a);
 			text[ry].insert(x, '\n');
-			len.insert(x, (size_t)0);
 			prevy = y;
 			++curnum;
-			wclear(text_win);
 
-			// print text again (find a better way)
-			print_text(text, text_win, maxx, maxy);
-			wmove(text_win, prevy + 1, x);
-			wrefresh(text_win);
+			// print text again (or find a better way)
+			print_text();
+			wmove(text_win, prevy + 1, 0);
+			//wrefresh(text_win);
 			break;
 
 		case HOME:
@@ -215,7 +148,7 @@ read:
 			break;
 
 		case END:
-			wmove(text_win, y, len[ry] + 1);
+			wmove(text_win, y, text[ry].length);
 			break;
 
 		case SAVE:
@@ -229,68 +162,71 @@ read:
 				//wscanw(header_win, "%s", filename);
 				if (wgetnstr(header_win, filename, FILENAME_MAX) == ERR ||
 				    strlen(filename) == 0) {
-					print_header(header_win, maxx);
-					print2header(header_win, maxx, "ERROR", 1);
+					print_header();
+					print2header("ERROR", 1);
 					wmove(text_win, y, x);
 					break;
 				}
 			}
 			fo = fopen(filename, "w");
-			for (i = 0; i <= curnum; ++i) {
-				for (const wchar_t &c : text[i]) {
-					fputwc(c, fo);
-					if (i > maxx)
-						break;
-				}
-			}
+			for (i = 0; i <= curnum; ++i)
+				fputws_unlocked(text[i].buffer, fo);
 			fclose(fo);
 
-			print_header(header_win, maxx);
-			print2header(header_win, maxx, "Saved", 1);
+			print_header();
+			print2header("Saved", 1);
 			wmove(text_win, y, x);
 			break;
 
-		case INFO:
-			char tmp[42];
+		case 27: // alt - i
+			wtimeout(text_win, 1000);
+			if (!(wgetch(text_win) == INFO))
+				break;
+			wtimeout(text_win, -42);
+			char tmp[21];
+			bzero(tmp, 21);
 			if (strlen(filename) != 0) {
 				struct stat stat_buf;
 				if (stat(filename, &stat_buf) == 0) {
-					bzero(tmp, 42);
-					strcat(tmp, itoa(curnum));
-					strcat(tmp, " lines");
-					print2header(header_win, maxx, hrsize(stat_buf.st_size), 3);
-					print2header(header_win, maxx, tmp, 1);
+					sprintf(tmp, "%s lines", itoa(curnum));
+					print2header(hrsize(stat_buf.st_size), 3);
+					print2header(tmp, 1);
 				}
 			}
-			bzero(tmp, 42);
-			strcat(tmp, "y: ");
-			strcat(tmp, itoa(ry + 1));
-			strcat(tmp, " x: ");
-			strcat(tmp, itoa(x + 1));
-			print2header(header_win, maxx, tmp, 2);
+			sprintf(tmp, "y: %lu x: %u", ry, x);
+			print2header(tmp, 2);
 			wmove(text_win, y, x);
 			break;
 
+		case KEY_RESIZE:
 		case REFRESH:
-			print_header(header_win, maxx);
-			print_text(text, text_win, maxx, maxy);
-			init_lines(ln_win, maxy);
+			getmaxyx(text_win, maxy, maxx);
+			print_header();
+			print_text();
+			print_lines();
 			ofy = 0;
+			wrefresh(text_win);
+			wrefresh(ln_win);
+			wrefresh(header_win);
 			wmove(text_win, 0, 0);
 			break;
 
 		case EXIT:
 			goto stop;
 
+		case KEY_TAB:
+			winsch(text_win, '\t');
+			wmove(text_win, y, x + 8);
+			text[ry].insert(x, '\t');
+			break;
+
 		default:
+			if (s[0] < 32)
+				break;
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, text_win->_curx + 1);
 
 			text[ry].insert(x, s[0]);
-			it = len.mutable_begin();
-			//*(it + ry)++; // this does not work 
-			it += ry;
-			*it = *it + 1;
 			break;
 		}
 	}
