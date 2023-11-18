@@ -1,10 +1,8 @@
-#include <stdio.h> 
-#include <stdlib.h> // atoll
-#include <stdint.h> // uint64_t
+#include "../headers/headers.h"
 
 inline char *itoa(int a)
 {
-	static char b[42];
+	static char b[12];
 	sprintf(b, "%d", a);
 	return b;
 }

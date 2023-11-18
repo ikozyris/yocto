@@ -1,5 +1,5 @@
 # The compiler: g++
-CC = g++
+CC = g++ -std=c++20
 
 # Compiler flags:
 #  -Wall		Turns on most, but not all, compiler warnings
@@ -8,8 +8,8 @@ CC = g++
 #  -Ofast		Optimizes the code
 #  -lncursesw	Links to ncurses library for wide characters
 
-#CXXFLAGS = -Wall -Wextra -Werror -pedantic -Ofast -lncursesw # Debug only
-CXXFLAGS = -Ofast -lncursesw
+CXXFLAGS = -Wall -Wextra -Wpadded -pedantic -lncursesw # Debug only
+#CXXFLAGS = -Ofast -lncursesw
 
 # the build target executable:
 TARGET = yocto
