@@ -1,5 +1,4 @@
-#define ctrl(x)         ((x) & 0x1f)
-
+#define 	ctrl(x)         ((x) & 0x1f)
 #undef 	KEY_ENTER
 #define 	KEY_ENTER       10 // overwrite default
 
@@ -16,5 +15,6 @@
 #define DELETE		KEY_DC
 #define HOME		ctrl('A')
 #define END			ctrl('E')
-#define INFO		ctrl('I')
+#define INFO		'i' // with alt
 #define REFRESH		ctrl('R')
+#define KEY_TAB		9

@@ -2,11 +2,17 @@
 
 DIALOG_CANCEL=1
 DIALOG_ESC=255
-HEIGHT=15
-WIDTH=40
+HEIGHT=0
+WIDTH=0
+
+if command -v dialog &> /dev/null; then
+	DIAL="dialog"
+else
+	DIAL="whiptail"
+fi
 
 DIALOG() {
-	dialog --clear --backtitle "Yocto Installation Wizard" "$@"
+	$DIAL --clear --backtitle "Yocto Installation Wizard" "$@"
 }
 
 display_result() {
@@ -16,7 +22,7 @@ display_result() {
 
 KEY_SAVE="ctrl('S')"
 KEY_EXIT="ctrl('C')"
-KEY_INFO="ctrl('I')"
+KEY_INFO="'i'"
 KEY_REFRESH="ctrl('R')"
 KEY_HOME="ctrl('A')"
 KEY_END="ctrl('E')"
@@ -59,7 +65,7 @@ config_dialog() {
 	while true; do
 		exec 3>&1 # open stdout fd
 		selection=$(DIALOG --title "$1" \
-		    --menu "Please select:" $HEIGHT $WIDTH 3 \
+		    --menu "Please select:" $HEIGHT $WIDTH 0 \
 		    "1" "Edit Keybindings" \
 		    "2" "Install dependencies" \
 		2>&1 1>&3) # redirect output streams
@@ -77,12 +83,16 @@ config_dialog() {
 		esac
 		case $selection in
 		1 )
-			key_config
+			if [ $DIAL = "dialog" ]; then
+				key_config
+			else
+				display_result "dialog not installed; But you can still edit keybindings.h"
+			fi
 			;;
 		2 )
 			clear
 			echo "#### Installing Dependencies"
-			sudo apt install libncurses-dev g++ make
+			sudo apt install libncurses-dev gcc make dialog
 		   	;;
 		esac
     	done
@@ -91,7 +101,6 @@ config_dialog() {
 while true; do
     	exec 3>&1
     	selection=$(DIALOG --title "Menu" \
-		--cancel-label "Exit" \
 		--menu "Please select:" $HEIGHT $WIDTH 0 \
 		"1" "Configure" \
 		"2" "Compile" \

@@ -1,3 +1,6 @@
 .vscode
 main
 yocto
+gen.c
+test-case
+mem_usg.sh

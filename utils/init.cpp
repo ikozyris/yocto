@@ -8,24 +8,23 @@ void init_curses()
 	noecho();
 }
 
-void init_header(WINDOW *&header_win, int &maxx)
+void init_header()
 {
 	header_win = newwin(1, maxx, 0, 0);
 	wattrset(header_win, A_STANDOUT);
-	print_header(header_win, maxx);
+	print_header();
 }
 
-void init_lines(WINDOW *&ln_win, int &maxy)
+void init_lines()
 {
 	ln_win = newwin(maxy, 4, 1, 0);
 	wmove(ln_win, 0, 0);
 	wattrset(ln_win, A_DIM);
 	scrollok(ln_win, TRUE);
-	for (int i = 1;  i < maxy; ++i)
-		mvwprintw(ln_win, i - 1, 0, "%3d", i);
+	print_lines();
 }
 
-void init_text(WINDOW *&text_win, int maxy, int maxx)
+void init_text()
 {
 	text_win = newwin(maxy - 1, maxx, 1, 4);
 	scrollok(text_win, TRUE);
