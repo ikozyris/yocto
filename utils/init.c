@@ -1,4 +1,4 @@
-#include "print.cpp"
+#include "io.cpp"
 
 void init_curses()
 {
