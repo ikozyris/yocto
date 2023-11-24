@@ -144,7 +144,7 @@ read:
 
 		case SAVE:
 			if (strlen(filename) == 0) {
-				print_header();
+				clear_header();
 				print2header("Enter filename: ", 1);
 				wmove(header_win, 0, 16);
 				//wscanw(header_win, "%s", filename);
@@ -152,7 +152,7 @@ read:
 				echo();
 				if (wgetnstr(header_win, filename, FILENAME_MAX) == ERR ||
 				    strlen(filename) == 0) {
-					print_header();
+					reset_header();
 					print2header("ERROR", 1);
 					wmove(text_win, y, x);
 					break;
@@ -168,7 +168,7 @@ read:
 #endif
 			fclose(fo);
 
-			print_header();
+			reset_header();
 			print2header("Saved", 1);
 			wmove(text_win, y, x);
 			break;
@@ -196,7 +196,7 @@ read:
 		case KEY_RESIZE:
 		case REFRESH:
 			getmaxyx(text_win, maxy, maxx);
-			print_header();
+			reset_header();
 			print_text();
 			print_lines();
 			ofy = 0;

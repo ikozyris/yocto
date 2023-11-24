@@ -12,7 +12,7 @@ void init_header()
 {
 	header_win = newwin(1, maxx, 0, 0);
 	wattrset(header_win, A_STANDOUT);
-	print_header();
+	reset_header();
 }
 
 void init_lines()
