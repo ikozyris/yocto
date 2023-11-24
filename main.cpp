@@ -144,12 +144,12 @@ read:
 
 		case SAVE:
 			if (strlen(filename) == 0) {
-				wclear(header_win);
-				wmove(header_win, 0, 0);
-				waddnstr(header_win, "Enter filename: ", 17);
-				wrefresh(header_win);
-				wmove(header_win, 0, 15);
+				print_header();
+				print2header("Enter filename: ", 1);
+				wmove(header_win, 0, 16);
 				//wscanw(header_win, "%s", filename);
+
+				echo();
 				if (wgetnstr(header_win, filename, FILENAME_MAX) == ERR ||
 				    strlen(filename) == 0) {
 					print_header();

@@ -4,4 +4,3 @@
 #include <unistd.h>
 #include <locale.h>
 #include <sys/stat.h>
-#include <omp.h>
