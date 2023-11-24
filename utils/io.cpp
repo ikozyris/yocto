@@ -18,12 +18,12 @@ void clear_header()
 	wrefresh(header_win);
 }
 
-void print_header_title() {
+inline void print_header_title() {
 	mvwprintw(header_win, 0, maxx / 2 - 9, "%s", name);
 	wrefresh(header_win);
 }
 
-void reset_header() {
+inline void reset_header() {
 	clear_header();
 	print_header_title();
 }
