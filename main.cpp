@@ -1,6 +1,6 @@
-#include "utils/init.cpp"
+#include "utils/init.c"
 #include "headers/keybindings.h"
-#include "utils/sizes.cpp"
+#include "utils/sizes.c"
 
 int main(int argc, char *argv[])
 {
@@ -20,30 +20,23 @@ int main(int argc, char *argv[])
 	getmaxyx(text_win, maxy, maxx);
 	wrefresh(ln_win);
 
+	FILE *fo;
 	if (argc > 1) {
 		strcpy(filename, argv[1]);
-		fi = fopen(argv[1], "r");
+		FILE *fi = fopen(filename, "r");
 		if (fi == NULL) {
-			fo = fopen(argv[1], "w");
+			fo = fopen(filename, "w");
 			print2header("New file", 1);
 			goto read;
 		}
-		wchar_t tmp[200];
-		while ((fgetws_unlocked(tmp, 200, fi))) {
-			//for (unsigned i = 0; i < wcslen(tmp); ++i)
-			//	text[curnum].push_back(tmp[i]);
-			text[curnum].push_back(tmp, wcslen(tmp));
-			curnum++;
-			//if (text[curnum].capacity == 0) {
-			if (curnum >= txt_cpt) {
-				txt_cpt = text.size() * 2;
-				text.resize(txt_cpt);
-			}
-		}
+		read_getc(fi);
+		//read_fgets(fi);
+		//read_fread(fi); // MUCH faster
 		fclose(fi);
 		print_text();
 	}
 
+//	sleep(5);
 	wmove(text_win, 0, 0);
 //	goto stop; /*
 read:
@@ -61,7 +54,7 @@ read:
 				ofy++;
 				wscrl(text_win, 1);
 				wscrl(ln_win, 1);
-				mvwprintw(ln_win, maxy - 1, 0, "%3ld", ry + 2);
+				mvwprintw(ln_win, maxy - 1, 0, "%3d", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
 				print_line_no_nl(ry + 1);
@@ -75,7 +68,7 @@ read:
 			if (y == 0 && ofy != 0) {
 				wscrl(text_win, -1); // scroll up
 				wscrl(ln_win, -1);
-				mvwprintw(ln_win, 0, 0, "%3ld", ry);
+				mvwprintw(ln_win, 0, 0, "%3d", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
 				print_line(ry - 1);
@@ -89,7 +82,7 @@ read:
 		case LEFT:
 			if (x > 0)
 				wmove(text_win, y, x - 1);
-			else
+			else if (y > 0)
 				wmove(text_win, y - 1, text[ry - 1].length);
 			break;
 
@@ -103,9 +96,9 @@ read:
 		case BACKSPACE:
 			if (x != 0) {
 				mvwdelch(text_win, y, x - 1);
-				text[ry].erase(x - 1);
+				eras(text[ry], x - 1);
 			} else if (y != 0){ // delete previous line's \n
-				text[ry - 1].erase(text[ry].length);
+				eras(text[ry], text[ry].length);
 				print_text();
 				--curnum;
 			}
@@ -115,9 +108,9 @@ read:
 		case DELETE:
 			if (x != 0) {
 				wdelch(text_win);
-				text[ry].erase(x - 1);
+				eras(text[ry], x - 1);
 			} else { // delete previous line's \n
-				text[ry].erase(text[ry].length);
+				eras(text[ry], text[ry].length);
 				print_text();
 				--curnum;
 				wmove(text_win, y, x);
@@ -127,13 +120,11 @@ read:
 		case ENTER:
 			it = text.begin();
 			it += ry;
-			static gap_buf<wchar_t> a;
-			//a.init();
-			a.resize(20);
-			a.insert(0, L'\n');
-			//a.push_back(L'\n');
+			static gap_buf a;
+			init(a);
+			resize(a, 20);
+			insert(a, 0, L'\n');
 			text.insert(it, a);
-			text[ry].insert(x, '\n');
 			prevy = y;
 			++curnum;
 
@@ -152,7 +143,6 @@ read:
 			break;
 
 		case SAVE:
-			i = 0;
 			if (strlen(filename) == 0) {
 				wclear(header_win);
 				wmove(header_win, 0, 0);
@@ -169,8 +159,12 @@ read:
 				}
 			}
 			fo = fopen(filename, "w");
-			for (i = 0; i <= curnum; ++i)
-				fputws_unlocked(text[i].buffer, fo);
+			for (unsigned char i = 0; i <= curnum; ++i)
+#if defined(UNICODE)
+				fputws(text[i].buffer, fo);
+#else
+				fputs(data(text[i]), fo);
+#endif
 			fclose(fo);
 
 			print_header();
@@ -193,7 +187,7 @@ read:
 					print2header(tmp, 1);
 				}
 			}
-			sprintf(tmp, "y: %lu x: %u", ry, x);
+			sprintf(tmp, "y: %u x: %u", ry, x);
 			print2header(tmp, 2);
 			wmove(text_win, y, x);
 			break;
@@ -217,7 +211,7 @@ read:
 		case KEY_TAB:
 			winsch(text_win, '\t');
 			wmove(text_win, y, x + 8);
-			text[ry].insert(x, '\t');
+			insert(text[ry], x, '\t');
 			break;
 
 		default:
@@ -226,7 +220,7 @@ read:
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, text_win->_curx + 1);
 
-			text[ry].insert(x, s[0]);
+			insert(text[ry], x, s[0]);
 			break;
 		}
 	}
