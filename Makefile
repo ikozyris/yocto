@@ -1,15 +1,15 @@
-# The compiler: g++
-CC = g++ -std=c++20
+# The compiler: gcc
+CC = g++ --std=c++20 #-DUNICODE
 
 # Compiler flags:
 #  -Wall		Turns on most, but not all, compiler warnings
 #  -Wextra		Turns on extra warnings
 #  -Werror		Warnings will not be tolerated!
 #  -Ofast		Optimizes the code
-#  -lncursesw	Links to ncurses library for wide characters
+#  -lncurses	Links to ncurses library for wide characters
 
-CXXFLAGS = -Wall -Wextra -Wpadded -pedantic -lncursesw # Debug only
-#CXXFLAGS = -Ofast -lncursesw
+#CXXFLAGS = -Wall -Wextra -Ofast -Wpadded -pedantic -lncursesw # Debug only
+CXXFLAGS = -Ofast -lncursesw -fopenmp -march=native
 
 # the build target executable:
 TARGET = yocto

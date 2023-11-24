@@ -1,13 +1,13 @@
 #include "../headers/headers.h"
 
-inline char *itoa(int a)
+char *itoa(int a)
 {
 	static char b[12];
 	sprintf(b, "%d", a);
 	return b;
 }
 
-static char *hrsize(uint64_t bytes)
+char *hrsize(uint64_t bytes)
 {
 	char *suffix[] = {(char*)"B", (char*)"KB", (char*)"MB", 
 			  (char*)"GB", (char*)"TB"};
