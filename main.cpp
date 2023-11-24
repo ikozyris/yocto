@@ -158,6 +158,7 @@ read:
 					break;
 				}
 			}
+			noecho();
 			fo = fopen(filename, "w");
 			for (unsigned char i = 0; i <= curnum; ++i)
 #if defined(UNICODE)
