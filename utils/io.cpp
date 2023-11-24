@@ -20,6 +20,7 @@ void clear_header()
 
 void print_header_title() {
 	mvwprintw(header_win, 0, maxx / 2 - 9, "%s", name);
+	wrefresh(header_win);
 }
 
 void reset_header() {
