@@ -10,13 +10,22 @@ void print_lines()
 	} while (--i != 0);
 }
 
-void print_header()
+void clear_header()
 {
 	wmove(header_win, 0, 0);
 	for (short i = maxx;  i != 0; --i)
 		waddch(header_win, ' ');
+	wrefresh(header_win);
+}
+
+inline void print_header_title() {
 	mvwprintw(header_win, 0, maxx / 2 - 9, "%s", name);
 	wrefresh(header_win);
+}
+
+inline void reset_header() {
+	clear_header();
+	print_header_title();
 }
 
 // pos: (1 left) (3 right) (else center)
