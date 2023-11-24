@@ -32,10 +32,6 @@ typedef struct gap_buf {
 		bzero(buffer, array_size);
 		//memset(buffer, gapchar, array_size);
 	}
-
-	~gap_buf() {
-		free(buffer);
-	}
 } gap_buf;
 
 inline void init(gap_buf &a) {

@@ -121,8 +121,6 @@ read:
 			it = text.begin();
 			it += ry;
 			static gap_buf a;
-			init(a);
-			resize(a, 20);
 			insert(a, 0, L'\n');
 			text.insert(it, a);
 			prevy = y;
@@ -131,7 +129,6 @@ read:
 			// print text again (or find a better way)
 			print_text();
 			wmove(text_win, prevy + 1, 0);
-			//wrefresh(text_win);
 			break;
 
 		case HOME:
