@@ -2,5 +2,5 @@
 main
 yocto
 gen.c
-test-case
+test*
 mem_usg.sh

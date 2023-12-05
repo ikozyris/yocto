@@ -43,12 +43,15 @@ read:
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate once
-		if (x > text[ry].length) // if out of bounds: move (to avoid bugs)
-			wmove(text_win, y, text[ry].length);
+		print_text();
+		wmove(text_win, y, x);
+		mv_curs(text[ry], x);
+		if (x >= min(text[ry].length, maxx)) // if out of bounds: move (to avoid bugs)
+			wmove(text_win, y, min(text[ry].length, maxx));
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
 		case DOWN:
-			if (ry > curnum) // do not scroll indefinetly
+			if (ry >= curnum) // do not scroll indefinetly
 				break;
 			if (y == (maxy - 1) && ry < curnum) {
 				ofy++;
@@ -121,7 +124,8 @@ read:
 			it = text.begin();
 			it += ry;
 			static gap_buf a;
-			insert(a, 0, L'\n');
+			apnd_s(a, (tp*)" \n\0\0", 4);
+			//insert(a, 1, L'\n');
 			text.insert(it, a);
 			prevy = y;
 			++curnum;
@@ -144,7 +148,6 @@ read:
 				clear_header();
 				print2header("Enter filename: ", 1);
 				wmove(header_win, 0, 16);
-				//wscanw(header_win, "%s", filename);
 
 				echo();
 				if (wgetnstr(header_win, filename, FILENAME_MAX) == ERR ||
@@ -159,9 +162,9 @@ read:
 			fo = fopen(filename, "w");
 			for (unsigned char i = 0; i <= curnum; ++i)
 #if defined(UNICODE)
-				fputws(text[i].buffer, fo);
+				fputws(data(text[i], text[i].capacity), fo);
 #else
-				fputs(data(text[i]), fo);
+				fputs(data(text[i], text[i].capacity), fo);
 #endif
 			fclose(fo);
 

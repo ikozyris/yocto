@@ -1,13 +1,13 @@
 #include "gapbuffer.hpp"
-#define MAX_LINES 5000
+#define DEFAULT_LINES 128
 
 WINDOW *header_win, *ln_win, *text_win;
 
 #include <deque>
-unsigned txt_cpt = MAX_LINES; // deque does not expose this property itself
-std::deque<gap_buf> text(MAX_LINES);
+unsigned txt_cpt = DEFAULT_LINES; // deque does not expose this property itself
+std::deque<gap_buf> text(DEFAULT_LINES);
 std::deque<gap_buf>::iterator it;
-//gap_buf text[MAX_LINES];
+//gap_buf text[DEFAULT_LINES];
 
 wchar_t s[2];
 unsigned char y, x;
