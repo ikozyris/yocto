@@ -47,11 +47,11 @@ void print2header(const char *msg, unsigned char pos)
 #define max(a, b) (a > b ? a : b)
 
 #if defined(UNICODE)
-#define print_line(i) waddnwstr(text_win, text[i].buffer, min(text[i].length, maxx))
-#define print_line_no_nl(i) waddnwstr(text_win, text[i].buffer, min(text[i].length - 1, maxx))
+#define print_line(i) waddnwstr(text_win, data(text[i], maxx), min(text[i].length, maxx))
+#define print_line_no_nl(i) waddnwstr(text_win, data(text[i], maxx), min(text[i].length - 1, maxx))
 #else
-#define print_line(i) waddnstr(text_win, data(text[i]), min(text[i].length, maxx))
-#define print_line_no_nl(i) waddnstr(text_win, data(text[i]), min(text[i].length - 1, maxx))
+#define print_line(i) waddnstr(text_win, data(text[i], maxx), min(text[i].length, maxx))
+#define print_line_no_nl(i) waddnstr(text_win, data(text[i], maxx), min(text[i].length - 1, maxx))
 #endif
 
 void print_text()
@@ -86,8 +86,12 @@ inline void read_getc(FILE *fi)
 
 inline void read_fgets(FILE *fi)
 {
-	char tmp[sz];
+	tp tmp[sz];
+#if defined(UNICODE)
+	while ((fgetws_unlocked(tmp, sz, fi))) {
+#else
 	while ((fgets_unlocked(tmp, sz, fi))) {
+#endif
 		apnd_s(text[curnum], tmp, sz);
 		if (text[curnum].capacity > 10e5) [[unlikely]]
 			++curnum;
@@ -96,11 +100,9 @@ inline void read_fgets(FILE *fi)
 
 inline void read_fread(FILE *fi)
 {
-	char tmp[sz];
+	tp tmp[sz];
 	size_t a = 0;
 	while ((a = fread(tmp, sizeof(tmp[0]), sz, fi))) {
 		apnd_s(text[curnum], tmp, a);
-		if (text[curnum].capacity > 10e5) [[unlikely]]
-			++curnum;
 	}
 }

@@ -10,6 +10,7 @@ void init_curses()
 
 void init_header()
 {
+	// newwin arguments: height, width, start y, start x
 	header_win = newwin(1, maxx, 0, 0);
 	wattrset(header_win, A_STANDOUT);
 	reset_header();
@@ -26,7 +27,7 @@ void init_lines()
 
 void init_text()
 {
-	text_win = newwin(maxy - 1, maxx, 1, 4);
+	text_win = newwin(maxy - 1, maxx - 4, 1, 4);
 	scrollok(text_win, TRUE);
 	keypad(text_win, TRUE);
 	wmove(text_win, 0, 0);

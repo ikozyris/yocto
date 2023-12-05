@@ -9,7 +9,7 @@ CC = g++ --std=c++20 #-DUNICODE
 #  -lncurses	Links to ncurses library for wide characters
 
 #CXXFLAGS = -Wall -Wextra -Ofast -Wpadded -pedantic -lncursesw # Debug only
-CXXFLAGS = -Ofast -lncursesw -fopenmp -march=native
+CXXFLAGS = -O3 -lncursesw -fopenmp -march=native
 
 # the build target executable:
 TARGET = yocto

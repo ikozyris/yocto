@@ -19,7 +19,8 @@ int main()
 	if (strcmp(input, "yocto") == 0) {
 		printf("Correct!\n");
 	} else {
-		printf("Wrong answer\n");
+		while (1)
+			printf("NO! ");
 	}
 }
 ```
