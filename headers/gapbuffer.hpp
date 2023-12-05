@@ -1,23 +1,20 @@
 #include "headers.h"
 
-// \param a visible position in array
-// \return real position in array
-// \example file[map(position)]
-#define map(a)	a // for future use (currently useless)
-
 #if defined(UNICODE)
 #define tp wchar_t
 #else
 #define tp char
 #endif
 
-#define gap 10
-#define gapchar 0
-#define array_size 50
+#define gap 16
+#define gapchar 1
+#define array_size 32
 
 typedef struct gap_buf {
 	unsigned capacity; // allocated size
 	unsigned length;	 // length of line
+	unsigned gps;	// gap start (first element of gap)
+	unsigned gpe;	// gap end	(last element of gap)
 	tp *buffer;
 
 	tp &operator[](unsigned pos) {
@@ -26,48 +23,64 @@ typedef struct gap_buf {
 
 	gap_buf() {
 		buffer = (tp*)malloc(sizeof(tp) * array_size);
-		//buffer = new tp[array_size];
 		length = 0;
+		gps = 0;
+		gpe = 0;
 		capacity = array_size;
-		bzero(buffer, array_size);
-		//memset(buffer, gapchar, array_size);
+		//bzero(buffer, array_size);
+		memset(buffer, gapchar, array_size);
 	}
 } gap_buf;
 
-inline void init(gap_buf &a) {
-	a.buffer = (tp*)malloc(sizeof(tp) * array_size);
-	//buffer = new tp[array_size];
-	a.length = 0;
-	a.capacity = array_size;
-	bzero(a.buffer, array_size);
-	//memset(a.buffer, gapchar, array_size);
-}
-
 inline void resize(gap_buf &a, unsigned size) {
-	//size++;
 	a.buffer = (tp*)realloc(a.buffer, sizeof(tp) * size);
 	a.capacity = size;
+}
 
-	return;
+void grow_gap(gap_buf &a, unsigned pos) {
+	char tmp = a[pos];
+	for (unsigned i = a.length; i > pos; --i) {
+		a[i + gap] = a[i];
+		a[i] = gapchar;
+	}
+	a.gps = pos;
+	if (a[pos + gap == gapchar])
+		a.gpe = pos + gap;
+	else
+		a.gpe = pos + gap - 1;
+	a[pos] = gapchar;
+	a[pos + gap] = tmp;
+}
+
+void mv_curs(gap_buf &a, unsigned pos) {
+	if (a.gps == a.gpe) { [[unlikely]]
+		grow_gap(a, pos);
+	} else if (pos > a.gps) { // move to right
+		while (pos != a.gps) {
+			a.gpe++;
+			a[a.gps] = a[a.gpe];
+			a[a.gpe] = gapchar;
+			a.gps++;
+		}
+	} else if (pos < a.gps) { // move to left
+		while (pos != a.gps) {
+			a.gps--;
+			a[a.gpe] = a[a.gps];
+			a[a.gps] = gapchar;
+			a.gpe--;
+		}
+	}
 }
 
 inline void insert(gap_buf &a, unsigned pos, tp ch) {
-	if (a.buffer[map(pos)] == gapchar) {
-		a.buffer[map(pos)] = ch;
-	} else if (map(pos) < a.capacity) {
-		/*char tmp = a.buffer[map(pos)];
-		for (unsigned i = a.length; i > map(pos); --i) {
-			a.buffer[i + gap] = a.buffer[i];
-			a.buffer[i] = gapchar;
-		}
-		a.buffer[map(pos)] = ch;
-		a.buffer[map(pos + gap)] = tmp;*/
-		for (unsigned i = a.length; i > map(pos); --i) {
-			a.buffer[i] = a.buffer[i - 1];
-		}
-		a.buffer[map(pos)] = ch;
-	} else {
+	if (a.length + gap * 3 > a.capacity) [[unlikely]]
 		resize(a, a.capacity * 2);
+	if (a[pos] == gapchar) { [[likely]]
+		a[pos] = ch;
+		++a.gps;
+	} else {
+		grow_gap(a, pos);
+		a[pos] = ch;
 	}
 	++a.length;
 }
@@ -75,7 +88,7 @@ inline void insert(gap_buf &a, unsigned pos, tp ch) {
 inline void apnd_c(gap_buf &a, tp ch) {
 	if (a.length >= a.capacity) [[unlikely]]
 		resize(a, a.capacity * 2);
-	a.buffer[map(a.length)] = ch;
+	a[a.length] = ch;
 	++a.length;
 }
 
@@ -84,22 +97,24 @@ inline void apnd_s(gap_buf &a, tp *str, unsigned size) {
 		resize(a, a.capacity + size * 2);
 	#pragma omp parallel for
 	for (unsigned i = a.length; i < a.length + size; ++i)
-		a.buffer[map(i)] = str[i - a.length];
+		a[i] = str[i - a.length];
 	a.length += size;
 }
 
 inline void eras(gap_buf &a, unsigned pos) {
-	a.buffer[map(pos)] = gapchar;
+	a[pos] = gapchar;
+	a.gps--;
 }
 
-inline tp *data(gap_buf &a) {
-	tp *tmp = (tp*)malloc(sizeof(tp) * a.capacity);
-	bzero(tmp, a.capacity);
+inline tp *data(gap_buf &a, unsigned width) {
+	tp *tmp = (tp*)malloc(sizeof(tp) * width);
+	bzero(tmp, width);
 	unsigned done = 0;
-	for (unsigned i = 0; i < a.capacity; ++i) 
-		if (a.buffer[i] != gapchar) {
-			tmp[done] = a.buffer[i];
+	for (unsigned i = 0; done < width; ++i) {
+		if (a[i] != gapchar) {
+			tmp[done] = a[i];
 			done++;
 		}
+	}
 	return tmp;
 }
