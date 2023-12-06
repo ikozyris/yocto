@@ -1,14 +1,11 @@
 #include "gapbuffer.hpp"
 #define DEFAULT_LINES 128
 
-WINDOW *header_win, *ln_win, *text_win;
-
-#include <deque>
-unsigned txt_cpt = DEFAULT_LINES; // deque does not expose this property itself
+unsigned txt_cpt = DEFAULT_LINES; // deque doesn't return capacity
 std::deque<gap_buf> text(DEFAULT_LINES);
 std::deque<gap_buf>::iterator it;
-//gap_buf text[DEFAULT_LINES];
 
+WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[2];
 unsigned char y, x;
 // offset in y axis of text and screen
