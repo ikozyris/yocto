@@ -5,7 +5,7 @@ void init_curses()
 	initscr();
 	cbreak();
 	raw();
-	noecho();
+	noecho(); // only temporarly enabled when asking for input in header
 }
 
 void init_header()

@@ -1,5 +1,5 @@
 # Yocto
-A simple and compact text editor using ncurses and rope, written in C++ with less than 300 lines of code.
+A simple and compact text editor using ncurses and a gap buffer, written in C++, in ~650 lines of code.
 More information is available on the [wiki](https://github.com/ikozyris/yocto/wiki).
 
 ## How to use
@@ -8,7 +8,8 @@ make build
 make install
 ```
 
-Or use the dialog utility (`wizard.sh`)
+Or use the user-friendly dialog utility (`wizard.sh`)
+which also supports configuring yocto
 
 ### License
 

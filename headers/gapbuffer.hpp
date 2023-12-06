@@ -39,6 +39,7 @@ inline void resize(gap_buf &a, unsigned size) {
 
 void grow_gap(gap_buf &a, unsigned pos) {
 	char tmp = a[pos];
+	// TODO: make it parallel
 	for (unsigned i = a.length; i > pos; --i) {
 		a[i + gap] = a[i];
 		a[i] = gapchar;

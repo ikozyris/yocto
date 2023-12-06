@@ -60,8 +60,6 @@ void print_text()
 	wclear(text_win);
 	for (i = 0; i < min(txt_cpt, maxy - 1); ++i)
 		print_line(i);
-		//for (int j = 0; j < (int)text[i].length && j < maxx; ++j)
-		//	waddch(text_win, text[i][j]);
 	print_line_no_nl(i);
 }
 
@@ -102,7 +100,6 @@ inline void read_fread(FILE *fi)
 {
 	tp tmp[sz];
 	size_t a = 0;
-	while ((a = fread(tmp, sizeof(tmp[0]), sz, fi))) {
+	while ((a = fread(tmp, sizeof(tmp[0]), sz, fi)))
 		apnd_s(text[curnum], tmp, a);
-	}
 }
