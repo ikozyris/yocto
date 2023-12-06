@@ -9,7 +9,6 @@ int main(int argc, char *argv[])
 	setlocale(LC_NUMERIC,"C");
 
 	init_curses();
-
 	getmaxyx(stdscr, maxy, maxx);
 
 	// initialize windows
@@ -100,7 +99,7 @@ read:
 			if (x != 0) {
 				mvwdelch(text_win, y, x - 1);
 				eras(text[ry], x - 1);
-			} else if (y != 0){ // delete previous line's \n
+			} else if (y != 0) { // delete previous line's \n
 				eras(text[ry], text[ry].length);
 				print_text();
 				--curnum;
