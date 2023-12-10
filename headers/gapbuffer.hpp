@@ -6,9 +6,9 @@
 #define tp char
 #endif
 
-#define gap 16
+#define gap 32
 #define gapchar 1
-#define array_size 32
+#define array_size 1024
 
 typedef struct gap_buf {
 	unsigned capacity; // allocated size
@@ -31,6 +31,11 @@ typedef struct gap_buf {
 		memset(buffer, gapchar, array_size);
 	}
 } gap_buf;
+
+inline void fre(gap_buf &a) {
+	::free(a.buffer);
+	a.buffer = NULL;
+}
 
 inline void resize(gap_buf &a, unsigned size) {
 	a.buffer = (tp*)realloc(a.buffer, sizeof(tp) * size);
