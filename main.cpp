@@ -34,15 +34,13 @@ int main(int argc, char *argv[])
 		fclose(fi);
 		print_text();
 	}
-
-//	sleep(5);
 	wmove(text_win, 0, 0);
-//	goto stop; /*
 read:
+//	goto stop;
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate once
-		print_text();
+		//print_text(); // debug only
 		wmove(text_win, y, x);
 		mv_curs(text[ry], x);
 		if (x >= min(text[ry].length, maxx)) // if out of bounds: move (to avoid bugs)
