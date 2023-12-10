@@ -80,7 +80,7 @@ inline void read_getc(FILE *fi)
 		}
 	}
 }
-#define sz 1'000'000 // 1MB temp array
+#define sz 1000000 // 1MB temp array
 
 inline void read_fgets(FILE *fi)
 {

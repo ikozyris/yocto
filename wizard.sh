@@ -90,7 +90,7 @@ config_dialog() {
 			if [ $DIAL = "dialog" ]; then
 				key_config
 			else
-				display_result "dialog not installed; But you can still edit keybindings.h"
+				display_result "dialog not installed, but you can still edit keybindings.h"
 			fi
 			;;
 		2 )
