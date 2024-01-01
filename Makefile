@@ -5,7 +5,7 @@ CC = g++ --std=c++20# -DUNICODE
 #  -Wall		Turns on most, but not all, compiler warnings
 #  -Wextra		Turns on extra warnings
 #  -Werror		Warnings will not be tolerated!
-#  -0fast		Optimizes the code
+#  -Ofast		Optimizes the code
 #  -fopenmp		Multi-threading
 #  -march=native	Add optimization flags specific to the host
 #  -flto		Link Time Optimization
@@ -13,7 +13,7 @@ CC = g++ --std=c++20# -DUNICODE
 #  -pendatic	Strictier warnings
 #  -lncursesw	Links to ncurses library for wide characters
 
-#CXXFLAGS = -Wall -Wextra -Ofast -Wpadded -pedantic -fopenmp -lncursesw # Debug only
+#CXXFLAGS = -g -Wall -Wextra -Wpadded -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
 CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw
 
 # the build target executable:

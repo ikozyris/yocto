@@ -1,4 +1,4 @@
-#include "io.cpp"
+#include "key_func.cpp"
 
 void init_curses()
 {

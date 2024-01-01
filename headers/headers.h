@@ -4,4 +4,4 @@
 #include <unistd.h>
 #include <locale.h>	// for setting locale
 #include <sys/stat.h>	// for file size
-#include <deque>
+#include <list>
