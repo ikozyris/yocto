@@ -1,22 +1,24 @@
 #include "gapbuffer.hpp"
-#define DEFAULT_LINES 128
 
-unsigned txt_cpt = DEFAULT_LINES; // deque doesn't return capacity
-std::deque<gap_buf> text(DEFAULT_LINES);
-std::deque<gap_buf>::iterator it;
+#if defined(DEBUG)
+#define DEFAULT_LINES 16
+#else
+#define DEFAULT_LINES 128
+#endif
+unsigned txt_cpt = DEFAULT_LINES; // capacity
+std::list<gap_buf> text(DEFAULT_LINES);
+std::list<gap_buf>::iterator it;
 
 WINDOW *header_win, *ln_win, *text_win;
-wchar_t s[2];
+wchar_t s[6];
 unsigned char y, x;
 // offset in y axis of text and screen
-long signed int ofy;
-unsigned ry;
-unsigned char prevy;
-unsigned maxy, maxx; // to store the maximum rows and columns
+long int ofy;
+unsigned int ry;
+unsigned int maxy, maxx; // to store the maximum rows and columns
 int ch;
-char filename[FILENAME_MAX];
+char *filename;
 
 // indx: tmp for lenght of line
 // curnum: total lines
 size_t indx, curnum;
-signed int mx;

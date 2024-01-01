@@ -2,5 +2,5 @@
 main
 yocto
 gen.c
-test*
+te*
 mem_usg.sh
