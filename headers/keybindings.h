@@ -18,3 +18,4 @@
 #define INFO		'i' // with alt
 #define REFRESH		ctrl('R')
 #define KEY_TAB		9
+#define CMD			'c'

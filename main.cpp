@@ -1,9 +1,9 @@
 #include "utils/init.c"
 #include "headers/keybindings.h"
-#include "utils/sizes.c"
 
 int main(int argc, char *argv[])
 {
+	it = text.begin();
 	// UTF-8
 	setlocale(LC_ALL, "");
 	setlocale(LC_NUMERIC,"C");
@@ -19,14 +19,13 @@ int main(int argc, char *argv[])
 	getmaxyx(text_win, maxy, maxx);
 	wrefresh(ln_win);
 
-	FILE *fo;
 	if (argc > 1) {
+		filename = (char*)malloc(sizeof(char) * 128);
 		strcpy(filename, argv[1]);
 		FILE *fi = fopen(filename, "r");
 		if (fi == NULL) {
-			fo = fopen(filename, "w");
 			print2header("New file", 1);
-			goto read;
+			goto loop;
 		}
 		read_getc(fi);
 		//read_fgets(fi);
@@ -35,21 +34,32 @@ int main(int argc, char *argv[])
 		print_text();
 	}
 	wmove(text_win, 0, 0);
-read:
-//	goto stop;
+
+	it = text.begin();
+loop:
+	//goto stop;
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate once
+		mv_curs(*it, x);
+#ifdef DEBUG
 		//print_text(); // debug only
+		char tmp[42];
+		sprintf(tmp, "s %u|  e %u| sz %u | len %u", 
+			it->gps, it->gpe, it->capacity, it->length);
+		clear_header();
+		print2header(tmp, 1);
 		wmove(text_win, y, x);
-		mv_curs(text[ry], x);
-		if (x >= min(text[ry].length, maxx)) // if out of bounds: move (to avoid bugs)
-			wmove(text_win, y, min(text[ry].length, maxx));
+#endif
+		if (x >= min(it->length - 1, maxx)) // if out of bounds: move (to avoid bugs)
+			wmove(text_win, y, min(it->length - 1, maxx));
+
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
 		case DOWN:
 			if (ry >= curnum) // do not scroll indefinetly
 				break;
+			++it;
 			if (y == (maxy - 1) && ry < curnum) {
 				ofy++;
 				wscrl(text_win, 1);
@@ -57,7 +67,7 @@ read:
 				mvwprintw(ln_win, maxy - 1, 0, "%3d", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
-				print_line_no_nl(ry + 1);
+				print_line_no_nl(*it);
 				wmove(text_win, y, x);
 			} else {
 				wmove(text_win, y + 1, x);
@@ -71,11 +81,12 @@ read:
 				mvwprintw(ln_win, 0, 0, "%3d", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
-				print_line(ry - 1);
+				print_line(*(--it));
 				wmove(text_win, 0, x);
 				wrefresh(ln_win);
-			} else {
+			} else if (y != 0) {
 				wmove(text_win, y - 1, x);
+				--it;
 			}
 			break;
 
@@ -83,53 +94,37 @@ read:
 			if (x > 0)
 				wmove(text_win, y, x - 1);
 			else if (y > 0)
-				wmove(text_win, y - 1, text[ry - 1].length);
+				wmove(text_win, y - 1, (--it)->length - 1);
 			break;
 
 		case RIGHT:
-			if ((size_t)x < text[ry].length)
+			if (x < it->length - 1)
 				wmove(text_win, y, x + 1);
-			else if (ry < curnum)
+			else if (ry < curnum) {
 				wmove(text_win, y + 1, 0);
+				++it;
+			}
 			break;
 
 		case BACKSPACE:
 			if (x != 0) {
 				mvwdelch(text_win, y, x - 1);
-				eras(text[ry], x - 1);
+				eras(*it, x - 1);
 			} else if (y != 0) { // delete previous line's \n
-				eras(text[ry], text[ry].length);
+				eras(*it, it->length);
 				print_text();
 				--curnum;
 			}
-			wmove(text_win, y, x - 1);
 			break;
 
 		case DELETE:
-			if (x != 0) {
-				wdelch(text_win);
-				eras(text[ry], x - 1);
-			} else { // delete previous line's \n
-				eras(text[ry], text[ry].length);
-				print_text();
-				--curnum;
-				wmove(text_win, y, x);
-			}
+			wdelch(text_win);
+			mv_curs(*it, x + 1);
+			eras(*it, x);
 			break;
 
 		case ENTER:
-			it = text.begin();
-			it += ry;
-			static gap_buf a;
-			apnd_s(a, (tp*)" \n\0\0", 4);
-			//insert(a, 1, L'\n');
-			text.insert(it, a);
-			prevy = y;
-			++curnum;
-
-			// print text again (or find a better way)
-			print_text();
-			wmove(text_win, prevy + 1, 0);
+			enter();
 			break;
 
 		case HOME:
@@ -137,56 +132,21 @@ read:
 			break;
 
 		case END:
-			wmove(text_win, y, text[ry].length);
+			wmove(text_win, y, it->length);
 			break;
 
 		case SAVE:
-			if (strlen(filename) == 0) {
-				clear_header();
-				print2header("Enter filename: ", 1);
-				wmove(header_win, 0, 16);
-
-				echo();
-				if (wgetnstr(header_win, filename, FILENAME_MAX) == ERR ||
-				    strlen(filename) == 0) {
-					reset_header();
-					print2header("ERROR", 1);
-					wmove(text_win, y, x);
-					break;
-				}
-			}
-			noecho();
-			fo = fopen(filename, "w");
-			for (unsigned char i = 0; i <= curnum; ++i)
-#if defined(UNICODE)
-				fputws(data(text[i], text[i].capacity), fo);
-#else
-				fputs(data(text[i], text[i].capacity), fo);
-#endif
-			fclose(fo);
-
-			reset_header();
-			print2header("Saved", 1);
-			wmove(text_win, y, x);
+			save();
 			break;
 
-		case 27: // alt - i
+		case 27: // ALT
 			wtimeout(text_win, 1000);
-			if (!(wgetch(text_win) == INFO))
-				break;
-			wtimeout(text_win, -42);
-			char tmp[21];
-			bzero(tmp, 21);
-			if (strlen(filename) != 0) {
-				struct stat stat_buf;
-				if (stat(filename, &stat_buf) == 0) {
-					sprintf(tmp, "%s lines", itoa(curnum));
-					print2header(hrsize(stat_buf.st_size), 3);
-					print2header(tmp, 1);
-				}
-			}
-			sprintf(tmp, "y: %u x: %u", ry, x);
-			print2header(tmp, 2);
+			ch = wgetch(text_win);
+			if (ch == INFO)
+				info();
+			else if (ch == CMD)
+				command();
+			wtimeout(text_win, -1);
 			wmove(text_win, y, x);
 			break;
 
@@ -208,17 +168,17 @@ read:
 
 		case KEY_TAB:
 			winsch(text_win, '\t');
-			wmove(text_win, y, x + 8);
-			insert(text[ry], x, '\t');
+			wmove(text_win, y, x + TABSIZE);
+			insert(*it, x, '\t');
 			break;
 
 		default:
-			if (s[0] < 32)
+			if (s[0] < 32 && s[0] > 0)
 				break;
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, text_win->_curx + 1);
 
-			insert(text[ry], x, s[0]);
+			insert(*it, x, s[0]);
 			break;
 		}
 	}
