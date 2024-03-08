@@ -1,4 +1,4 @@
-#include "utils/init.c"
+#include "utils/key_func.cpp"
 #include "headers/keybindings.h"
 
 int main(int argc, char *argv[])
@@ -40,10 +40,11 @@ loop:
 	//goto stop;
 	while (1) {
 		getyx(text_win, y, x);
-		ry = y + ofy; // calculate once
-		mv_curs(*it, x);
+		ry = y + ofy; // calculate offsets
+		rx = x + ofx;
+		mv_curs(*it, rx);
 #ifdef DEBUG
-		//print_text(); // debug only
+		print_text(); // debug only
 		char tmp[42];
 		sprintf(tmp, "s %u|  e %u| sz %u | len %u", 
 			it->gps, it->gpe, it->capacity, it->length);
@@ -51,8 +52,8 @@ loop:
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 #endif
-		if (x >= min(it->length - 1, maxx)) // if out of bounds: move (to avoid bugs)
-			wmove(text_win, y, min(it->length - 1, maxx));
+		if (x >= min(it->length, maxx)) // if out of bounds: move (to avoid bugs)
+			wmove(text_win, y, min(it->length, maxx));
 
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
@@ -81,7 +82,8 @@ loop:
 				mvwprintw(ln_win, 0, 0, "%3d", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
-				print_line(*(--it));
+				--it; // why can't *(--it) work?
+				print_line(*it);
 				wmove(text_win, 0, x);
 				wrefresh(ln_win);
 			} else if (y != 0) {
@@ -94,11 +96,11 @@ loop:
 			if (x > 0)
 				wmove(text_win, y, x - 1);
 			else if (y > 0)
-				wmove(text_win, y - 1, (--it)->length - 1);
+				wmove(text_win, y - 1, (--it)->length);
 			break;
 
 		case RIGHT:
-			if (x < it->length - 1)
+			if (x < it->length)
 				wmove(text_win, y, x + 1);
 			else if (ry < curnum) {
 				wmove(text_win, y + 1, 0);
@@ -139,7 +141,7 @@ loop:
 			save();
 			break;
 
-		case 27: // ALT
+		case 27: // ALT or ESC
 			wtimeout(text_win, 1000);
 			ch = wgetch(text_win);
 			if (ch == INFO)
@@ -161,6 +163,7 @@ loop:
 			wrefresh(ln_win);
 			wrefresh(header_win);
 			wmove(text_win, 0, 0);
+			it = text.begin();
 			break;
 
 		case EXIT:
@@ -169,16 +172,22 @@ loop:
 		case KEY_TAB:
 			winsch(text_win, '\t');
 			wmove(text_win, y, x + TABSIZE);
-			insert(*it, x, '\t');
+			insert_c(*it, x, '\t');
 			break;
 
 		default:
-			if (s[0] < 32 && s[0] > 0)
+			if (s[0] > 0 && s[0] < 32)
 				break;
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, text_win->_curx + 1);
-
-			insert(*it, x, s[0]);
+#if defined(UNICODE)
+			insert_c(*it, x, s[0]);
+#else
+			len = wcstombs(s2, s, 4);
+			insert_s(*it, rx, s2, len);
+			if (len != 1)
+				ofx++; // Unicode character
+#endif
 			break;
 		}
 	}

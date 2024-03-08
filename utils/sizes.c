@@ -1,4 +1,4 @@
-#include "../headers/headers.h"
+#include "../headers/vars.hpp"
 
 char *itoa(int a)
 {
