@@ -1,4 +1,6 @@
-#include "key_func.cpp"
+#include "sizes.c"
+
+#define name "Yocto 0.8-alpha3"
 
 void init_curses()
 {
@@ -8,12 +10,20 @@ void init_curses()
 	noecho(); // only temporarly enabled when asking for input in header
 }
 
-void init_header()
+void init_text()
 {
-	// newwin arguments: height, width, start y, start x
-	header_win = newwin(1, maxx, 0, 0);
-	wattrset(header_win, A_STANDOUT);
-	reset_header();
+	text_win = newwin(maxy - 1, maxx - 4, 1, 4);
+	scrollok(text_win, TRUE);
+	keypad(text_win, TRUE);
+	wmove(text_win, 0, 0);
+}
+
+void print_lines()
+{
+	short i = maxy;
+	do
+		mvwprintw(ln_win, i - 1, 0, "%3d", i);
+	while (--i != 0);
 }
 
 void init_lines()
@@ -25,10 +35,30 @@ void init_lines()
 	print_lines();
 }
 
-void init_text()
+void clear_header()
 {
-	text_win = newwin(maxy - 1, maxx - 4, 1, 4);
-	scrollok(text_win, TRUE);
-	keypad(text_win, TRUE);
-	wmove(text_win, 0, 0);
+	wmove(header_win, 0, 0);
+	for (short i = maxx;  i != 0; --i)
+		waddch(header_win, ' ');
+	wrefresh(header_win);
+}
+
+inline void print_header_title()
+{
+	mvwprintw(header_win, 0, maxx / 2 - 9, "%s", name);
+	wrefresh(header_win);
+}
+
+inline void reset_header()
+{
+	clear_header();
+	print_header_title();
+}
+
+void init_header()
+{
+	// newwin arguments: height, width, start y, start x
+	header_win = newwin(1, maxx, 0, 0);
+	wattrset(header_win, A_STANDOUT);
+	reset_header();
 }

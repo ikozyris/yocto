@@ -1,5 +1,4 @@
 #include "io.cpp"
-#include "sizes.c"
 
 void command()
 {
@@ -27,10 +26,20 @@ void command()
 				fscanf(file, " %d", &pid);
 		}
 		fclose(file);
-		sprintf(buffer, "RAM: %s pid: %d",
+		sprintf(buffer, "RAM: %s PID: %d",
 			  hrsize(memusg * 1000), pid);
 		clear_header();
 		print2header(buffer, 1);
+	} else if (strcmp(tmp, "stats") == 0) {
+		char tmp[42];
+		sprintf(tmp, "s %u|  e %u| sz %u | len %u", 
+			it->gps, it->gpe, it->capacity, it->length);
+		clear_header();
+		print2header(tmp, 1);
+		wmove(text_win, y, x);
+	} else if (strcmp(tmp, "run") == 0) {
+		char *tmp = input_header("Enter command");
+		system(tmp);
 	} else {
 		print2header("command not found", 3);
 	}
@@ -45,9 +54,9 @@ void save()
 	FILE *fo = fopen(filename, "w");
 	for (auto i : text)
 #if defined(UNICODE)
-	fputws(data(i, i.capacity), fo);
+	fputws(data(i, 0, i.capacity), fo);
 #else
-	fputs(data(i, i.capacity), fo);
+	fputs(data(i, 0, i.capacity), fo);
 #endif
 	fclose(fo);
 
@@ -65,24 +74,37 @@ void info()
 		print2header(hrsize(stat_buf.st_size), 3);
 		print2header(tmp, 1);
 	}
-	sprintf(tmp, "y: %u x: %u lenght: %u", 
+	sprintf(tmp, "y: %u x: %u length: %u", 
 		ry, x, it->length);
 	print2header(tmp, 2);
 }
 
 void enter()
 {
-	insert(*it, x, '\n');
+	insert_c(*it, x, '\n');
 
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
-	apnd_s(*t, data(*it, x, (*it).length),
-		(*it).length - x);
+	init(*t);
+	//char tmp[it->length];
+	//bzero(tmp, it->length);
+	//for (int i = it->gpe+1; i < it->length + gaplen(*it); ++i)
+	//	tmp[i-(it->gpe+1)] = it->buffer[i];
+	//apnd_s(*t, tmp);
+	apnd_s(*t, data(*it, it->gpe+1, it->length + gaplen(*t)));
+		//it->length - x);
 
-	for (unsigned i = (*it).gpe; i < (*it).length + (*it).gpe; ++i)
-		eras(*it, i);
-	text.insert(++it, *t);
+	if (it->gpe != it->capacity) // is newline not inserted at end
+	 	for (unsigned i = it->gpe + 1; i < it->length + gaplen(*t); ++i)
+	 		eras(*it, i);
+
+	// somewhere below iterator is invalidated
+	++it;
 	++curnum;
+	text.insert(it, *t);
 	// print text again (or find a better way)
 	print_text();
 	wmove(text_win, y + 1, 0);
+	// TODO: this shouldn't be necessary
+	it = text.begin();
+	std::advance(it, curnum);
 }

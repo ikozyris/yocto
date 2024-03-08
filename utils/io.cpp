@@ -1,34 +1,4 @@
-#include "../headers/vars.hpp"
-
-const char name[] = "Yocto 0.8-alpha3";
-
-void print_lines()
-{
-	short i = maxy;
-	do
-		mvwprintw(ln_win, i - 1, 0, "%3d", i);
-	while (--i != 0);
-}
-
-void clear_header()
-{
-	wmove(header_win, 0, 0);
-	for (short i = maxx;  i != 0; --i)
-		waddch(header_win, ' ');
-	wrefresh(header_win);
-}
-
-inline void print_header_title()
-{
-	mvwprintw(header_win, 0, maxx / 2 - 9, "%s", name);
-	wrefresh(header_win);
-}
-
-inline void reset_header()
-{
-	clear_header();
-	print_header_title();
-}
+#include "init.c"
 
 // pos: (1 left) (3 right) (else center)
 void print2header(const char *msg, unsigned char pos)
@@ -70,20 +40,20 @@ char *input_header(const char *q)
 #define max(a, b) (a > b ? a : b)
 
 #if defined(UNICODE)
-#define print_line(a) waddnwstr(text_win, data((a), maxx), min((a).length, maxx))
-#define print_line_no_nl(a) waddnwstr(text_win, data((a), maxx), min((a).length - 1, maxx))
+#define print_line(a) waddnwstr(text_win, data((a), 0, maxx), min((a).length, maxx))
+#define print_line_no_nl(a) waddnwstr(text_win, data((a), 0, maxx), min((a).length - 1, maxx))
 #else
-#define print_line(a) waddnstr(text_win, data((a), maxx), min((a).length, maxx))
-#define print_line_no_nl(a) waddnstr(text_win, data((a), maxx), min((a).length - 1, maxx))
+#define print_line(a) waddnstr(text_win, data((a), 0, maxx), min((a).length, maxx))
+#define print_line_no_nl(a) waddnstr(text_win, data((a), 0, maxx), min((a).length - 1, maxx))
 #endif
 
 void print_text()
 {
-	std::list<gap_buf>::iterator it = text.begin();
+	std::list<gap_buf>::iterator iter = text.begin();
 	wclear(text_win);
-	for (unsigned char i = 0; i < min(txt_cpt, maxy - 1); ++i, ++it)
-		print_line((*it));
-	print_line_no_nl((*it));
+	for (unsigned char i = 0; i < min(txt_cpt, maxy - 1); ++i, ++iter)
+		print_line((*iter));
+	print_line_no_nl((*iter));
 }
 
 inline void read_getc(FILE *fi)

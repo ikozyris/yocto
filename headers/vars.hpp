@@ -1,4 +1,5 @@
 #include "gapbuffer.hpp"
+#include "headers.h"
 
 #if defined(DEBUG)
 #define DEFAULT_LINES 16
@@ -11,10 +12,11 @@ std::list<gap_buf>::iterator it;
 
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[6];
-unsigned char y, x;
+char s2[6];
+unsigned char y, x, ofx = 0, len;
 // offset in y axis of text and screen
 long int ofy;
-unsigned int ry;
+unsigned int ry, rx;
 unsigned int maxy, maxx; // to store the maximum rows and columns
 int ch;
 char *filename;

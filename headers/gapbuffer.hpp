@@ -8,12 +8,12 @@
 #define gapchar 1
 #if defined(DEBUG)
 #define gap 2
-#define array_size 4
+#define array_size 64
 #else
 #define gap 32
 #define array_size 1024
 #endif
-#define gaplen(a) (a.gpe - a.gps + 1)
+#define gaplen(a) ((a).gpe - (a).gps + 1)
 
 struct gap_buf {
 	unsigned capacity; // allocated size
@@ -37,10 +37,23 @@ struct gap_buf {
 
 };
 
+void init(gap_buf &a)
+{
+	a.buffer = (tp*)malloc(sizeof(tp) * array_size);
+	a.length = 0;
+	a.gps = 0;
+	a.gpe = array_size;
+	a.capacity = array_size;
+	memset(a.buffer, gapchar, array_size);
+}
+
 inline void resize(gap_buf &a, const unsigned size) {
 	if (a.gpe == a.capacity)
 		a.gpe = size;
 	a.buffer = (tp*)realloc(a.buffer, sizeof(tp) * size);
+	tp *tmp = a.buffer;
+	for (tmp += a.capacity; tmp < a.buffer + size; ++tmp)
+		*tmp = gapchar;
 	a.capacity = size;
 }
 
@@ -85,7 +98,8 @@ void mv_curs(gap_buf &a, const unsigned pos) {
 	}
 }
 
-inline void insert(gap_buf &a, const unsigned pos, const tp ch) {
+inline void insert_c(gap_buf &a, const unsigned pos, const tp ch)
+{
 	if (a.length + gap >= a.capacity) [[unlikely]]
 		resize(a, a.capacity * 2);
 	if (a[pos] == gapchar) { [[likely]]
@@ -98,6 +112,21 @@ inline void insert(gap_buf &a, const unsigned pos, const tp ch) {
 	++a.length;
 }
 
+inline void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
+{
+	// is this uneeded? (later it is also checked indirectly)
+	if (a.length + gap + len >= a.capacity) [[unlikely]]
+		resize(a, a.capacity * 2);
+	if (gaplen(a) <= len)
+		grow_gap(a, pos);
+	#pragma omp parallel for
+	for (unsigned i = pos; i < pos + len; ++i)
+		a[i] = str[i - pos];
+
+	a.length += len;
+	a.gps += len;
+}
+
 inline void apnd_c(gap_buf &a, const tp ch) {
 	if (a.length + gap >= a.capacity) [[unlikely]]
 		resize(a, a.capacity * 2);
@@ -106,7 +135,8 @@ inline void apnd_c(gap_buf &a, const tp ch) {
 	++a.gps;
 }
 
-inline void apnd_s(gap_buf &a, const tp *str, const unsigned size) {
+inline void apnd_s(gap_buf &a, const tp *str, const unsigned size)
+{
 	if (a.length + size >= a.capacity) [[unlikely]]
 		resize(a, a.capacity + size * 2);
 	#pragma omp parallel for
@@ -116,7 +146,8 @@ inline void apnd_s(gap_buf &a, const tp *str, const unsigned size) {
 	a.gps += size;
 }
 
-inline void apnd_s(gap_buf &a, const tp *str) {
+inline void apnd_s(gap_buf &a, const tp *str)
+{
 	unsigned i = a.length;
 	while (str[i - a.length] != 0 && i < a.capacity) {
 		a[i] = str[i - a.length];
@@ -126,6 +157,7 @@ inline void apnd_s(gap_buf &a, const tp *str) {
 	a.gps += i - a.length;
 }
 
+// TODO: this does not work for multi byte chars
 void eras(gap_buf &a, const unsigned pos)
 {
 	a[pos] = gapchar;
@@ -133,9 +165,13 @@ void eras(gap_buf &a, const unsigned pos)
 	a.length--;
 }
 
-inline tp *data(const gap_buf &a, const unsigned from, const unsigned to) {
+// TODO: this is a mess
+inline tp *data(const gap_buf &a, const unsigned from, const unsigned to)
+{
 	tp *tmp = (tp*)malloc(sizeof(tp) * (to - from + 10));
 	bzero(tmp, to - from);
+	if (a.length == 0)
+		return tmp;
 	if (a.gps == a.length && a.gpe == a.capacity) { // gap ends at end so don't bother
 		for (unsigned i = from; i < to && i < a.gps; ++i)
 			tmp[i - from] = a[i];
@@ -149,18 +185,16 @@ inline tp *data(const gap_buf &a, const unsigned from, const unsigned to) {
 			for (unsigned i = a.gpe + 1; i <= gaplen(a) + to; ++i)
 				tmp[i - gaplen(a)] = a[i];
 		} else {
-			for (unsigned i = gaplen(a) + from; i < gaplen(a) + to - 1; ++i)
+			for (unsigned i = gaplen(a) + a.gps; i < gaplen(a) + to; ++i)
 				tmp[i - gaplen(a) - 1] = a[i];
 		}
 	}
 	return tmp;
 }
 
-inline tp *data(const gap_buf &a, const unsigned width) {
-	return data(a, 0, width);
-}
-
-void shrink(gap_buf &a) {
+// TODO: fix this
+void shrink(gap_buf &a)
+{
 	mv_curs(a, a.length);
 	a.buffer = (tp*)realloc(a.buffer, sizeof(tp) * a.length);
-}
+}	
