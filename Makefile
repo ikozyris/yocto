@@ -9,11 +9,10 @@ CC = g++ --std=c++20# -DUNICODE
 #  -fopenmp		Multi-threading
 #  -march=native	Add optimization flags specific to the host
 #  -flto		Link Time Optimization
-#  -Wpadded		Warn about bad struct packing
 #  -pendatic	Strictier warnings
 #  -lncursesw	Links to ncurses library for wide characters
 
-#CXXFLAGS = -g -Wall -Wextra -Wpadded -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
+#CXXFLAGS = -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
 CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw
 
 # the build target executable:
@@ -21,7 +20,7 @@ TARGET = yocto
 
 all:
 	$(CC) main.cpp -o $(TARGET) $(CXXFLAGS)
-	mv $(TARGET) ~/.local/bin/
+	cp $(TARGET) ~/.local/bin/
 
 build:
 	$(CC) main.cpp -o $(TARGET) $(CXXFLAGS)

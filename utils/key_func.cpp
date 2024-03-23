@@ -1,5 +1,22 @@
 #include "io.cpp"
 
+void info()
+{
+	char tmp[42];
+	struct stat stat_buf;
+	if (filename && stat(filename, &stat_buf) == 0) {
+		sprintf(tmp, "%ld lines", curnum + 1);
+		print2header(hrsize(stat_buf.st_size), 3);
+		print2header(tmp, 1);
+	}
+	unsigned sumlen = 0;
+	for (auto i : text)
+		sumlen += i.len;
+	sprintf(tmp, "y: %u x: %u len: %u sum len: %u", 
+		ry, x, it->len, sumlen);
+	print2header(tmp, 2);
+}
+
 void command()
 {
 	char *tmp = input_header("Enter command: ");
@@ -21,7 +38,7 @@ void command()
 		// read the entire file
 		while (fscanf(file, " %1023s", buffer) == 1) {
 			if (strcmp(buffer, "VmRSS:") == 0)
-				fscanf(file, " %d", &memusg);
+				fscanf(file, " %d", &memusg); // in kB
 			else if (strcmp(buffer, "Pid:") == 0)
 				fscanf(file, " %d", &pid);
 		}
@@ -33,13 +50,17 @@ void command()
 	} else if (strcmp(tmp, "stats") == 0) {
 		char tmp[42];
 		sprintf(tmp, "s %u|  e %u| sz %u | len %u", 
-			it->gps, it->gpe, it->capacity, it->length);
+			it->gps, it->gpe, it->cpt, it->len);
 		clear_header();
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 	} else if (strcmp(tmp, "run") == 0) {
 		char *tmp = input_header("Enter command");
 		system(tmp);
+	} else if (strcmp(tmp, "info")  == 0) {
+		info();
+	} else if (strcmp(tmp, "help")  == 0) {
+		print2header("resetheader, shrink, usg, stats, run, info", 1);
 	} else {
 		print2header("command not found", 3);
 	}
@@ -54,9 +75,9 @@ void save()
 	FILE *fo = fopen(filename, "w");
 	for (auto i : text)
 #if defined(UNICODE)
-	fputws(data(i, 0, i.capacity), fo);
+	fputws(data(i, 0, i.cpt), fo);
 #else
-	fputs(data(i, 0, i.capacity), fo);
+	fputs(data(i, 0, i.cpt), fo);
 #endif
 	fclose(fo);
 
@@ -65,37 +86,26 @@ void save()
 	wmove(text_win, y, x);
 }
 
-void info()
-{
-	char tmp[42];
-	struct stat stat_buf;
-	if (filename && stat(filename, &stat_buf) == 0) {
-		sprintf(tmp, "%ld lines", curnum + 1);
-		print2header(hrsize(stat_buf.st_size), 3);
-		print2header(tmp, 1);
-	}
-	sprintf(tmp, "y: %u x: %u length: %u", 
-		ry, x, it->length);
-	print2header(tmp, 2);
-}
-
 void enter()
 {
 	insert_c(*it, x, '\n');
 
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
-	//char tmp[it->length];
-	//bzero(tmp, it->length);
-	//for (int i = it->gpe+1; i < it->length + gaplen(*it); ++i)
+	//char tmp[it->len];
+	//bzero(tmp, it->len);
+	//for (int i = it->gpe+1; i < it->len + gaplen(*it); ++i)
 	//	tmp[i-(it->gpe+1)] = it->buffer[i];
 	//apnd_s(*t, tmp);
-	apnd_s(*t, data(*it, it->gpe+1, it->length + gaplen(*t)));
-		//it->length - x);
+	apnd_s(*t, data(*it, it->gpe+1, it->len + gaplen(*t)));	
+	//apnd_s(*t, data2(*it, x, it->len));
+		//it->len - x);
 
-	if (it->gpe != it->capacity) // is newline not inserted at end
-	 	for (unsigned i = it->gpe + 1; i < it->length + gaplen(*t); ++i)
+	if (it->gpe != it->cpt) // is newline not inserted at end
+	 	for (unsigned i = it->gpe + 1; i < it->len + gaplen(*t); ++i)
 	 		eras(*it, i);
+	//it->gps--;
+	it->gpe = it->cpt;
 
 	// somewhere below iterator is invalidated
 	++it;

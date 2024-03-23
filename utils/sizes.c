@@ -17,8 +17,8 @@ char *hrsize(size_t bytes)
 	double dblBytes = bytes;
 
 	unsigned i;
-	for (i = 0; (bytes / 1024) > 0 && i < (unsigned)length - 1; i++, bytes /= 1024)
-			dblBytes = bytes / 1024.0;
+	for (i = 0; (bytes / 1000) > 0 && i < (unsigned)length - 1; i++, bytes /= 1000)
+		dblBytes = bytes / 1000.0;
 
 	static char output[16];
 	sprintf(output, "%.02lf %s", dblBytes, suffix[i]);
