@@ -45,7 +45,7 @@ void clear_header()
 
 inline void print_header_title()
 {
-	mvwprintw(header_win, 0, maxx / 2 - 9, "%s", name);
+	mvwprintw(header_win, 0, maxx / 2 - sizeof(name)/2, "%s", name);
 	wrefresh(header_win);
 }
 
