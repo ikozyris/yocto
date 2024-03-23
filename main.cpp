@@ -45,15 +45,15 @@ loop:
 		mv_curs(*it, rx);
 #ifdef DEBUG
 		print_text(); // debug only
-		char tmp[42];
-		sprintf(tmp, "s %u|  e %u| sz %u | len %u", 
-			it->gps, it->gpe, it->capacity, it->length);
+		char tmp[128];
+		sprintf(tmp, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d", 
+			it->gps, it->gpe, it->cpt, it->len, it->gpe-it->gps, rx, it->buffer[x-1]);
 		clear_header();
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 #endif
-		if (x >= min(it->length, maxx)) // if out of bounds: move (to avoid bugs)
-			wmove(text_win, y, min(it->length, maxx));
+		if (x >= min(it->len, maxx)) // if out of bounds: move (to avoid bugs)
+			wmove(text_win, y, min(it->len, maxx));
 
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
@@ -96,11 +96,11 @@ loop:
 			if (x > 0)
 				wmove(text_win, y, x - 1);
 			else if (y > 0)
-				wmove(text_win, y - 1, (--it)->length);
+				wmove(text_win, y - 1, (--it)->len);
 			break;
 
 		case RIGHT:
-			if (x < it->length)
+			if (x < it->len)
 				wmove(text_win, y, x + 1);
 			else if (ry < curnum) {
 				wmove(text_win, y + 1, 0);
@@ -113,7 +113,7 @@ loop:
 				mvwdelch(text_win, y, x - 1);
 				eras(*it, x - 1);
 			} else if (y != 0) { // delete previous line's \n
-				eras(*it, it->length);
+				eras(*it, it->len);
 				print_text();
 				--curnum;
 			}
@@ -134,7 +134,7 @@ loop:
 			break;
 
 		case END:
-			wmove(text_win, y, it->length);
+			wmove(text_win, y, it->len);
 			break;
 
 		case SAVE:
@@ -169,10 +169,11 @@ loop:
 		case EXIT:
 			goto stop;
 
+		// TODO: use real tab
 		case KEY_TAB:
-			winsch(text_win, '\t');
-			wmove(text_win, y, x + TABSIZE);
-			insert_c(*it, x, '\t');
+			winsnstr(text_win, "    ", 4);
+			wmove(text_win, y, x + 4);
+			insert_s(*it, x, "    ", 4);
 			break;
 
 		default:
@@ -180,13 +181,13 @@ loop:
 				break;
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, text_win->_curx + 1);
-#if defined(UNICODE)
+#if defined(UNICODE) // all chars are wide, not need for wcstomb
 			insert_c(*it, x, s[0]);
 #else
 			len = wcstombs(s2, s, 4);
 			insert_s(*it, rx, s2, len);
-			if (len != 1)
-				ofx++; // Unicode character
+			if (len > 1)
+				ofx--; // Unicode character
 #endif
 			break;
 		}

@@ -40,11 +40,11 @@ char *input_header(const char *q)
 #define max(a, b) (a > b ? a : b)
 
 #if defined(UNICODE)
-#define print_line(a) waddnwstr(text_win, data((a), 0, maxx), min((a).length, maxx))
-#define print_line_no_nl(a) waddnwstr(text_win, data((a), 0, maxx), min((a).length - 1, maxx))
+#define print_line(a) waddnwstr(text_win, data((a), 0, maxx), min((a).len, maxx))
+#define print_line_no_nl(a) waddnwstr(text_win, data((a), 0, maxx), min((a).len - 1, maxx))
 #else
-#define print_line(a) waddnstr(text_win, data((a), 0, maxx), min((a).length, maxx))
-#define print_line_no_nl(a) waddnstr(text_win, data((a), 0, maxx), min((a).length - 1, maxx))
+#define print_line(a) waddnstr(text_win, data((a), 0, maxx), min((a).len, maxx))
+#define print_line_no_nl(a) waddnstr(text_win, data((a), 0, maxx), min((a).len - 1, maxx))
 #endif
 
 void print_text()
@@ -78,7 +78,7 @@ inline void read_getc(FILE *fi)
 
 inline void read_fgets(FILE *fi)
 {
-	tp tmp[sz];
+	tp tmp[sz+2];
 #if defined(UNICODE)
 	while ((fgetws_unlocked(tmp, sz, fi)))
 #else
@@ -86,7 +86,7 @@ inline void read_fgets(FILE *fi)
 #endif 
 {
 		apnd_s(*it, tmp);
-		if (tmp[sz - 1] == 0) { [[unlikely]]
+		if (tmp[sz-1] == 0) { [[unlikely]]
 			++curnum;
 			++it;
 		}
