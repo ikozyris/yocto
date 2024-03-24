@@ -2,7 +2,6 @@ Follow the Linux Kernel coding style. <br>
 With the exception that the maximum lenght of line is 100
 
 The most important things are:
-- Descriptive comments in commits
 - Use tabs (*not* spaces)
 - Braces open in the same line as the if, while, switch... except functions
 
@@ -14,13 +13,29 @@ example:
 int main()
 {
 	char input[5];
+ultimate_question:
 	printf("Which is the best text editor? ");
 	scanf("%5s", input);
 	if (strcmp(input, "yocto") == 0) {
 		printf("Correct!\n");
+		goto exit;
 	} else {
-		while (1)
-			printf("NO! ");
+		printf("Are you sure?\n");
+		scanf("%s", input);
+		if (strcmp(input, "yes") == 0)
+			while (1)
+				printf("NO! ");
+		else
+			goto ultimate_question;
 	}
+	printf("This will never be executed!");
+exit:
+	return 0;
 }
 ```
+
+For merge requests:
+- Descriptive comments in commits, title, 
+- If the change is really minor (<10 lines) and does
+	not change the logic/alogrithm of the code,
+	create an issue rather than a merge request
