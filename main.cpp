@@ -40,21 +40,20 @@ loop:
 	//goto stop;
 	while (1) {
 		getyx(text_win, y, x);
-		ry = y + ofy; // calculate offsets
-		rx = x + ofx;
-		mv_curs(*it, rx);
+		ry = y + ofy; // calculate offset
+		if (x > min((ry != curnum ? it->len-1 : it->len), maxx)) // if out of bounds: move (to avoid bugs)
+			wmove(text_win, y, min((ry != curnum ? it->len-1 : it->len), maxx));
+		mv_curs(*it, x);
+
 #ifdef DEBUG
 		print_text(); // debug only
 		char tmp[128];
 		sprintf(tmp, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d", 
-			it->gps, it->gpe, it->cpt, it->len, it->gpe-it->gps, rx, it->buffer[x-1]);
+			it->gps, it->gpe, it->cpt, it->len, it->gpe-it->gps, x, it->buffer[x-1]);
 		clear_header();
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 #endif
-		if (x >= min(it->len, maxx)) // if out of bounds: move (to avoid bugs)
-			wmove(text_win, y, min(it->len, maxx));
-
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
 		case DOWN:
@@ -185,7 +184,7 @@ loop:
 			insert_c(*it, x, s[0]);
 #else
 			len = wcstombs(s2, s, 4);
-			insert_s(*it, rx, s2, len);
+			insert_s(*it, x, s2, len);
 			if (len > 1)
 				ofx--; // Unicode character
 #endif

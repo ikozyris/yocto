@@ -7,8 +7,8 @@
 #endif
 #define gapchar 0
 #if defined(DEBUG)
-#define gap 2
-#define array_size 8
+#define gap 4
+#define array_size 32
 #else
 #define gap 32
 #define array_size 1024

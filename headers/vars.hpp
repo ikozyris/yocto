@@ -16,7 +16,7 @@ char s2[6];
 unsigned char y, x, ofx = 0, len;
 // offset in y axis of text and screen
 long int ofy;
-unsigned int ry, rx;
+unsigned int ry;
 unsigned int maxy, maxx; // to store the maximum rows and columns
 int ch;
 char *filename;

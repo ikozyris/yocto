@@ -60,7 +60,10 @@ void command()
 	} else if (strcmp(tmp, "info")  == 0) {
 		info();
 	} else if (strcmp(tmp, "help")  == 0) {
-		print2header("resetheader, shrink, usg, stats, run, info", 1);
+		print2header("resetheader, shrink, usg, stats, run, info, setgap", 1);
+	} else if (strcmp(tmp, "setgap") == 0) {
+		char *in = input_header("Gap start: ");
+		sscanf(in, "%u", &(it->gps));
 	} else {
 		print2header("command not found", 3);
 	}
@@ -97,15 +100,17 @@ void enter()
 	//for (int i = it->gpe+1; i < it->len + gaplen(*it); ++i)
 	//	tmp[i-(it->gpe+1)] = it->buffer[i];
 	//apnd_s(*t, tmp);
-	apnd_s(*t, data(*it, it->gpe+1, it->len + gaplen(*t)));	
-	//apnd_s(*t, data2(*it, x, it->len));
+	//apnd_s(*t, data(*it, it->gpe+1, it->len + gaplen(*t)));	
+	apnd_s(*t, data2(*it, x+1, it->len+1));
 		//it->len - x);
 
-	if (it->gpe != it->cpt) // is newline not inserted at end
-	 	for (unsigned i = it->gpe + 1; i < it->len + gaplen(*t); ++i)
+	if (it->gpe != it->cpt) { // is newline not inserted at end
+	 	for (unsigned i = it->gpe + 1; i < it->len + gaplen(*it); ++i)
 	 		eras(*it, i);
-	//it->gps--;
-	it->gpe = it->cpt;
+		it->gps = x + 1;
+		it->len = x + 1;
+		it->gpe = it->cpt;
+	}
 
 	// somewhere below iterator is invalidated
 	++it;
