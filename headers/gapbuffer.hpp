@@ -5,15 +5,15 @@
 #else
 #define tp char
 #endif
-#define gapchar 0
 #if defined(DEBUG)
-#define gap 4
-#define array_size 32
+#define gap 2
+#define array_size 8
 #else
-#define gap 32
-#define array_size 1024
+#define gap 8
+#define array_size 32
 #endif
 #define gaplen(a) ((a).gpe - (a).gps + 1)
+#define ingap(pos) ((pos >= a.gps && pos <= a.gpe) ? true : false)
 
 struct gap_buf {
 	unsigned cpt; // allocated size
@@ -32,9 +32,7 @@ struct gap_buf {
 		gps = 0;
 		gpe = array_size;
 		cpt = array_size;
-		memset(buffer, gapchar, array_size);
 	}
-
 };
 
 void init(gap_buf &a)
@@ -44,7 +42,6 @@ void init(gap_buf &a)
 	a.gps = 0;
 	a.gpe = array_size;
 	a.cpt = array_size;
-	memset(a.buffer, gapchar, array_size);
 }
 
 void resize(gap_buf &a, const unsigned size)
@@ -57,47 +54,41 @@ void resize(gap_buf &a, const unsigned size)
 
 void grow_gap(gap_buf &a, const unsigned pos)
 {
-	if (a.len + gap >= a.cpt)
+	if (a.len == a.cpt)
 		resize(a, a.cpt * 2);
 	char tmp = a[pos];
 	// TODO: split into chunks and parallel
-	for (unsigned i = a.len; i > pos; --i) {
+	for (unsigned i = a.len; i > pos; --i)
 		a[i + gap] = a[i];
-		a[i] = gapchar;
-	}
 	a.gps = pos;
 	a.gpe = pos + gap;
-	a[pos] = gapchar;
 	a[pos + gap] = tmp;
 }
 
 void mv_curs(gap_buf &a, const unsigned pos)
 {
-	if (a.gps == a.gpe) [[unlikely]]
+	if (a.gps == a.gpe)  { [[unlikely]]
 		grow_gap(a, pos);
-	// TODO: parallel
-	else if (pos > a.gps) { // move to right
-		while (pos != a.gps) {
-			a.gpe++;
-			a[a.gps] = a[a.gpe];
-			a[a.gpe] = gapchar;
-			a.gps++;
-		}
-	} else if (pos < a.gps) { // move to left
-		while (pos != a.gps) {
-			a.gps--;
-			a[a.gpe] = a[a.gps];
-			a[a.gps] = gapchar;
-			a.gpe--;
-		}
+		return;
 	}
+	unsigned _s = gaplen(a);
+	// TODO: parallel and benchmark custom vs memmove
+	if (pos > a.gps) { // move to right
+		for (unsigned i = a.gps; i < pos + _s; ++i)
+			a[i] = a[i + _s];
+	} else if (pos < a.gps) { // move to left
+		for (unsigned i = a.gpe; i >= pos + _s; --i)
+			a[i] = a[i - _s];
+	}
+	a.gpe = pos + _s - 1;
+	a.gps = pos;
 }
 
 void insert_c(gap_buf &a, const unsigned pos, const tp ch)
 {
-	if (a.len + gap >= a.cpt) [[unlikely]]
+	if (a.len == a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
-	if (a[pos] == gapchar) { [[likely]]
+	if (ingap(pos)) { [[likely]]
 		a[pos] = ch;
 		++a.gps;
 	} else {
@@ -110,7 +101,7 @@ void insert_c(gap_buf &a, const unsigned pos, const tp ch)
 void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
 {
 	// is this uneeded? (later it is also checked indirectly)
-	if (a.len + gap + len >= a.cpt) [[unlikely]]
+	if (a.len + len >= a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
 	if (gaplen(a) <= len)
 		grow_gap(a, pos);
@@ -124,7 +115,7 @@ void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
 
 void apnd_c(gap_buf &a, const tp ch)
 {
-	if (a.len + gap >= a.cpt) [[unlikely]]
+	if (a.len >= a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
 	a[a.len] = ch;
 	++a.len;
@@ -147,7 +138,7 @@ void apnd_s(gap_buf &a, const tp *str)
 	unsigned i = a.len;
 	while (str[i - a.len] != 0) {
 		a[i] = str[i - a.len];
-		if (++i >= a.cpt)
+		if (++i == a.cpt)
 			resize(a, a.cpt * 2); 
 	}
 	a.len += i - a.len;
@@ -155,9 +146,8 @@ void apnd_s(gap_buf &a, const tp *str)
 }
 
 // TODO: this does not work for multi byte chars
-void eras(gap_buf &a, const unsigned pos)
+inline void eras(gap_buf &a, const unsigned pos)
 {
-	a[pos] = gapchar;
 	a.gps--;
 	a.len--;
 }
@@ -189,6 +179,7 @@ tp *data(const gap_buf &a, const unsigned from, const unsigned to)
 	return tmp;
 }
 
+// naive unbuggy implementation of above function 
 tp *data2(const gap_buf &a, const unsigned from, const unsigned to) {
 	tp *buffer = (tp*)malloc(sizeof(tp) * a.len+4);
 	for (unsigned i = 0; i < a.gps; ++i)
