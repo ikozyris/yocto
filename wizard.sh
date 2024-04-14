@@ -71,7 +71,6 @@ config_dialog() {
 		    --menu "Please select:" $HEIGHT $WIDTH 0 \
 		    "1" "Edit Keybindings" \
 		    "2" "Install dependencies" \
-		    "3" "Extended Unicode support (wchar_t)" \
 		2>&1 1>&3) # redirect output streams
 		exit_status=$?
 		exec 3>&- # delete fd
@@ -98,15 +97,6 @@ config_dialog() {
 			echo "#### Installing Dependencies"
 			sudo apt install libncurses-dev gcc make dialog
 		   	;;
-		3 )
-			if grep -q '#' <<< "$(sed '2q;d' Makefile)"; then
-				sed -i "2s/#/   /g" Makefile
-				display_result "Enabled extended unicode"
-			else
-				sed -i "2s/   /#/g" Makefile
-				display_result "Disabled extended unicode"
-			fi
-			;;
 		esac
     	done
 }
@@ -140,8 +130,7 @@ while true; do
 		;;
 	2 )
 		if make build 2>&1 >/dev/null | grep -q Error; then
-			result="Make sure to report at:
-			https://github.com/ikozyris/yocto/issues"
+			result="Make sure to report at: https://github.com/ikozyris/yocto/issues"
 			display_result "Failed to build yocto"
 	    	else
 			result="Now you can install!"

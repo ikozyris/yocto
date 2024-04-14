@@ -58,6 +58,7 @@ void command()
 		char *tmp = input_header("Enter command");
 		system(tmp);
 	} else if (strcmp(tmp, "info")  == 0) {
+		clear_header();
 		info();
 	} else if (strcmp(tmp, "help")  == 0) {
 		print2header("resetheader, shrink, usg, stats, run, info, setgap", 1);
@@ -77,11 +78,7 @@ void save()
 		filename = input_header("Enter filename: ");
 	FILE *fo = fopen(filename, "w");
 	for (auto i : text)
-#if defined(UNICODE)
-	fputws(data(i, 0, i.cpt), fo);
-#else
-	fputs(data(i, 0, i.cpt), fo);
-#endif
+		fputs(data(i, 0, i.cpt), fo);
 	fclose(fo);
 
 	reset_header();

@@ -180,14 +180,10 @@ loop:
 				break;
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, text_win->_curx + 1);
-#if defined(UNICODE) // all chars are wide, not need for wcstomb
-			insert_c(*it, x, s[0]);
-#else
 			len = wcstombs(s2, s, 4);
 			insert_s(*it, x, s2, len);
 			if (len > 1)
 				ofx--; // Unicode character
-#endif
 			break;
 		}
 	}

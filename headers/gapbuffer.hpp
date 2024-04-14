@@ -1,10 +1,6 @@
 #include "headers.h"
 
-#if defined(UNICODE)
-#define tp wchar_t
-#else
-#define tp char
-#endif
+
 #if defined(DEBUG)
 #define gap 2
 #define array_size 8
@@ -20,14 +16,14 @@ struct gap_buf {
 	unsigned len;	 // length of line
 	unsigned gps;	// gap start (first element of gap)
 	unsigned gpe;	// gap end	(last element of gap)
-	tp *buffer;
+	char *buffer;
 
-	tp &operator[](const unsigned pos) const {
+	char &operator[](const unsigned pos) const {
 		return buffer[pos];
 	}
 
 	gap_buf() {
-		buffer = (tp*)malloc(sizeof(tp) * array_size);
+		buffer = (char*)malloc(sizeof(char) * array_size);
 		len = 0;
 		gps = 0;
 		gpe = array_size;
@@ -37,7 +33,7 @@ struct gap_buf {
 
 void init(gap_buf &a)
 {
-	a.buffer = (tp*)malloc(sizeof(tp) * array_size);
+	a.buffer = (char*)malloc(sizeof(char) * array_size);
 	a.len = 0;
 	a.gps = 0;
 	a.gpe = array_size;
@@ -48,14 +44,16 @@ void resize(gap_buf &a, const unsigned size)
 {
 	if (a.gpe == a.cpt)
 		a.gpe = size;
-	a.buffer = (tp*)realloc(a.buffer, sizeof(tp) * size);
+	a.buffer = (char*)realloc(a.buffer, sizeof(char) * size);
 	a.cpt = size;
 }
 
 void grow_gap(gap_buf &a, const unsigned pos)
 {
-	if (a.len == a.cpt)
+	if (a.len == a.cpt) {
 		resize(a, a.cpt * 2);
+		return; // let mv_curs do the work
+	}
 	char tmp = a[pos];
 	// TODO: split into chunks and parallel
 	for (unsigned i = a.len; i > pos; --i)
@@ -67,10 +65,8 @@ void grow_gap(gap_buf &a, const unsigned pos)
 
 void mv_curs(gap_buf &a, const unsigned pos)
 {
-	if (a.gps == a.gpe)  { [[unlikely]]
+	if (a.gps == a.gpe) [[unlikely]]
 		grow_gap(a, pos);
-		return;
-	}
 	unsigned _s = gaplen(a);
 	// TODO: parallel and benchmark custom vs memmove
 	if (pos > a.gps) { // move to right
@@ -84,7 +80,7 @@ void mv_curs(gap_buf &a, const unsigned pos)
 	a.gps = pos;
 }
 
-void insert_c(gap_buf &a, const unsigned pos, const tp ch)
+void insert_c(gap_buf &a, const unsigned pos, const char ch)
 {
 	if (a.len == a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
@@ -113,7 +109,7 @@ void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
 	a.gps += len;
 }
 
-void apnd_c(gap_buf &a, const tp ch)
+void apnd_c(gap_buf &a, const char ch)
 {
 	if (a.len >= a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
@@ -122,7 +118,7 @@ void apnd_c(gap_buf &a, const tp ch)
 	++a.gps;
 }
 
-void apnd_s(gap_buf &a, const tp *str, const unsigned size)
+void apnd_s(gap_buf &a, const char *str, const unsigned size)
 {
 	if (a.len + size >= a.cpt) [[unlikely]]
 		resize(a, a.cpt + size * 2);
@@ -133,7 +129,7 @@ void apnd_s(gap_buf &a, const tp *str, const unsigned size)
 	a.gps = a.len;
 }
 
-void apnd_s(gap_buf &a, const tp *str)
+void apnd_s(gap_buf &a, const char *str)
 {
 	unsigned i = a.len;
 	while (str[i - a.len] != 0) {
@@ -153,9 +149,9 @@ inline void eras(gap_buf &a, const unsigned pos)
 }
 
 // TODO: this is a mess
-tp *data(const gap_buf &a, const unsigned from, const unsigned to)
+char *data(const gap_buf &a, const unsigned from, const unsigned to)
 {
-	tp *tmp = (tp*)malloc(sizeof(tp) * (to - from + 10));
+	char *tmp = (char*)malloc(sizeof(char) * (to - from + 10));
 	bzero(tmp, to - from);
 	if (a.len == 0)
 		return tmp;
@@ -180,14 +176,14 @@ tp *data(const gap_buf &a, const unsigned from, const unsigned to)
 }
 
 // naive unbuggy implementation of above function 
-tp *data2(const gap_buf &a, const unsigned from, const unsigned to) {
-	tp *buffer = (tp*)malloc(sizeof(tp) * a.len+4);
+char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
+	char *buffer = (char*)malloc(sizeof(char) * a.len+4);
 	for (unsigned i = 0; i < a.gps; ++i)
 		buffer[i] = a[i];
 	for (unsigned i = a.gpe+1; i < a.len+a.gpe; ++i)
 		buffer[i-gaplen(a)] = a[i];
 
-	tp *output = (tp*)malloc(sizeof(tp)*(to-from+1));
+	char *output = (char*)malloc(sizeof(char)*(to-from+1));
 	for (unsigned i = from; i < to; ++i)
 		output[i-from] = buffer[i];
 	free(buffer);
@@ -198,5 +194,5 @@ tp *data2(const gap_buf &a, const unsigned from, const unsigned to) {
 void shrink(gap_buf &a)
 {
 	mv_curs(a, a.len);
-	a.buffer = (tp*)realloc(a.buffer, sizeof(tp) * a.len);
+	a.buffer = (char*)realloc(a.buffer, sizeof(char) * a.len);
 }	
