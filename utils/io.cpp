@@ -39,13 +39,8 @@ char *input_header(const char *q)
 #define min(a, b) (a < b ? a : b)
 #define max(a, b) (a > b ? a : b)
 
-#if defined(UNICODE)
-#define print_line(a) waddnwstr(text_win, data((a), 0, maxx), min((a).len, maxx))
-#define print_line_no_nl(a) waddnwstr(text_win, data((a), 0, maxx), min((a).len - 1, maxx))
-#else
 #define print_line(a) waddnstr(text_win, data((a), 0, maxx), min((a).len, maxx))
 #define print_line_no_nl(a) waddnstr(text_win, data((a), 0, maxx), min((a).len - 1, maxx))
-#endif
 
 void print_text()
 {
@@ -58,11 +53,7 @@ void print_text()
 
 inline void read_getc(FILE *fi)
 {
-#if defined(UNICODE)
-	while ((ch = getwc_unlocked(fi)) != EOF) {
-#else
 	while ((ch = getc_unlocked(fi)) != EOF) {
-#endif
 		apnd_c(*it, ch);
 		if (ch == '\n')  { [[unlikely]]
 			++curnum;
@@ -70,6 +61,7 @@ inline void read_getc(FILE *fi)
 				txt_cpt = text.size() * 2;
 				text.resize(txt_cpt);
 			}
+			it->gpe = it->cpt;
 			++it;
 		}
 	}
@@ -78,12 +70,8 @@ inline void read_getc(FILE *fi)
 
 inline void read_fgets(FILE *fi)
 {
-	tp tmp[sz+2];
-#if defined(UNICODE)
-	while ((fgetws_unlocked(tmp, sz, fi)))
-#else
+	char tmp[sz+2];
 	while ((fgets_unlocked(tmp, sz, fi)))
-#endif 
 {
 		apnd_s(*it, tmp);
 		if (tmp[sz-1] == 0) { [[unlikely]]
@@ -95,7 +83,7 @@ inline void read_fgets(FILE *fi)
 
 inline void read_fread(FILE *fi)
 {
-	tp tmp[sz];
+	char tmp[sz];
 	size_t a = 0;
 	while ((a = fread(tmp, sizeof(tmp[0]), sz, fi))) {
 		apnd_s(*it, tmp, a);

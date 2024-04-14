@@ -1,5 +1,5 @@
 # The compiler: g++
-CC = g++ --std=c++20# -DUNICODE
+CC = g++ --std=c++20
 
 # Compiler flags:
 #  -Wall		Turns on most, but not all, compiler warnings
