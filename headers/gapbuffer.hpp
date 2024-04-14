@@ -1,6 +1,5 @@
 #include "headers.h"
 
-
 #if defined(DEBUG)
 #define gap 2
 #define array_size 8
@@ -76,7 +75,10 @@ void mv_curs(gap_buf &a, const unsigned pos)
 		for (unsigned i = a.gpe; i >= pos + _s; --i)
 			a[i] = a[i - _s];
 	}
-	a.gpe = pos + _s - 1;
+	if (pos >= a.len)
+		a.gpe = a.cpt;
+	else
+		a.gpe = pos + _s - 1;
 	a.gps = pos;
 }
 
