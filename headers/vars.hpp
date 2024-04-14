@@ -2,9 +2,9 @@
 #include "headers.h"
 
 #if defined(DEBUG)
-#define DEFAULT_LINES 16
+#define DEFAULT_LINES 2
 #else
-#define DEFAULT_LINES 128
+#define DEFAULT_LINES 16
 #endif
 unsigned txt_cpt = DEFAULT_LINES; // capacity
 std::list<gap_buf> text(DEFAULT_LINES);

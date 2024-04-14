@@ -187,11 +187,13 @@ loop:
 			break;
 		}
 	}
-	//*/
+	// free heap */
 stop:
 	delwin(text_win);
 	delwin(ln_win);
 	delwin(header_win);
+	for (auto i : text)
+		free(i.buffer);
 	endwin();
 	return 0;
 }
