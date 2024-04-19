@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 		}
 		read_getc(fi);
 		//read_fgets(fi);
-		//read_fread(fi); // MUCH faster
+		//read_fread(fi); 
 		fclose(fi);
 		print_text();
 	}
@@ -187,13 +187,11 @@ loop:
 			break;
 		}
 	}
-	// free heap */
+	//*/
 stop:
 	delwin(text_win);
 	delwin(ln_win);
 	delwin(header_win);
-	for (auto i : text)
-		free(i.buffer);
 	endwin();
 	return 0;
 }

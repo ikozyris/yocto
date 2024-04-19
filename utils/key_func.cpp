@@ -19,7 +19,7 @@ void info()
 
 void command()
 {
-	char *tmp = input_header("Enter command: ");
+	const char *tmp = input_header("Enter command: ");
 	if (strcmp(tmp, "resethead") == 0)
 		reset_header();
 	else if (strcmp(tmp, "shrink") == 0)
@@ -55,15 +55,15 @@ void command()
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 	} else if (strcmp(tmp, "run") == 0) {
-		char *tmp = input_header("Enter command");
-		system(tmp);
+		const char *_tmp = input_header("Enter command");
+		system(_tmp);
 	} else if (strcmp(tmp, "info")  == 0) {
 		clear_header();
 		info();
 	} else if (strcmp(tmp, "help")  == 0) {
 		print2header("resetheader, shrink, usg, stats, run, info, setgap", 1);
 	} else if (strcmp(tmp, "setgap") == 0) {
-		char *in = input_header("Gap start: ");
+		const char *in = input_header("Gap start: ");
 		sscanf(in, "%u", &(it->gps));
 	} else {
 		print2header("command not found", 3);
@@ -75,7 +75,7 @@ void save()
 	if (!filename)
 		filename = (char*)malloc(128);
 	if (strlen(filename) <= 0)
-		filename = input_header("Enter filename: ");
+		filename = (char*)input_header("Enter filename: ");
 	FILE *fo = fopen(filename, "w");
 	for (auto i : text)
 		fputs(data(i, 0, i.cpt), fo);
@@ -113,6 +113,7 @@ void enter()
 	++it;
 	++curnum;
 	text.insert(it, *t);
+	free(t);
 	// print text again (or find a better way)
 	print_text();
 	wmove(text_win, y + 1, 0);

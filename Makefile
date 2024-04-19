@@ -14,6 +14,7 @@ CC = g++ --std=c++20
 
 #CXXFLAGS = -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
 CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw
+#CXXFLAGS = -g -fopenmp -march=native -lncursesw
 
 # the build target executable:
 TARGET = yocto

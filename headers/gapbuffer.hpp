@@ -28,6 +28,10 @@ struct gap_buf {
 		gpe = array_size;
 		cpt = array_size;
 	}
+	~gap_buf() {
+		free(buffer);
+		buffer = 0;
+	}
 };
 
 void init(gap_buf &a)
@@ -66,7 +70,7 @@ void mv_curs(gap_buf &a, const unsigned pos)
 {
 	if (a.gps == a.gpe) [[unlikely]]
 		grow_gap(a, pos);
-	unsigned _s = gaplen(a);
+	const unsigned _s = gaplen(a);
 	// TODO: parallel and benchmark custom vs memmove
 	if (pos > a.gps) { // move to right
 		for (unsigned i = a.gps; i < pos + _s; ++i)
@@ -151,7 +155,7 @@ inline void eras(gap_buf &a, const unsigned pos)
 }
 
 // TODO: this is a mess
-char *data(const gap_buf &a, const unsigned from, const unsigned to)
+const char *data(const gap_buf &a, const unsigned from, const unsigned to)
 {
 	char *tmp = (char*)malloc(sizeof(char) * (to - from + 10));
 	bzero(tmp, to - from);
@@ -177,8 +181,8 @@ char *data(const gap_buf &a, const unsigned from, const unsigned to)
 	return tmp;
 }
 
-// naive unbuggy implementation of above function 
-char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
+// naive implementation of above function 
+const char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
 	char *buffer = (char*)malloc(sizeof(char) * a.len+4);
 	for (unsigned i = 0; i < a.gps; ++i)
 		buffer[i] = a[i];
