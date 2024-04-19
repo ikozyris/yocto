@@ -17,7 +17,7 @@ void print2header(const char *msg, unsigned char pos)
 }
 
 // Ask for input from header
-char *input_header(const char *q)
+const char *input_header(const char *q)
 {
 	clear_header();
 	wmove(header_win, 0, 0);
@@ -54,25 +54,28 @@ void print_text()
 inline void read_getc(FILE *fi)
 {
 	while ((ch = getc_unlocked(fi)) != EOF) {
-		apnd_c(*it, ch);
+		it->buffer[it->len++] = ch;
+		if (it->len >= it->cpt) { [[unlikely]]
+			it->buffer = (char*)realloc(it->buffer, it->cpt * 2);
+			it->cpt *= 2;
+		}
 		if (ch == '\n')  { [[unlikely]]
-			++curnum;
-			if (curnum >= txt_cpt) { [[unlikely]]
+			it->gps = it->len;
+			if (++curnum >= txt_cpt) { [[unlikely]]
 				txt_cpt = text.size() * 2;
 				text.resize(txt_cpt);
 			}
-			it->gpe = it->cpt;
 			++it;
 		}
 	}
 }
-#define sz 256
+
+#define sz 65536
 
 inline void read_fgets(FILE *fi)
 {
 	char tmp[sz+2];
-	while ((fgets_unlocked(tmp, sz, fi)))
-{
+	while ((fgets_unlocked(tmp, sz, fi))) {
 		apnd_s(*it, tmp);
 		if (tmp[sz-1] == 0) { [[unlikely]]
 			++curnum;
@@ -84,8 +87,21 @@ inline void read_fgets(FILE *fi)
 inline void read_fread(FILE *fi)
 {
 	char tmp[sz];
-	size_t a = 0;
+	unsigned a = 0; // bytes read
+	unsigned b = 0;
 	while ((a = fread(tmp, sizeof(tmp[0]), sz, fi))) {
-		apnd_s(*it, tmp, a);
+		for (unsigned i = 0; i < a; ++i) {
+			it->buffer[i - b] = tmp[i];
+			// if (i - b > it->cpt) {
+			// 	it->buffer = (char*)realloc(it->buffer, it->cpt * 2);
+			// 	it->cpt *= 2;
+			// }
+			if (tmp[i] == '\n') {
+				it->gps = it->len = i - b + 1;
+				++it;
+				b = i + 1;
+				++curnum;
+			}
+		}
 	}
 }
