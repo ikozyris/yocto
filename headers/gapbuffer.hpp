@@ -11,8 +11,8 @@
 #define ingap(pos) ((pos >= a.gps && pos <= a.gpe) ? true : false)
 
 struct gap_buf {
-	unsigned cpt; // allocated size
-	unsigned len;	 // length of line
+	unsigned cpt; 	// allocated size
+	unsigned len;	// length of line
 	unsigned gps;	// gap start (first element of gap)
 	unsigned gpe;	// gap end	(last element of gap)
 	char *buffer;
@@ -22,7 +22,7 @@ struct gap_buf {
 	}
 
 	gap_buf() {
-		buffer = (char*)malloc(sizeof(char) * array_size);
+		buffer = (char*)malloc(array_size);
 		len = 0;
 		gps = 0;
 		gpe = array_size;
@@ -36,7 +36,7 @@ struct gap_buf {
 
 void init(gap_buf &a)
 {
-	a.buffer = (char*)malloc(sizeof(char) * array_size);
+	a.buffer = (char*)malloc(array_size);
 	a.len = 0;
 	a.gps = 0;
 	a.gpe = array_size;
@@ -47,7 +47,7 @@ void resize(gap_buf &a, const unsigned size)
 {
 	if (a.gpe == a.cpt)
 		a.gpe = size;
-	a.buffer = (char*)realloc(a.buffer, sizeof(char) * size);
+	a.buffer = (char*)realloc(a.buffer, size);
 	a.cpt = size;
 }
 
@@ -72,13 +72,12 @@ void mv_curs(gap_buf &a, const unsigned pos)
 		grow_gap(a, pos);
 	const unsigned _s = gaplen(a);
 	// TODO: parallel and benchmark custom vs memmove
-	if (pos > a.gps) { // move to right
+	if (pos > a.gps) // move to right
 		for (unsigned i = a.gps; i < pos + _s; ++i)
 			a[i] = a[i + _s];
-	} else if (pos < a.gps) { // move to left
+	else if (pos < a.gps) // move to left
 		for (unsigned i = a.gpe; i >= pos + _s; --i)
 			a[i] = a[i - _s];
-	}
 	if (pos >= a.len)
 		a.gpe = a.cpt;
 	else
@@ -157,10 +156,10 @@ inline void eras(gap_buf &a, const unsigned pos)
 // TODO: this is a mess
 const char *data(const gap_buf &a, const unsigned from, const unsigned to)
 {
-	char *tmp = (char*)malloc(sizeof(char) * (to - from + 10));
+	char *tmp = (char*)malloc(to - from + 10);
 	bzero(tmp, to - from);
 	if (a.len == 0)
-		return tmp;
+		return "";
 	if (a.gps == a.len && a.gpe == a.cpt) { // gap ends at end so don't bother
 		for (unsigned i = from; i < to && i < a.gps; ++i)
 			tmp[i - from] = a[i];
@@ -181,15 +180,15 @@ const char *data(const gap_buf &a, const unsigned from, const unsigned to)
 	return tmp;
 }
 
-// naive implementation of above function 
-const char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
-	char *buffer = (char*)malloc(sizeof(char) * a.len+4);
+// naive (simplier, should be bug free) implementation of above function 
+const char *data2(const gap_buf a, const unsigned from, const unsigned to) {
+	char *buffer = (char*)malloc(a.len+4);
 	for (unsigned i = 0; i < a.gps; ++i)
 		buffer[i] = a[i];
 	for (unsigned i = a.gpe+1; i < a.len+a.gpe; ++i)
 		buffer[i-gaplen(a)] = a[i];
 
-	char *output = (char*)malloc(sizeof(char)*(to-from+1));
+	char *output = (char*)malloc(to-from+1);
 	for (unsigned i = from; i < to; ++i)
 		output[i-from] = buffer[i];
 	free(buffer);
