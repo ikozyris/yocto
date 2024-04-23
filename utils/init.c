@@ -38,7 +38,7 @@ void init_lines()
 void clear_header()
 {
 	wmove(header_win, 0, 0);
-	for (short i = maxx;  i != 0; --i)
+	for (short i = maxx; i != 0; --i)
 		waddch(header_win, ' ');
 	wrefresh(header_win);
 }

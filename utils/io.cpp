@@ -36,8 +36,8 @@ const char *input_header(const char *q)
 	return tmp;
 }
 
-#define min(a, b) (a < b ? a : b)
-#define max(a, b) (a > b ? a : b)
+#define min(a, b) (a <= b ? a : b)
+#define max(a, b) (a >= b ? a : b)
 
 #define print_line(a) waddnstr(text_win, data((a), 0, maxx), min((a).len, maxx))
 #define print_line_no_nl(a) waddnstr(text_win, data((a), 0, maxx), min((a).len - 1, maxx))
@@ -48,7 +48,10 @@ void print_text()
 	wclear(text_win);
 	for (unsigned char i = 0; i < min(txt_cpt, maxy - 1); ++i, ++iter)
 		print_line((*iter));
-	print_line_no_nl((*iter));
+	if (curnum >= maxy)
+		print_line_no_nl((*iter));
+	else
+		print_line((*iter));
 }
 
 inline void read_getc(FILE *fi)
@@ -61,6 +64,7 @@ inline void read_getc(FILE *fi)
 		}
 		if (ch == '\n')  { [[unlikely]]
 			it->gps = it->len;
+			it->gpe = it->cpt;
 			if (++curnum >= txt_cpt) { [[unlikely]]
 				txt_cpt = text.size() * 2;
 				text.resize(txt_cpt);

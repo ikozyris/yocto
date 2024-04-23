@@ -77,8 +77,9 @@ void save()
 	if (strlen(filename) <= 0)
 		filename = (char*)input_header("Enter filename: ");
 	FILE *fo = fopen(filename, "w");
-	for (auto i : text)
-		fputs(data(i, 0, i.cpt), fo);
+	std::list<gap_buf>::iterator iter;
+	for (iter = text.begin(); iter != text.end(); ++iter)
+		fputs(data((*iter), 0, (*iter).cpt), fo);
 	fclose(fo);
 
 	reset_header();
@@ -98,12 +99,8 @@ void enter()
 	//	tmp[i-(it->gpe+1)] = it->buffer[i];
 	//apnd_s(*t, tmp);
 	//apnd_s(*t, data(*it, it->gpe+1, it->len + gaplen(*t)));	
-	apnd_s(*t, data2(*it, x+1, it->len+1));
-		//it->len - x);
-
-	if (it->gpe != it->cpt) { // is newline not inserted at end
-	 	for (unsigned i = it->gpe + 1; i < it->len + gaplen(*it); ++i)
-	 		eras(*it, i);
+	if (it->gpe != it->cpt) {
+		apnd_s(*t, data2(*it, x+1, it->len+1));
 		it->gps = x + 1;
 		it->len = x + 1;
 		it->gpe = it->cpt;
