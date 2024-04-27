@@ -12,25 +12,27 @@ CC = g++ --std=c++20
 #  -pendatic	Strictier warnings
 #  -lncursesw	Links to ncurses library for wide characters
 
-#CXXFLAGS = -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
+#CXXFLAGS = -Og -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
 CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw
-#CXXFLAGS = -g -fopenmp -march=native -lncursesw
+#CXXFLAGS = -Og -g -fopenmp -march=native -lncursesw -fprofile-generate
 
 # the build target executable:
 TARGET = yocto
+#PATHT = /usr/bin/
+PATHT = ~/.local/bin/
 
 all:
 	$(CC) main.cpp -o $(TARGET) $(CXXFLAGS)
-	cp $(TARGET) ~/.local/bin/
+	cp $(TARGET) $(PATHT)$(TARGET)
 
 build:
 	$(CC) main.cpp -o $(TARGET) $(CXXFLAGS)
 
 install:
-	cp $(TARGET) ~/.local/bin/
+	cp $(TARGET) $(PATHT)$(TARGET)
 
 uninstall:
-	rm ~/.local/bin/$(TARGET)
+	rm $(PATHT)$(TARGET)
 
 clean:
 	$(RM) $(TARGET)

@@ -8,7 +8,8 @@
 #define array_size 32
 #endif
 #define gaplen(a) ((a).gpe - (a).gps + 1)
-#define ingap(pos) ((pos >= a.gps && pos <= a.gpe) ? true : false)
+#define ingap(a, pos) (((pos) >= (a).gps && (pos) <= (a).gpe) ? true : false)
+#define mveras(a, pos) (mv_curs(a, pos), eras(a))
 
 struct gap_buf {
 	unsigned cpt; 	// allocated size
@@ -89,7 +90,7 @@ void insert_c(gap_buf &a, const unsigned pos, const char ch)
 {
 	if (a.len == a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
-	if (ingap(pos)) { [[likely]]
+	if (ingap(a, pos)) { [[likely]]
 		a[pos] = ch;
 		++a.gps;
 	} else {
@@ -147,7 +148,7 @@ void apnd_s(gap_buf &a, const char *str)
 }
 
 // TODO: this does not work for multi byte chars
-inline void eras(gap_buf &a, const unsigned pos)
+inline void eras(gap_buf &a)
 {
 	a.gps--;
 	a.len--;

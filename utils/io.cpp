@@ -3,11 +3,13 @@
 // pos: (1 left) (3 right) (else center)
 void print2header(const char *msg, unsigned char pos)
 {
-	if (pos == 3) {
+	if (strlen(msg) > (maxx)) {
+		print2header("ERROR tlo", 1);
+	} else if (pos == 3)
 		mvwprintw(header_win, 0, maxx - strlen(msg), "%s", msg);
-	} else if (pos == 1) {
+	else if (pos == 1)
 		mvwprintw(header_win, 0, 0, "%s", msg);
-	} else {
+	else {
 		unsigned char hmx = maxx / 2;
 		// 20-width spaces + 0
 		mvwprintw(header_win, 0, hmx - 10, "                    ");

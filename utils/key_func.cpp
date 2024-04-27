@@ -1,20 +1,24 @@
 #include "io.cpp"
 
-void info()
+void stats()
 {
-	char tmp[42];
+	char *_tmp = (char*)malloc(256);
 	struct stat stat_buf;
 	if (filename && stat(filename, &stat_buf) == 0) {
-		sprintf(tmp, "%ld lines", curnum + 1);
+		sprintf(_tmp, "%ld lines", curnum + 1);
 		print2header(hrsize(stat_buf.st_size), 3);
-		print2header(tmp, 1);
+		print2header(_tmp, 1);
 	}
 	unsigned sumlen = 0;
-	for (auto i : text)
+	for (auto &i : text)
 		sumlen += i.len;
-	sprintf(tmp, "y: %u x: %u len: %u sum len: %u", 
-		ry, x, it->len, sumlen);
-	print2header(tmp, 2);
+	snprintf(_tmp, maxx-2, "gap start %u g end %u buffer size %u length %u y %u x %u sum len %u", 
+		it->gps, it->gpe, it->cpt, it->len, ry, x, sumlen);
+	clear_header();
+	print2header(_tmp, 1);
+	free(_tmp);
+	_tmp = 0;
+	wmove(text_win, y, x);
 }
 
 void command()
@@ -47,27 +51,18 @@ void command()
 			  hrsize(memusg * 1000), pid);
 		clear_header();
 		print2header(buffer, 1);
-	} else if (strcmp(tmp, "stats") == 0) {
-		char tmp[42];
-		sprintf(tmp, "s %u|  e %u| sz %u | len %u", 
-			it->gps, it->gpe, it->cpt, it->len);
-		clear_header();
-		print2header(tmp, 1);
-		wmove(text_win, y, x);
-	} else if (strcmp(tmp, "run") == 0) {
+	} else if (strcmp(tmp, "stats") == 0)
+		stats();
+	else if (strcmp(tmp, "run") == 0) {
 		const char *_tmp = input_header("Enter command");
 		system(_tmp);
-	} else if (strcmp(tmp, "info")  == 0) {
-		clear_header();
-		info();
-	} else if (strcmp(tmp, "help")  == 0) {
-		print2header("resetheader, shrink, usg, stats, run, info, setgap", 1);
-	} else if (strcmp(tmp, "setgap") == 0) {
+	} else if (strcmp(tmp, "help")  == 0)
+		print2header("resetheader, shrink, usg, stats, run, setgap", 1);
+	else if (strcmp(tmp, "setgap") == 0) {
 		const char *in = input_header("Gap start: ");
 		sscanf(in, "%u", &(it->gps));
-	} else {
+	} else
 		print2header("command not found", 3);
-	}
 }
 
 void save()
@@ -99,7 +94,7 @@ void enter()
 	//	tmp[i-(it->gpe+1)] = it->buffer[i];
 	//apnd_s(*t, tmp);
 	//apnd_s(*t, data(*it, it->gpe+1, it->len + gaplen(*t)));	
-	if (it->gpe != it->cpt) {
+	if (it->gpe != it->cpt) { // newline is at the end
 		apnd_s(*t, data2(*it, x+1, it->len+1));
 		it->gps = x + 1;
 		it->len = x + 1;
@@ -116,5 +111,5 @@ void enter()
 	wmove(text_win, y + 1, 0);
 	// TODO: this shouldn't be necessary
 	it = text.begin();
-	std::advance(it, curnum);
+	std::advance(it, y+1);
 }
