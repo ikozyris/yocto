@@ -47,8 +47,7 @@ void command()
 				fscanf(file, " %d", &pid);
 		}
 		fclose(file);
-		sprintf(buffer, "RAM: %s PID: %d",
-			  hrsize(memusg * 1000), pid);
+		sprintf(buffer, "RAM: %s PID: %d", hrsize(memusg * 1000), pid);
 		clear_header();
 		print2header(buffer, 1);
 	} else if (strcmp(tmp, "stats") == 0)
@@ -61,6 +60,9 @@ void command()
 	else if (strcmp(tmp, "setgap") == 0) {
 		const char *in = input_header("Gap start: ");
 		sscanf(in, "%u", &(it->gps));
+	} else if (strcmp(tmp, "fixgap") == 0) {
+		mv_curs(*it, it->len);
+		mv_curs(*it, x);
 	} else
 		print2header("command not found", 3);
 }
