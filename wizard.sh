@@ -95,7 +95,7 @@ config_dialog() {
 		2 )
 			clear
 			echo "#### Installing Dependencies"
-			sudo apt install libncurses-dev gcc make dialog
+			apt install libncurses-dev gcc make dialog
 		   	;;
 		esac
     	done
@@ -138,7 +138,7 @@ while true; do
 		fi
 		;;
 	3 )
-		if [ ! -d "$HOME.local/bin" ]; then
+		if [  -d "$HOME.local/bin" ]; then
 			result="Installed on ~/.local/bin"
 			make install
 			display_result "Installed Yocto"
