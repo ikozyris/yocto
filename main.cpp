@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 	getmaxyx(text_win, maxy, maxx);
 	wrefresh(ln_win);
 
+read:
 	if (argc > 1) {
 		filename = (char*)malloc(sizeof(char) * 128);
 		strcpy(filename, argv[1]);
@@ -154,6 +155,19 @@ loop:
 				stats();
 			else if (ch == CMD)
 				command();
+			else if (ch == 'r') {
+				argc = 2;
+				strcpy(argv[1], input_header("File to open: "));
+				std::list<gap_buf>::iterator iter;
+				for (iter = text.begin(); iter != text.end(); ++iter) {
+					iter->len = iter->gps = 0;
+					iter->gpe = iter->cpt;
+				}
+				curnum = 0;
+				it = text.begin();
+				wclear(text_win);
+				goto read;
+			}
 			wtimeout(text_win, -1);
 			wmove(text_win, y, x);
 			break;
