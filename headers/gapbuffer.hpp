@@ -73,8 +73,7 @@ void mv_curs(gap_buf &a, const unsigned pos)
 		grow_gap(a, pos);
 	const unsigned _s = gaplen(a);
 	if (pos > a.gps) // move to right
-		#pragma omp parallel for private(a)
-		for (unsigned i = a.gps; i < pos-1; ++i)
+		for (unsigned i = a.gps; i < pos; ++i)
 			a[i] = a[i + _s];
 	else if (pos < a.gps) // move to left
 		for (unsigned i = a.gpe; i >= pos + _s; --i)

@@ -5,3 +5,4 @@ gen.c
 te*
 mem_usg.sh
 microbench
+*.gc*

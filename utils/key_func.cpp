@@ -61,8 +61,21 @@ void command()
 		const char *in = input_header("Gap start: ");
 		sscanf(in, "%u", &(it->gps));
 	} else if (strcmp(tmp, "fixgap") == 0) {
-		mv_curs(*it, it->len);
-		mv_curs(*it, x);
+		unsigned msec = 0, trigger = 1; /* 10ms */
+		unsigned iterations = 0;
+		clock_t before = clock();
+		do {
+			mv_curs(*it, it->len);
+			mv_curs(*it, x);
+			clock_t difference = clock() - before;
+			msec = difference * 1000 / CLOCKS_PER_SEC;
+			iterations++;
+		} while (msec < trigger);
+		char tmp[128];
+		snprintf(tmp, maxx, "Time taken %u seconds %u milliseconds (%u iterations)\n",
+  			msec/1000, msec%1000, iterations);
+		print2header(tmp, 1);
+		wmove(text_win, y, x);
 	} else
 		print2header("command not found", 3);
 }

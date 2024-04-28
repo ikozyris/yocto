@@ -5,3 +5,4 @@
 #include <locale.h>	// for setting locale
 #include <sys/stat.h>	// for file size
 #include <list>
+#include <time.h>
