@@ -181,7 +181,7 @@ const char *data(const gap_buf &a, const unsigned from, const unsigned to)
 }
 
 // naive (simplier, should be bug free) implementation of above function 
-const char *data2(const gap_buf a, const unsigned from, const unsigned to) {
+const char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
 	char *buffer = (char*)malloc(a.len+4);
 	for (unsigned i = 0; i < a.gps; ++i)
 		buffer[i] = a[i];

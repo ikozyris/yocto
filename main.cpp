@@ -197,10 +197,10 @@ loop:
 			break;
 
 		default:
-			if (s[0] > 0 && s[0] < 32)
+			if (s[0] > 0 && s[0] < 32) // not a character
 				break;
 			wins_nwstr(text_win, s, 1);
-			wmove(text_win, y, text_win->_curx + 1);
+			wmove(text_win, y, x + 1);
 			len = wcstombs(s2, s, 4);
 			insert_s(*it, x, s2, len);
 			if (len > 1)

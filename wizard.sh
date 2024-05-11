@@ -34,12 +34,12 @@ key_config() {
 	exec 3>&1 # open stdout fd
 	OUTPUT=$(DIALOG --title "Edit Keybindings" \
 	--form "Edit the fields" $HEIGHT $WIDTH 0 \
-	"Save:" 	1 1 "$KEY_SAVE"     1 15 15 0 \
-      "Exit:"    	2 1 "$KEY_EXIT"     2 15 15 0 \
-	"Home:"	3 1 "$KEY_HOME"	  3 15 15 0 \
-	"End:"	4 1 "$KEY_END"	  4 15 15 0 \
-      "Info:"    	5 1 "$KEY_INFO"     5 15 15 0 \
-      "Refresh:"  6 1 "$KEY_REFRESH"  6 15 15 0 \
+	"Save:"		1 1 "$KEY_SAVE"		1 15 15 0 \
+	"Exit:"		2 1 "$KEY_EXIT"		2 15 15 0 \
+	"Home:"		3 1 "$KEY_HOME"		3 15 15 0 \
+	"End:"		4 1 "$KEY_END"		4 15 15 0 \
+	"Info:"		5 1 "$KEY_INFO"		5 15 15 0 \
+	"Refresh:"	6 1 "$KEY_REFRESH"	6 15 15 0 \
 	2>&1 1>&3)
 	exit_status=$?
 	case $exit_status in

@@ -9,17 +9,18 @@ CC = g++ --std=c++20
 #  -fopenmp		Multi-threading
 #  -march=native	Add optimization flags specific to the host
 #  -flto		Link Time Optimization
-#  -pendatic	Strictier warnings
-#  -lncursesw	Links to ncurses library for wide characters
+#  -pendatic		Strictier warnings
+#  -lncursesw		Links to ncurses library for wide characters
 
 #CXXFLAGS = -Og -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
-#CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw
-CXXFLAGS = -Og -g -fopenmp -march=native -lncursesw -fprofile-generate -fprofile-arcs -ftest-coverage --coverage -lgcov
+CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw
+#CXXFLAGS = -Og -g -fopenmp -march=native -lncursesw -fprofile-generate -fprofile-arcs -ftest-coverage --coverage -lgcov
 
 # the build target executable:
 TARGET = yocto
-#PATHT = /usr/bin/
-PATHT = ~/.local/bin/
+PATHT = /usr/bin/
+# if available root is not required to install
+#PATHT = ~/.local/bin/
 
 all:
 	$(CC) main.cpp -o $(TARGET) $(CXXFLAGS)
