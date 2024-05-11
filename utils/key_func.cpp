@@ -105,12 +105,12 @@ void enter()
 	init(*t);
 	//char tmp[it->len];
 	//bzero(tmp, it->len);
-	//for (int i = it->gpe+1; i < it->len + gaplen(*it); ++i)
-	//	tmp[i-(it->gpe+1)] = it->buffer[i];
+	//for (int i = it->gpe + 1; i < it->len + gaplen(*it); ++i)
+	//	tmp[i - (it->gpe + 1)] = it->buffer[i];
 	//apnd_s(*t, tmp);
-	//apnd_s(*t, data(*it, it->gpe+1, it->len + gaplen(*t)));	
-	if (it->gpe != it->cpt) { // newline is at the end
-		apnd_s(*t, data2(*it, x+1, it->len+1));
+	//apnd_s(*t, data(*it, it->gpe + 1, it->len + gaplen(*t)));	
+	if ((it->cpt != it->gpe)) { // newline is not at the end
+		apnd_s(*t, data2(*it, x + 1, it->len + 1));
 		it->gps = x + 1;
 		it->len = x + 1;
 		it->gpe = it->cpt;
@@ -126,5 +126,5 @@ void enter()
 	wmove(text_win, y + 1, 0);
 	// TODO: this shouldn't be necessary
 	it = text.begin();
-	std::advance(it, y+1);
+	std::advance(it, y + 1);
 }
