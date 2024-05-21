@@ -117,10 +117,10 @@ loop:
 				--it;
 				mv_curs(*it, it->len);
 				eras(*it);
-				apnd_s(*it, data(*tmp, 0, tmp->len+1), tmp->len+1);
+				apnd_s(*it, data(*tmp, 0, tmp->len + 1), tmp->len + 1);
 				text.erase(tmp);
 				print_text();
-				wmove(text_win, y-1, it->len-1);
+				wmove(text_win, y - 1, it->len - 1);
 				--curnum;
 			}
 			break;
@@ -141,7 +141,7 @@ loop:
 			break;
 
 		case END:
-			wmove(text_win, y, ry != curnum ? it->len-1 : it->len);
+			wmove(text_win, y, ry != curnum ? it->len - 1 : it->len);
 			break;
 
 		case SAVE:
@@ -204,7 +204,7 @@ loop:
 			len = wcstombs(s2, s, 4);
 			insert_s(*it, x, s2, len);
 			if (len > 1)
-				ofx--; // Unicode character
+				ofx-=len - 1; // Unicode character
 			break;
 		}
 	}

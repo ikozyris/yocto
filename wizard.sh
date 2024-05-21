@@ -14,6 +14,14 @@ else
 	exit 1
 fi
 
+isroot() {
+	if [ "$EUID" -ne 0 ]; then
+		display_result "Please run as root"
+		return 1
+	fi
+	return 0
+}
+
 DIALOG() {
 	$DIAL --clear --backtitle "Yocto Installation Wizard" "$@"
 }
@@ -94,8 +102,17 @@ config_dialog() {
 			;;
 		2 )
 			clear
-			echo "#### Installing Dependencies"
-			apt install libncurses-dev gcc make dialog
+			if isroot; then
+				echo "#### Installing Dependencies"
+				if command -v apt &> /dev/null; then
+					apt install libncurses-dev gcc make dialog
+				elif command -v dnf &> /dev/null; then
+					dnf install ncurses-devel gcc make dialog
+				elif command -v pacman &> /dev/null; then
+					pacman -S ncurses gcc make dialog
+				fi
+			fi
+			sleep 1
 		   	;;
 		esac
     	done
@@ -130,7 +147,7 @@ while true; do
 		;;
 	2 )
 		if make build 2>&1 >/dev/null | grep -q Error; then
-			result="Make sure to report at: https://github.com/ikozyris/yocto/issues"
+			result="Make sure to report the output of make at: https://github.com/ikozyris/yocto/issues"
 			display_result "Failed to build yocto"
 	    	else
 			result="Now you can install!"
@@ -138,18 +155,20 @@ while true; do
 		fi
 		;;
 	3 )
-		if [  -d "$HOME.local/bin" ]; then
+		if [ -d "$HOME.local/bin" ]; then
 			result="Installed on ~/.local/bin"
 			make install
 			display_result "Installed Yocto"
 		else
-			result="Installed in /usr/bin"
-			cp yocto /usr/bin/
-			display_result "Installed Yocto"
+			if isroot; then
+				result="Installed in /usr/bin"
+				cp yocto /usr/bin/
+				display_result "Installed Yocto"
+			fi
 		fi
 		;;
-	4)
-		if [ ! -d "$HOME.local/bin" ]; then
+	4 )
+		if [ -d "$HOME.local/bin/yocto" ]; then
 			result="Uninstalled from ~/.local/bin"
 			rm ~/.local/bin/yocto
 			display_result "We are sorry to see you go!"

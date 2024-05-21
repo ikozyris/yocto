@@ -11,6 +11,18 @@ make install
 Or use the user-friendly dialog utility (`wizard.sh`)
 which also supports configuring yocto
 
+### Keybindings
+* Save: Ctrl-S
+* Exit: Ctrl-C
+* Go to start of line: Ctrl-A
+* Go to end of line: Ctrl-E
+* Enter built-in terminal: Alt-C
+* Show info: Alt-I (also command _stats_ in built-in terminal)
+
+### About the name
+Yocto is the SI (metric) prefix for 10^-24.
+Since this text editor is tiny, yocto is a suitable name.
+
 ### License
 
 Copyright (C) 2022-2024  ikozyris<br>
