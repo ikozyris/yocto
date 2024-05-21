@@ -45,8 +45,9 @@ char *input_header(const char *q)
 void print_text()
 {
 	std::list<gap_buf>::iterator iter = text.begin();
+	std::advance(iter, ofy);
 	wclear(text_win);
-	for (unsigned char i = 0; i < min(txt_cpt, maxy - 1); ++i, ++iter)
+	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy - 1); ++i, ++iter)
 		print_line((*iter));
 	if (curnum >= maxy)
 		print_line_no_nl((*iter));

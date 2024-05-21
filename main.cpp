@@ -175,10 +175,10 @@ loop:
 		case KEY_RESIZE:
 		case REFRESH:
 			getmaxyx(text_win, maxy, maxx);
+			ofy = 0;
 			reset_header();
 			print_text();
 			print_lines();
-			ofy = 0;
 			wrefresh(text_win);
 			wrefresh(ln_win);
 			wrefresh(header_win);

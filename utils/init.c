@@ -22,7 +22,7 @@ void print_lines()
 {
 	short i = maxy;
 	do
-		mvwprintw(ln_win, i - 1, 0, "%3d", i);
+		mvwprintw(ln_win, i - 1, 0, "%3ld", i + ofy);
 	while (--i != 0);
 }
 
