@@ -24,12 +24,12 @@ void stats()
 void command()
 {
 	const char *tmp = input_header("Enter command: ");
-	if (strcmp(tmp, "resethead") == 0)
+	if (strcmp(tmp, "resetheader") == 0)
 		reset_header();
 	else if (strcmp(tmp, "shrink") == 0)
 		for (auto i : text)
 			shrink(i);
-	else if (strcmp(tmp, "usg") == 0) {
+	else if (strcmp(tmp, "usage") == 0) {
 		int memusg, pid;
 		// stores each word in status file
 		char buffer[1024] = "";
@@ -61,7 +61,7 @@ void command()
 		const char *in = input_header("Gap start: ");
 		sscanf(in, "%u", &(it->gps));
 	} else if (strcmp(tmp, "fixgap") == 0) {
-		unsigned msec = 0, trigger = 1; /* 10ms */
+		unsigned msec = 0, trigger = 1; /* 1ms */
 		unsigned iterations = 0;
 		clock_t before = clock();
 		do {
@@ -76,6 +76,16 @@ void command()
   			msec/1000, msec%1000, iterations);
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
+	} else if (strcmp(tmp, "scroll") == 0) {
+		const char *in = input_header("Scroll to line: ");
+		unsigned a;
+		sscanf(in, "%u", &a);
+		ofy = a - 1;
+		print_lines();
+		wrefresh(ln_win);
+		print_text();
+		it = text.begin();
+		std::advance(it, ofy);
 	} else
 		print2header("command not found", 3);
 }
