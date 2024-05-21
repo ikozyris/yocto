@@ -16,7 +16,7 @@ int main()
 ultimate_question:
 	printf("Which is the best text editor? ");
 	scanf("%5s", input);
-	if (strcmp(input, "yocto") == 0) {
+	if (strcmp(input, "yocto") == 0 || strcmp(input, "42") == 0) {
 		printf("Correct!\n");
 		goto exit;
 	} else {
@@ -34,8 +34,6 @@ exit:
 }
 ```
 
-For merge requests:
-- Descriptive comments in commits, title, 
-- If the change is really minor (<10 lines) and does
-	not change the logic/alogrithm of the code,
-	create an issue rather than a merge request
+For pull/merge requests (PR/MR):
+- Descriptive comments in commits, title, description 
+- If the change is just a typo create an issue not a PR/MR
