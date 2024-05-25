@@ -24,3 +24,12 @@ char *hrsize(size_t bytes)
 	sprintf(output, "%.02lf %s", dblBytes, suffix[i]);
 	return output;
 }
+
+// get length of line y
+unsigned sizeofline(unsigned y) {
+	unsigned i = maxx - 1;
+	wmove(text_win, y, i);
+	while ((winch(text_win) & A_CHARTEXT) == ' ')
+		wmove(text_win, y, --i);
+	return i;	
+}
