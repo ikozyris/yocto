@@ -28,11 +28,18 @@ read:
 			print2header("New file", 1);
 			goto loop;
 		}
-		read_getc(fi);
+
+		if (argc > 2 && strcmp(argv[2], "-ro") == 0) {
+			read_fread(fi); 
+			print_text_w(0);
+			print2header("Read-Only", 3);
+			goto ro;
+		} else {
+			read_getc(fi);
+			print_text();
+		}
 		//read_fgets(fi);
-		//read_fread(fi); 
 		fclose(fi);
-		print_text();
 	}
 	wmove(text_win, 0, 0);
 
@@ -204,11 +211,33 @@ loop:
 			len = wcstombs(s2, s, 4);
 			insert_s(*it, x, s2, len);
 			if (len > 1)
-				ofx-=len - 1; // Unicode character
+				ofx -= len - 1; // Unicode character
 			break;
 		}
 	}
 	//*/
+ro:
+	while (ch = wgetch(text_win)) {
+		switch (ch) {
+		case UP:
+			if (ppi >= previndx || ppi >= buf_indx)
+				ppi = 0;
+			else
+				ppi = previndx;
+			printed = print_text_w(ppi);
+			if (buf_indx > printed)
+				previndx = buf_indx - printed;
+			else
+				previndx = 0;
+			break;
+		case DOWN:
+			previndx = buf_indx - printed;
+			printed = print_text_w(buf_indx);
+			break;
+		case EXIT:
+			goto stop;
+		}
+	}
 stop:
 	delwin(text_win);
 	delwin(ln_win);

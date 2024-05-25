@@ -23,7 +23,7 @@ void stats()
 
 void command()
 {
-	const char *tmp = input_header("Enter command: ");
+	char *tmp = input_header("Enter command: ");
 	if (strcmp(tmp, "resetheader") == 0)
 		reset_header();
 	else if (strcmp(tmp, "shrink") == 0)
@@ -53,13 +53,15 @@ void command()
 	} else if (strcmp(tmp, "stats") == 0)
 		stats();
 	else if (strcmp(tmp, "run") == 0) {
-		const char *_tmp = input_header("Enter command");
+		char *_tmp = input_header("Enter command");
 		system(_tmp);
+		free(_tmp);
 	} else if (strcmp(tmp, "help")  == 0)
 		print2header("resetheader, shrink, usg, stats, run, setgap", 1);
 	else if (strcmp(tmp, "setgap") == 0) {
-		const char *in = input_header("Gap start: ");
+		char *in = input_header("Gap start: ");
 		sscanf(in, "%u", &(it->gps));
+		free(in);
 	} else if (strcmp(tmp, "fixgap") == 0) {
 		unsigned msec = 0, trigger = 1; /* 1ms */
 		unsigned iterations = 0;
@@ -77,17 +79,21 @@ void command()
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 	} else if (strcmp(tmp, "scroll") == 0) {
-		const char *in = input_header("Scroll to line: ");
+		char *in = input_header("Scroll to line: ");
 		unsigned a;
 		sscanf(in, "%u", &a);
-		ofy = a - 1;
-		print_lines();
-		wrefresh(ln_win);
-		print_text();
-		it = text.begin();
-		std::advance(it, ofy);
+		free(in);
+		if (a <= curnum) {
+			ofy = a - 1;
+			print_lines();
+			wrefresh(ln_win);
+			print_text();
+			it = text.begin();
+			std::advance(it, ofy);
+		}
 	} else
 		print2header("command not found", 3);
+	free(tmp);
 }
 
 void save()

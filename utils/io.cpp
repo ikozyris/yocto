@@ -30,7 +30,7 @@ char *input_header(const char *q)
 		print2header("ERROR", 1);
 		wmove(text_win, y, x);
 	} if (strlen(tmp) <= 0) {
-		tmp = 0;
+		bzero(tmp, 128);
 	}
 	noecho();
 	return tmp;
@@ -55,15 +55,25 @@ void print_text()
 		print_line((*iter));
 }
 
+// print text with line wrapping
+unsigned print_text_w(unsigned start)
+{
+	wmove(text_win, 0, 0);
+	buf_indx = start;
+	while (getcury(text_win) < maxy-1 && buf_indx < it->len)
+		waddch(text_win, it->buffer[buf_indx++]);
+	wclrtobot(text_win);
+	return buf_indx - start; // how many characters were printed
+}
+
 inline void read_getc(FILE *fi)
 {
 	while ((ch = getc_unlocked(fi)) != EOF) {
 		it->buffer[it->len++] = ch;
 		if (it->len >= it->cpt) { [[unlikely]]
-			it->buffer = (char*)realloc(it->buffer, it->cpt * 2);
 			it->cpt *= 2;
-		}
-		if (ch == '\n')  { [[unlikely]]
+			it->buffer = (char*)realloc(it->buffer, it->cpt);
+		} if (ch == '\n')  { [[unlikely]]
 			it->gps = it->len;
 			it->gpe = it->cpt;
 			if (++curnum >= txt_cpt) { [[unlikely]]
@@ -79,10 +89,10 @@ inline void read_getc(FILE *fi)
 
 inline void read_fgets(FILE *fi)
 {
-	char tmp[sz+2];
+	char tmp[sz + 2];
 	while ((fgets_unlocked(tmp, sz, fi))) {
 		apnd_s(*it, tmp);
-		if (tmp[sz-1] == 0) { [[unlikely]]
+		if (tmp[sz - 1] == 0) { [[unlikely]]
 			++curnum;
 			++it;
 		}
@@ -93,20 +103,7 @@ inline void read_fread(FILE *fi)
 {
 	char tmp[sz];
 	unsigned a = 0; // bytes read
-	unsigned b = 0;
 	while ((a = fread(tmp, sizeof(tmp[0]), sz, fi))) {
-		for (unsigned i = 0; i < a; ++i) {
-			it->buffer[i - b] = tmp[i];
-			// if (i - b > it->cpt) {
-			// 	it->buffer = (char*)realloc(it->buffer, it->cpt * 2);
-			// 	it->cpt *= 2;
-			// }
-			if (tmp[i] == '\n') {
-				it->gps = it->len = i - b + 1;
-				++it;
-				b = i + 1;
-				++curnum;
-			}
-		}
+		apnd_s(*it, tmp, a);
 	}
 }

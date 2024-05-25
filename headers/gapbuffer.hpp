@@ -15,7 +15,7 @@ struct gap_buf {
 	unsigned cpt; 	// allocated size
 	unsigned len;	// length of line
 	unsigned gps;	// gap start (first element of gap)
-	unsigned gpe;	// gap end	(last element of gap)
+	unsigned gpe;	// gap end (last element of gap)
 	char *buffer;
 
 	char &operator[](const unsigned pos) const {
@@ -127,9 +127,7 @@ void apnd_s(gap_buf &a, const char *str, const unsigned size)
 {
 	if (a.len + size >= a.cpt) [[unlikely]]
 		resize(a, a.cpt + size * 2);
-	#pragma omp parallel for
-	for (unsigned i = a.len; i < a.len + size; ++i)
-		a[i] = str[i - a.len];
+	memcpy(a.buffer + a.len, str, size);
 	a.len += size;
 	a.gps = a.len;
 }

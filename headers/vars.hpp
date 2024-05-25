@@ -15,9 +15,10 @@ wchar_t s[6];
 char s2[6];
 unsigned char y, x, ofx = 0, len;
 // offset in y axis of text and screen
-long int ofy;
-unsigned int ry;
-unsigned int maxy, maxx; // to store the maximum rows and columns
+long ofy;
+unsigned ry;
+unsigned buf_indx, printed, previndx, ppi;
+unsigned maxy, maxx; // to store the maximum rows and columns
 int ch;
 char *filename;
 
