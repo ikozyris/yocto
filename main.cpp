@@ -3,6 +3,33 @@
 
 int main(int argc, char *argv[])
 {
+	if (argc > 1 && strcmp(argv[1], "-h") == 0 ||
+	strcmp(argv[1], "--help") == 0) {
+		puts(name);
+		puts("A simple, compact and fast text editor.\n"
+		"Source code: https://github.com/ikozyris/yocto\n"
+		"Wiki: https://github.com/ikozyris/yocto/wiki\n"
+		"License: GNU GPL v3\n");
+		puts("Usage:\n"
+		"       --help, -h          Show this help\n"
+		"<file> --read-only, -ro    Just read, like a pager\n"
+		"<file>                     Open file and allow edits\n"
+		"-                          Ask for file name on save\n\n"
+		"Keybindings:\n"
+		"Save:                      Ctrl-S\n"
+		"Exit:                      Ctrl-C\n"
+		"Go to start of line:       Ctrl-A\n"
+		"Go to end of line:         Ctrl-E\n"
+		"Enter built-in terminal:   Alt-C\n"
+		"Show debbuging info:       Alt-I (also command stats in built-in terminal)\n\n"
+		"Built-in terminal commands:\n"
+		"scroll                     Scroll to line\n"
+		"usage                      Show RAM usage and PID of yocto\n"
+		"run                        Execute a command\n"
+		"help                       List commands\n"
+		"fixgap                     Benchmark move gap to end and back");
+		return 0;
+	}
 	it = text.begin();
 	// UTF-8
 	setlocale(LC_ALL, "");
@@ -29,7 +56,8 @@ read:
 			goto loop;
 		}
 
-		if (argc > 2 && strcmp(argv[2], "-ro") == 0) {
+		if (argc > 2 && (strcmp(argv[2], "-ro") == 0 ||
+				strcmp(argv[2], "--read-only") == 0)) {
 			read_fread(fi); 
 			print_text_w(0);
 			print2header("Read-Only", 3);
