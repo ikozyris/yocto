@@ -59,7 +59,6 @@ void grow_gap(gap_buf &a, const unsigned pos)
 		return; // let mv_curs do the work
 	}
 	char tmp = a[pos];
-	// TODO: split into chunks and parallel
 	for (unsigned i = a.len; i > pos; --i)
 		a[i + gap] = a[i];
 	a.gps = pos;
@@ -71,17 +70,15 @@ void mv_curs(gap_buf &a, const unsigned pos)
 {
 	if (a.gps == a.gpe) [[unlikely]]
 		grow_gap(a, pos);
-	const unsigned _s = gaplen(a);
-	if (pos > a.gps) // move to right
-		for (unsigned i = a.gps; i < pos; ++i)
-			a[i] = a[i + _s];
-	else if (pos < a.gps) // move to left
-		for (unsigned i = a.gpe; i >= pos + _s; --i)
-			a[i] = a[i - _s];
+	const unsigned gpl = gaplen(a);
+	if (pos > a.gps) // move gap to right
+		memmove(a.buffer + a.gps, a.buffer + a.gps + gpl, pos - a.gps);
+	else if (pos < a.gps) // move gap to left
+		memmove(a.buffer + pos + gpl, a.buffer + pos, a.gps-pos);
 	if (pos >= a.len)
 		a.gpe = a.cpt;
 	else
-		a.gpe = pos + _s - 1;
+		a.gpe = pos + gpl - 1;
 	a.gps = pos;
 }
 

@@ -3,8 +3,8 @@
 
 int main(int argc, char *argv[])
 {
-	if (argc > 1 && strcmp(argv[1], "-h") == 0 ||
-	strcmp(argv[1], "--help") == 0) {
+	if (argc > 1 && (strcmp(argv[1], "-h") == 0 ||
+	strcmp(argv[1], "--help") == 0)) {
 		puts(name);
 		puts("A simple, compact and fast text editor.\n"
 		"Source code: https://github.com/ikozyris/yocto\n"
@@ -245,7 +245,7 @@ loop:
 	}
 	//*/
 ro:
-	while (ch = wgetch(text_win)) {
+	while ((ch = wgetch(text_win))) {
 		switch (ch) {
 		case UP:
 			if (ppi >= previndx || ppi >= buf_indx)

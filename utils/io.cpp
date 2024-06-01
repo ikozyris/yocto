@@ -60,7 +60,7 @@ unsigned print_text_w(unsigned start)
 {
 	wmove(text_win, 0, 0);
 	buf_indx = start;
-	while (getcury(text_win) < maxy-1 && buf_indx < it->len)
+	while ((unsigned)getcury(text_win) < maxy-1 && buf_indx < it->len)
 		waddch(text_win, it->buffer[buf_indx++]);
 	wclrtobot(text_win);
 	return buf_indx - start; // how many characters were printed
