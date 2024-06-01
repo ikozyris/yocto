@@ -66,44 +66,56 @@ unsigned print_text_w(unsigned start)
 	return buf_indx - start; // how many characters were printed
 }
 
-inline void read_getc(FILE *fi)
-{
-	while ((ch = getc_unlocked(fi)) != EOF) {
-		it->buffer[it->len++] = ch;
-		if (it->len >= it->cpt) { [[unlikely]]
-			it->cpt *= 2;
-			it->buffer = (char*)realloc(it->buffer, it->cpt);
-		} if (ch == '\n')  { [[unlikely]]
-			it->gps = it->len;
-			it->gpe = it->cpt;
-			if (++curnum >= txt_cpt) { [[unlikely]]
-				txt_cpt = text.size() * 2;
-				text.resize(txt_cpt);
-			}
-			++it;
+inline void ins_b(char ch) {
+	it->buffer[it->len++] = ch;
+	if (it->len >= it->cpt) { [[unlikely]]
+		it->cpt *= 2;
+		it->buffer = (char*)realloc(it->buffer, it->cpt);
+	} if (ch == '\n')  { [[unlikely]]
+		it->gps = it->len;
+		it->gpe = it->cpt;
+		if (++curnum >= txt_cpt) { [[unlikely]]
+			txt_cpt = text.size() * 2;
+			text.resize(txt_cpt);
 		}
+		++it;
 	}
 }
 
-#define sz 65536
-
-inline void read_fgets(FILE *fi)
+void read_getc(FILE *fi)
 {
-	char tmp[sz + 2];
-	while ((fgets_unlocked(tmp, sz, fi))) {
+	while ((ch = getc_unlocked(fi)) != EOF)
+		ins_b(ch);
+}
+
+// For size see: https://github.com/ikozyris/yocto/wiki/Comments-on-optimizations#buffer-size-for-reading
+#define SZ 524288 // 512 KB
+
+void read_fgets(FILE *fi)
+{
+	char tmp[SZ];
+	while ((fgets_unlocked(tmp, SZ - 2, fi))) {
 		apnd_s(*it, tmp);
-		if (tmp[sz - 1] == 0) { [[unlikely]]
+		if (tmp[SZ - 3] == 0) { [[unlikely]]
 			++curnum;
 			++it;
 		}
 	}
 }
 
-inline void read_fread(FILE *fi)
+void read_fread(FILE *fi)
 {
-	char tmp[sz];
+	char tmp[SZ];
 	unsigned a = 0; // bytes read
-	while ((a = fread(tmp, sizeof(tmp[0]), sz, fi))) {
+	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi)))
 		apnd_s(*it, tmp, a);
-	}
+}
+
+void read_fread_b(FILE *fi)
+{
+	char tmp[SZ];
+	unsigned a;
+	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi)))
+		for (unsigned i = 0; i < a; ++i)
+			ins_b(tmp[i]);
 }
