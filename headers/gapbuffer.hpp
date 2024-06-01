@@ -74,7 +74,7 @@ void mv_curs(gap_buf &a, const unsigned pos)
 	if (pos > a.gps) // move gap to right
 		memmove(a.buffer + a.gps, a.buffer + a.gps + gpl, pos - a.gps);
 	else if (pos < a.gps) // move gap to left
-		memmove(a.buffer + pos + gpl, a.buffer + pos, a.gps-pos);
+		memmove(a.buffer + pos + gpl, a.buffer + pos, a.gps - pos);
 	if (pos >= a.len)
 		a.gpe = a.cpt;
 	else

@@ -63,7 +63,8 @@ read:
 			print2header("Read-Only", 3);
 			goto ro;
 		} else {
-			read_getc(fi);
+			read_fread_b(fi);
+			//read_getc(fi);
 			print_text();
 		}
 		//read_fgets(fi);
