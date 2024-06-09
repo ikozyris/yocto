@@ -39,20 +39,20 @@ char *input_header(const char *q)
 #define min(a, b) (a <= b ? a : b)
 #define max(a, b) (a >= b ? a : b)
 
-#define print_line(a) waddnstr(text_win, data((a), 0, maxx), min((a).len, maxx))
-#define print_line_no_nl(a) waddnstr(text_win, data((a), 0, maxx), min((a).len - 1, maxx))
+#define print_line(a)       {char *t = data((a), 0, maxx); waddstr(text_win, t); free(t);}
+#define print_line_no_nl(a) {char *t = data((a), 0, maxx-1); waddnstr(text_win, t, min((a).len-1, maxx-1)); free(t);}
 
 void print_text()
 {
 	std::list<gap_buf>::iterator iter = text.begin();
 	std::advance(iter, ofy);
 	wclear(text_win);
-	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy - 1); ++i, ++iter)
+	unsigned ty = 0;
+	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy - 1); ++i, ++iter) {
 		print_line((*iter));
-	if (curnum >= maxy)
-		print_line_no_nl((*iter));
-	else
-		print_line((*iter));
+		wmove(text_win, ++ty, 0);
+	}
+	print_line_no_nl((*iter));
 }
 
 // print text with line wrapping

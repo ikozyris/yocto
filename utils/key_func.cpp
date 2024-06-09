@@ -27,7 +27,7 @@ void command()
 	if (strcmp(tmp, "resetheader") == 0)
 		reset_header();
 	else if (strcmp(tmp, "shrink") == 0)
-		for (auto i : text)
+		for (auto &i : text)
 			shrink(i);
 	else if (strcmp(tmp, "usage") == 0) {
 		int memusg, pid;
@@ -59,9 +59,7 @@ void command()
 	} else if (strcmp(tmp, "help")  == 0)
 		print2header("resetheader, shrink, usg, stats, run, setgap", 1);
 	else if (strcmp(tmp, "setgap") == 0) {
-		char *in = input_header("Gap start: ");
-		sscanf(in, "%u", &(it->gps));
-		free(in);
+		++it->gps;
 	} else if (strcmp(tmp, "fixgap") == 0) {
 		unsigned msec = 0, trigger = 1; /* 1ms */
 		unsigned iterations = 0;
@@ -88,9 +86,16 @@ void command()
 			print_lines();
 			wrefresh(ln_win);
 			print_text();
-			it = text.begin();
-			std::advance(it, ofy);
+			std::advance(it, ofy-ry);
 		}
+	} else if (strcmp(tmp, "fixstr") == 0) {
+		wchar_t temp[256];
+		bzero(temp, 256*sizeof(wchar_t));
+		winwstr(text_win, temp);
+		int len = wcstombs(it->buffer, temp, it->cpt);
+		it->len = len;
+		it->gps = len + 1;
+		it->gpe = it->cpt;
 	} else
 		print2header("command not found", 3);
 	free(tmp);

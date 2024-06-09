@@ -1,5 +1,7 @@
 #include "headers.h"
 
+long signed ofx;
+
 #if defined(DEBUG)
 #define gap 2
 #define array_size 8
@@ -123,7 +125,7 @@ void apnd_c(gap_buf &a, const char ch)
 void apnd_s(gap_buf &a, const char *str, const unsigned size)
 {
 	if (a.len + size >= a.cpt) [[unlikely]]
-		resize(a, a.cpt + size * 2);
+		resize(a, a.cpt * 2);
 	memcpy(a.buffer + a.len, str, size);
 	a.len += size;
 	a.gps = a.len;
@@ -144,17 +146,25 @@ void apnd_s(gap_buf &a, const char *str)
 // TODO: this does not work for multi byte chars
 inline void eras(gap_buf &a)
 {
-	a.gps--;
-	a.len--;
+	if (a[a.gps - 1] < 0) { // unicode
+		--a.gps;
+		--a.len;
+		--ofx;
+	}
+	--a.gps;
+	--a.len;
+	
 }
 
 // TODO: this is a mess
-const char *data(const gap_buf &a, const unsigned from, const unsigned to)
+char *data(const gap_buf &a, const unsigned from, const unsigned to)
 {
 	char *tmp = (char*)malloc(to - from + 10);
 	bzero(tmp, to - from);
-	if (a.len == 0)
-		return "";
+	if (a.len == 0) {
+		free(tmp);
+		return 0;
+	}
 	if (a.gps == a.len && a.gpe == a.cpt) { // gap ends at end so don't bother
 		for (unsigned i = from; i < to && i < a.gps; ++i)
 			tmp[i - from] = a[i];
@@ -176,16 +186,16 @@ const char *data(const gap_buf &a, const unsigned from, const unsigned to)
 }
 
 // naive (simplier, should be bug free) implementation of above function 
-const char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
-	char *buffer = (char*)malloc(a.len+4);
+char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
+	char *buffer = (char*)malloc(a.len + 4);
 	for (unsigned i = 0; i < a.gps; ++i)
 		buffer[i] = a[i];
-	for (unsigned i = a.gpe+1; i < a.len+a.gpe; ++i)
-		buffer[i-gaplen(a)] = a[i];
+	for (unsigned i = a.gpe + 1; i < a.len + a.gpe; ++i)
+		buffer[i - gaplen(a)] = a[i];
 
 	char *output = (char*)malloc(to-from+1);
 	for (unsigned i = from; i < to; ++i)
-		output[i-from] = buffer[i];
+		output[i - from] = buffer[i];
 	free(buffer);
 	return output;
 }
@@ -194,5 +204,5 @@ const char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
 void shrink(gap_buf &a)
 {
 	mv_curs(a, a.len);
-	a.buffer = (char*)realloc(a.buffer, sizeof(char) * a.len);
+	resize(a, a.len + 1);
 }	
