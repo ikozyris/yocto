@@ -77,10 +77,12 @@ loop:
 	//goto stop;
 	while (1) {
 		getyx(text_win, y, x);
+		if (x >= min(ry < curnum ? (it->len - 1 - ofx) : (it->len - ofx), maxx)) // if out of bounds: move (to avoid bugs)
+			wmove(text_win, y, min((ry != curnum ? it->len - ofx - 1 : it->len - ofx), maxx));
+		getyx(text_win, y, x);
 		ry = y + ofy; // calculate offset
-		if (x > min((ry != curnum ? it->len-1 : it->len), maxx)) // if out of bounds: move (to avoid bugs)
-			wmove(text_win, y, min((ry != curnum ? it->len-1 : it->len), maxx));
-		mv_curs(*it, x);
+		rx = x + ofx;
+		mv_curs(*it, rx);
 
 #ifdef DEBUG
 		print_text(); // debug only
@@ -97,6 +99,7 @@ loop:
 			if (ry >= curnum) // do not scroll indefinetly
 				break;
 			++it;
+			ofx = 0; // invalidated
 			if (y == (maxy - 1) && ry < curnum) {
 				ofy++;
 				wscrl(text_win, 1);
@@ -106,9 +109,8 @@ loop:
 				wmove(text_win, y, 0);
 				print_line_no_nl(*it);
 				wmove(text_win, y, x);
-			} else {
+			} else
 				wmove(text_win, y + 1, x);
-			}
 			break;
 
 		case UP:
@@ -122,9 +124,11 @@ loop:
 				print_line(*it);
 				wmove(text_win, 0, x);
 				wrefresh(ln_win);
+				ofx = 0;
 			} else if (y != 0) {
 				wmove(text_win, y - 1, x);
 				--it;
+				ofx = 0;
 			}
 			break;
 
@@ -136,7 +140,7 @@ loop:
 			break;
 
 		case RIGHT:
-			if (ry != curnum ? x < it->len-1 : x < it->len)
+			if (ry != curnum ? rx < it->len-1 : rx < it->len)
 				wmove(text_win, y, x + 1);
 			else if (ry < curnum) {
 				wmove(text_win, y + 1, 0);
@@ -163,9 +167,9 @@ loop:
 
 		case DELETE:
 			wdelch(text_win);
-			mv_curs(*it, x + 1);
-			if (x + (unsigned)1 <= it->len)
-				mveras(*it, x + 1);
+			mv_curs(*it, rx + 1);
+			if (rx + (unsigned)1 <= it->len)
+				mveras(*it, rx + 1);
 			break;
 
 		case ENTER:
@@ -191,7 +195,7 @@ loop:
 				stats();
 			else if (ch == CMD)
 				command();
-			else if (ch == 'r') {
+			else if (ch == 'r') { // switch file
 				argc = 2;
 				strcpy(argv[1], input_header("File to open: "));
 				std::list<gap_buf>::iterator iter;
@@ -203,6 +207,21 @@ loop:
 				it = text.begin();
 				wclear(text_win);
 				goto read;
+			} else if (ch == 'u') { // calculate x offset
+				wmove(text_win, y, 0);
+				wchar_t temp[256];
+				bzero(temp, 256 * sizeof(wchar_t));
+				if (winwstr(text_win, temp) == ERR)
+					break;
+				ofx = 0;
+				for (ofx = maxx; ofx > 0; --ofx)
+					if (temp[ofx] != ' ' && temp[ofx] != 0)
+						break;
+				ofx += 2;
+				x = ofx;
+				print2header(itoa(ofx), 1);
+				ofx = (long)it->len - (long)ofx;
+				print2header(itoa(ofx), 2);
 			}
 			wtimeout(text_win, -1);
 			wmove(text_win, y, x);
@@ -212,6 +231,7 @@ loop:
 		case REFRESH:
 			getmaxyx(text_win, maxy, maxx);
 			ofy = 0;
+			ofx = 0;
 			reset_header();
 			print_text();
 			print_lines();
@@ -227,9 +247,9 @@ loop:
 
 		// TODO: use real tab
 		case KEY_TAB:
-			winsnstr(text_win, "    ", 4);
-			wmove(text_win, y, x + 4);
-			insert_s(*it, x, "    ", 4);
+			winsnstr(text_win, "        ", 8);
+			wmove(text_win, y, x + 8);
+			insert_s(*it, x, "    ", 8);
 			break;
 
 		default:
@@ -238,9 +258,9 @@ loop:
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, x + 1);
 			len = wcstombs(s2, s, 4);
-			insert_s(*it, x, s2, len);
+			insert_s(*it, rx, s2, len);
 			if (len > 1)
-				ofx -= len - 1; // Unicode character
+				ofx += len - 1; // Unicode character
 			break;
 		}
 	}

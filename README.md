@@ -1,5 +1,5 @@
 # Yocto
-A simple and compact text editor using ncurses and a gap buffer, written in C++, in ~650 lines of code.
+A simple, compact and *fast* text editor using ncurses and a gap buffer, written in C++, in <1k lines of code.
 More information is available on the [wiki](https://github.com/ikozyris/yocto/wiki).
 
 ## How to use
@@ -16,8 +16,16 @@ which also supports configuring yocto
 * Exit: Ctrl-C
 * Go to start of line: Ctrl-A
 * Go to end of line: Ctrl-E
+* Open other file Alt-R
+* Calculate x offset (for UTF-8): Alt-U
 * Enter built-in terminal: Alt-C
 * Show info: Alt-I (also command _stats_ in built-in terminal)
+
+### How fast is it?
+Some define fast as reasonably optimized, in yocto fast means 
+faster than *every* other editor available. As anyone can understand from 
+[these benchmarks](https://github.com/ikozyris/yocto/wiki/Performance-&-Benchmarks)
+yocto is indeed *fast*.
 
 ### About the name
 Yocto is the SI (metric) prefix for 10^-24.

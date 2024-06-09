@@ -1,9 +1,9 @@
 #include "../headers/vars.hpp"
 
-char *itoa(int a)
+char *itoa(long a)
 {
 	static char b[12]; // static to keep in scope after function returns
-	sprintf(b, "%d", a);
+	sprintf(b, "%ld", a);
 	return b;
 }
 
