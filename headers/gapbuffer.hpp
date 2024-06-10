@@ -12,6 +12,8 @@ long signed ofx;
 #define gaplen(a) ((a).gpe - (a).gps + 1)
 #define ingap(a, pos) (((pos) >= (a).gps && (pos) <= (a).gpe) ? true : false)
 #define mveras(a, pos) (mv_curs(a, pos), eras(a))
+#define min(a, b) (a <= b ? a : b)
+#define max(a, b) (a >= b ? a : b)
 
 struct gap_buf {
 	unsigned cpt; 	// allocated size
@@ -61,8 +63,7 @@ void grow_gap(gap_buf &a, const unsigned pos)
 		return; // let mv_curs do the work
 	}
 	char tmp = a[pos];
-	for (unsigned i = a.len; i > pos; --i)
-		a[i + gap] = a[i];
+	memmove(a.buffer + pos + gap, a.buffer + pos, a.len - pos + 1);
 	a.gps = pos;
 	a.gpe = pos + gap;
 	a[pos + gap] = tmp;
@@ -102,13 +103,10 @@ void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
 {
 	// is this uneeded? (later it is also checked indirectly)
 	if (a.len + len >= a.cpt) [[unlikely]]
-		resize(a, a.cpt * 2);
+		resize(a, (a.cpt + len) * 2);
 	if (gaplen(a) <= len)
 		grow_gap(a, pos);
-	//#pragma omp parallel for if(len > 10)
-	for (unsigned i = pos; i < pos + len; ++i)
-		a[i] = str[i - pos];
-
+	memcpy(a.buffer + pos, str, len);
 	a.len += len;
 	a.gps += len;
 }
@@ -125,7 +123,7 @@ void apnd_c(gap_buf &a, const char ch)
 void apnd_s(gap_buf &a, const char *str, const unsigned size)
 {
 	if (a.len + size >= a.cpt) [[unlikely]]
-		resize(a, a.cpt * 2);
+		resize(a, (a.cpt + size) * 2);
 	memcpy(a.buffer + a.len, str, size);
 	a.len += size;
 	a.gps = a.len;
@@ -165,37 +163,35 @@ char *data(const gap_buf &a, const unsigned from, const unsigned to)
 		free(tmp);
 		return 0;
 	}
-	if (a.gps == a.len && a.gpe == a.cpt) { // gap ends at end so don't bother
-		for (unsigned i = from; i < to && i < a.gps; ++i)
-			tmp[i - from] = a[i];
-	} else if (a.gps == 0) {
-		for (unsigned i = from + a.gpe + 1; i < to + a.gpe; ++i)
-			tmp[i - a.gpe - 1] = a[i];
-	} else {
-		if (from < a.gps) {
+	// try some special cases where 1 copy is required
+	if (a.gps == a.len && a.gpe == a.cpt) // gap ends at end so don't bother
+		memcpy(tmp, a.buffer + from, min(to, a.gps));
+	else if (a.gps == 0) // x = 0; gap at start
+		memcpy(tmp, a.buffer + from + a.gpe + 1, min(to, a.len) - from);
+	else {
+		if (from < a.gps) { // worse case
 			for (unsigned i = from; i <= a.gps; ++i)
 				tmp[i] = a[i];
 			for (unsigned i = a.gpe + 1; i <= gaplen(a) + to; ++i)
 				tmp[i - gaplen(a)] = a[i];
-		} else {
+			//memcpy(tmp, a.buffer + from, min(to, a.gps));
+			//memcpy(tmp + min(to, a.gps), a.buffer +, a.gps - to - 1);
+		} else
 			for (unsigned i = gaplen(a) + a.gps; i < gaplen(a) + to; ++i)
 				tmp[i - gaplen(a) - 1] = a[i];
-		}
+			//memcpy(tmp, a.buffer + a.gpe + 1, a.gps - to);
 	}
 	return tmp;
 }
 
-// naive (simplier, should be bug free) implementation of above function 
+// naive, simplier, slower, should be bug free, implementation of above function 
 char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
-	char *buffer = (char*)malloc(a.len + 4);
-	for (unsigned i = 0; i < a.gps; ++i)
-		buffer[i] = a[i];
-	for (unsigned i = a.gpe + 1; i < a.len + a.gpe; ++i)
-		buffer[i - gaplen(a)] = a[i];
+	char *buffer = (char*)malloc(a.len + 1);
+	memcpy(buffer, a.buffer, a.gps);
+	memcpy(buffer + a.gps, a.buffer + a.gpe + 1, a.len - a.gps);
 
-	char *output = (char*)malloc(to-from+1);
-	for (unsigned i = from; i < to; ++i)
-		output[i - from] = buffer[i];
+	char *output = (char*)malloc(to - from + 1);
+	memcpy(output, buffer + from, to - from + 1);
 	free(buffer);
 	return output;
 }
