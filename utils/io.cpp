@@ -29,15 +29,11 @@ char *input_header(const char *q)
 		reset_header();
 		print2header("ERROR", 1);
 		wmove(text_win, y, x);
-	} if (strlen(tmp) <= 0) {
+	} if (strlen(tmp) <= 0)
 		bzero(tmp, 128);
-	}
 	noecho();
 	return tmp;
 }
-
-#define min(a, b) (a <= b ? a : b)
-#define max(a, b) (a >= b ? a : b)
 
 #define print_line(a)       {char *t = data((a), 0, maxx); waddstr(text_win, t); free(t);}
 #define print_line_no_nl(a) {char *t = data((a), 0, maxx-1); waddnstr(text_win, t, min((a).len-1, maxx-1)); free(t);}
@@ -48,7 +44,7 @@ void print_text()
 	std::advance(iter, ofy);
 	wclear(text_win);
 	unsigned ty = 0;
-	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy - 1); ++i, ++iter) {
+	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy - 1) && iter != text.end(); ++i, ++iter) {
 		print_line((*iter));
 		wmove(text_win, ++ty, 0);
 	}
@@ -67,8 +63,8 @@ unsigned print_text_w(unsigned start)
 }
 
 inline void ins_b(char ch) {
-	it->buffer[it->len++] = ch;
-	if (it->len >= it->cpt) { [[unlikely]]
+	it->buffer[it->len] = ch;
+	if (++it->len >= it->cpt) { [[unlikely]]
 		it->cpt *= 2;
 		it->buffer = (char*)realloc(it->buffer, it->cpt);
 	} if (ch == '\n')  { [[unlikely]]
@@ -80,12 +76,6 @@ inline void ins_b(char ch) {
 		}
 		++it;
 	}
-}
-
-void read_getc(FILE *fi)
-{
-	while ((ch = getc_unlocked(fi)) != EOF)
-		ins_b(ch);
 }
 
 // For size see: https://github.com/ikozyris/yocto/wiki/Comments-on-optimizations#buffer-size-for-reading

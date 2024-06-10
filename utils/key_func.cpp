@@ -30,7 +30,7 @@ void command()
 		for (auto &i : text)
 			shrink(i);
 	else if (strcmp(tmp, "usage") == 0) {
-		int memusg, pid;
+		size_t memusg, pid;
 		// stores each word in status file
 		char buffer[1024] = "";
 
@@ -42,12 +42,12 @@ void command()
 		// read the entire file
 		while (fscanf(file, " %1023s", buffer) == 1) {
 			if (strcmp(buffer, "VmRSS:") == 0)
-				fscanf(file, " %d", &memusg); // in kB
+				fscanf(file, " %lu", &memusg); // in kB
 			else if (strcmp(buffer, "Pid:") == 0)
-				fscanf(file, " %d", &pid);
+				fscanf(file, " %lu", &pid);
 		}
 		fclose(file);
-		sprintf(buffer, "RAM: %s PID: %d", hrsize(memusg * 1000), pid);
+		sprintf(buffer, "RAM: %s PID: %lu", hrsize(memusg * 1000), pid);
 		clear_header();
 		print2header(buffer, 1);
 	} else if (strcmp(tmp, "stats") == 0)
@@ -72,8 +72,8 @@ void command()
 			iterations++;
 		} while (msec < trigger);
 		char tmp[128];
-		snprintf(tmp, maxx, "Time taken %u seconds %u milliseconds (%u iterations)\n",
-  			msec/1000, msec%1000, iterations);
+		snprintf(tmp, maxx, "%u secs %u millisecs (%u iterations)\n",
+  			msec / 1000, msec % 1000, iterations);
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 	} else if (strcmp(tmp, "scroll") == 0) {
@@ -86,11 +86,11 @@ void command()
 			print_lines();
 			wrefresh(ln_win);
 			print_text();
-			std::advance(it, ofy-ry);
+			std::advance(it, ofy - ry);
 		}
 	} else if (strcmp(tmp, "fixstr") == 0) {
 		wchar_t temp[256];
-		bzero(temp, 256*sizeof(wchar_t));
+		bzero(temp, 256 * sizeof(wchar_t));
 		winwstr(text_win, temp);
 		int len = wcstombs(it->buffer, temp, it->cpt);
 		it->len = len;
@@ -108,9 +108,13 @@ void save()
 	if (strlen(filename) <= 0)
 		filename = (char*)input_header("Enter filename: ");
 	FILE *fo = fopen(filename, "w");
+	unsigned i;
 	std::list<gap_buf>::iterator iter;
-	for (iter = text.begin(); iter != text.end(); ++iter)
-		fputs(data((*iter), 0, (*iter).cpt), fo);
+	for (iter = text.begin(), i = 0; iter != text.end() && i < curnum; ++iter, ++i) {
+		char *tmp = data((*iter), 0, iter->cpt);
+		fputs(tmp, fo);
+		free(tmp);
+	}
 	fclose(fo);
 
 	reset_header();
@@ -124,14 +128,10 @@ void enter()
 
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
-	//char tmp[it->len];
-	//bzero(tmp, it->len);
-	//for (int i = it->gpe + 1; i < it->len + gaplen(*it); ++i)
-	//	tmp[i - (it->gpe + 1)] = it->buffer[i];
-	//apnd_s(*t, tmp);
-	//apnd_s(*t, data(*it, it->gpe + 1, it->len + gaplen(*t)));	
 	if ((it->cpt != it->gpe)) { // newline is not at the end
-		apnd_s(*t, data2(*it, x + 1, it->len + 1));
+		char *tmp = data2(*it, x + 1, it->len + 1);
+		apnd_s(*t, tmp, 2);
+		free(tmp);
 		it->gps = x + 1;
 		it->len = x + 1;
 		it->gpe = it->cpt;

@@ -199,7 +199,8 @@ loop:
 				argc = 2;
 				strcpy(argv[1], input_header("File to open: "));
 				std::list<gap_buf>::iterator iter;
-				for (iter = text.begin(); iter != text.end(); ++iter) {
+				unsigned i;
+				for (iter = text.begin(), i = 0; iter != text.end() && i < curnum; ++iter, ++i) {
 					iter->len = iter->gps = 0;
 					iter->gpe = iter->cpt;
 				}
@@ -249,7 +250,7 @@ loop:
 		case KEY_TAB:
 			winsnstr(text_win, "        ", 8);
 			wmove(text_win, y, x + 8);
-			insert_s(*it, x, "    ", 8);
+			insert_s(*it, x, "        ", 8);
 			break;
 
 		default:

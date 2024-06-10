@@ -1,13 +1,13 @@
 #include "../headers/vars.hpp"
 
-char *itoa(long a)
+const char *itoa(long a)
 {
-	static char b[12]; // static to keep in scope after function returns
+	static char b[12];
 	sprintf(b, "%ld", a);
 	return b;
 }
 
-// convert int bytes to human-readable string
+// convert bytes to human-readable string e.g 1024 = 1.024KB = 1KiB
 char *hrsize(size_t bytes)
 {
 	char *suffix[] = {(char*)"B", (char*)"KB", (char*)"MB",
