@@ -35,7 +35,7 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-#define print_line(a)       {char *t = data((a), 0, maxx); waddstr(text_win, t); free(t);}
+#define print_line(a)       {char *t = data((a), 0, maxx); waddnstr(text_win, t, maxx); free(t);}
 #define print_line_no_nl(a) {char *t = data((a), 0, maxx-1); waddnstr(text_win, t, min((a).len-1, maxx-1)); free(t);}
 
 void print_text()

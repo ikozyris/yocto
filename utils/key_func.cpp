@@ -30,7 +30,7 @@ void command()
 		for (auto &i : text)
 			shrink(i);
 	else if (strcmp(tmp, "usage") == 0) {
-		size_t memusg, pid;
+		size_t memusg = 0, tmp, pid;
 		// stores each word in status file
 		char buffer[1024] = "";
 
@@ -39,13 +39,18 @@ void command()
 		if (!file)
 			return;
 
-		// read the entire file
-		while (fscanf(file, " %1023s", buffer) == 1) {
-			if (strcmp(buffer, "VmRSS:") == 0)
-				fscanf(file, " %lu", &memusg); // in kB
-			else if (strcmp(buffer, "Pid:") == 0)
+		while (fscanf(file, " %1023s", buffer) == 1)
+			if (strcmp(buffer, "Pid:") == 0) {
 				fscanf(file, " %lu", &pid);
-		}
+				break;
+			}
+		fclose(file);
+		file = fopen("/proc/self/smaps", "r");
+		while (fscanf(file, " %1023s", buffer) == 1)
+			if (strcmp(buffer, "Pss:") == 0) {
+				fscanf(file, " %lu", &tmp);
+				memusg += tmp;
+			}
 		fclose(file);
 		sprintf(buffer, "RAM: %s PID: %lu", hrsize(memusg * 1000), pid);
 		clear_header();

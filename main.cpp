@@ -133,14 +133,30 @@ loop:
 			break;
 
 		case LEFT:
-			if (x > 0)
+			if (x == 0 && rx == maxx - 1) { // line has been wrapped
+				wmove(text_win, y, 0);
+				wclrtoeol(text_win);
+				print_line_no_nl(*it);
+				ofx -= (maxx - 1);
+				wmove(text_win, y, maxx - 1);
+			} else if (x > 0)
 				wmove(text_win, y, x - 1);
 			else if (y > 0)
 				wmove(text_win, y - 1, (--it)->len);
 			break;
 
 		case RIGHT:
-			if (ry != curnum ? rx < it->len-1 : rx < it->len)
+			if (x == maxx - 1 && rx < it->len - 1) {
+				wmove(text_win, y, 0);
+				wclrtoeol(text_win);
+				// printline() with custom start
+				char *tmp = data2(*it, maxx - 1, it->len);
+				waddnstr(text_win, tmp, it->len - maxx);
+				free(tmp);
+
+				ofx += maxx - 1;
+				wmove(text_win, y, 0);
+			} else if (ry != curnum ? rx < it->len - 1 : rx < it->len)
 				wmove(text_win, y, x + 1);
 			else if (ry < curnum) {
 				wmove(text_win, y + 1, 0);
