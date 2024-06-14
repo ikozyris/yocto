@@ -62,16 +62,17 @@ unsigned print_text_w(unsigned start)
 	return buf_indx - start; // how many characters were printed
 }
 
-inline void ins_b(char ch) {
-	it->buffer[it->len] = ch;
-	if (++it->len >= it->cpt) { [[unlikely]]
+inline void ins_b(char ch)
+{
+	it->buffer[it->len++] = ch;
+	if (it->len >= it->cpt) { [[likely]]
 		it->cpt *= 2;
 		it->buffer = (char*)realloc(it->buffer, it->cpt);
 	} if (ch == '\n')  { [[unlikely]]
 		it->gps = it->len;
 		it->gpe = it->cpt;
 		if (++curnum >= txt_cpt) { [[unlikely]]
-			txt_cpt = text.size() * 2;
+			txt_cpt *= 2;
 			text.resize(txt_cpt);
 		}
 		++it;
