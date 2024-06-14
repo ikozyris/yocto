@@ -26,10 +26,12 @@ void command()
 	char *tmp = input_header("Enter command: ");
 	if (strcmp(tmp, "resetheader") == 0)
 		reset_header();
-	else if (strcmp(tmp, "shrink") == 0)
+	else if (strcmp(tmp, "shrink") == 0) {
+                txt_cpt = curnum + 1;
+                text.resize(txt_cpt);
 		for (auto &i : text)
 			shrink(i);
-	else if (strcmp(tmp, "usage") == 0) {
+	} else if (strcmp(tmp, "usage") == 0) {
 		size_t memusg = 0, tmp, pid;
 		// stores each word in status file
 		char buffer[1024] = "";
@@ -63,9 +65,9 @@ void command()
 		free(_tmp);
 	} else if (strcmp(tmp, "help")  == 0)
 		print2header("resetheader, shrink, usg, stats, run, setgap", 1);
-	else if (strcmp(tmp, "setgap") == 0) {
+	else if (strcmp(tmp, "setgap") == 0)
 		++it->gps;
-	} else if (strcmp(tmp, "fixgap") == 0) {
+	else if (strcmp(tmp, "fixgap") == 0) {
 		unsigned msec = 0, trigger = 1; /* 1ms */
 		unsigned iterations = 0;
 		clock_t before = clock();
@@ -97,7 +99,7 @@ void command()
 		wchar_t temp[256];
 		bzero(temp, 256 * sizeof(wchar_t));
 		winwstr(text_win, temp);
-		int len = wcstombs(it->buffer, temp, it->cpt);
+		unsigned len = wcstombs(it->buffer, temp, it->cpt);
 		it->len = len;
 		it->gps = len + 1;
 		it->gpe = it->cpt;
@@ -129,22 +131,23 @@ void save()
 
 void enter()
 {
-	insert_c(*it, x, '\n');
+	insert_c(*it, rx, '\n');
 
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
 	if ((it->cpt != it->gpe)) { // newline is not at the end
-		char *tmp = data2(*it, x + 1, it->len + 1);
-		apnd_s(*t, tmp, 2);
+		char *tmp = data2(*it, rx + 1, it->len + 1);
+		apnd_s(*t, tmp, it->len - rx - 1);
 		free(tmp);
-		it->gps = x + 1;
-		it->len = x + 1;
+		it->gps = rx + 1;
+		it->len = rx + 1;
 		it->gpe = it->cpt;
 	}
 
 	// somewhere below iterator is invalidated
 	++it;
 	++curnum;
+        ++ofy;
 	text.insert(it, *t);
 	free(t);
 	// print text again (or find a better way)
@@ -152,5 +155,5 @@ void enter()
 	wmove(text_win, y + 1, 0);
 	// TODO: this shouldn't be necessary
 	it = text.begin();
-	std::advance(it, y + 1);
+	std::advance(it, ry + 1);
 }
