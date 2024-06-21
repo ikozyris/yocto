@@ -64,21 +64,29 @@ key_config() {
 
 	outputarray=($OUTPUT) # convert to array
 	# Replace the key* with the output of dialog
-	sed -i "9s/$KEY_SAVE/${outputarray[0]}/" keybindings.h 
-	sed -i "10s/$KEY_EXIT/${outputarray[1]}/" keybindings.h 
-	sed -i "17s/$KEY_HOME/${outputarray[2]}/" keybindings.h 
-	sed -i "18s/$KEY_END/${outputarray[3]}/" keybindings.h 
-	sed -i "19s/$KEY_INFO/${outputarray[4]}/" keybindings.h 
-	sed -i "20s/$KEY_REFRESH/${outputarray[5]}/" keybindings.h
+	sed -i "8s/$KEY_SAVE/${outputarray[0]}/" headers/keybindings.h 
+	sed -i "9s/$KEY_EXIT/${outputarray[1]}/" headers/keybindings.h 
+	sed -i "16s/$KEY_HOME/${outputarray[2]}/" headers/keybindings.h 
+	sed -i "17s/$KEY_END/${outputarray[3]}/" headers/keybindings.h 
+	sed -i "18s/$KEY_INFO/${outputarray[4]}/" headers/keybindings.h 
+	sed -i "19s/$KEY_REFRESH/${outputarray[5]}/" headers/keybindings.h
 }
 
+
 config_dialog() {
+	high_st="Disable"
+	tmp="$(cat Makefile | head -n 17 | tail -n 1)"
+	if ! grep -q "\-DHIGHLIGHT" <<< "$tmp"; then
+		high_st="Enable"
+	fi
+
 	while true; do
 		exec 3>&1 # open stdout fd
 		selection=$(DIALOG --title "$1" \
 		    --menu "Please select:" $HEIGHT $WIDTH 0 \
 		    "1" "Edit Keybindings" \
 		    "2" "Install dependencies" \
+		    "3" "$high_st syntax highlighting" \
 		2>&1 1>&3) # redirect output streams
 		exit_status=$?
 		exec 3>&- # delete fd
@@ -114,6 +122,13 @@ config_dialog() {
 			fi
 			sleep 1
 		   	;;
+		3 )
+			if [ $high_st = "Enable" ]; then
+				sed -i 's/CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw/CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw/g' Makefile
+			else
+				sed -i 's/CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw/CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw/g' Makefile
+			fi
+			;;
 		esac
     	done
 }
@@ -171,12 +186,11 @@ while true; do
 		if [ -d "$HOME.local/bin/yocto" ]; then
 			result="Uninstalled from ~/.local/bin"
 			rm ~/.local/bin/yocto
-			display_result "We are sorry to see you go!"
 		else
 			result="Uninstalled from /usr/bin"
 			rm /usr/bin/yocto
-			display_result "We are sorry to see you go!"
 		fi
+		display_result "We are sorry to see you go."
 		;;
     	esac
 done
