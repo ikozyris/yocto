@@ -10,11 +10,12 @@ CC = g++ --std=c++20
 #  -march=native	Add optimization flags specific to the host
 #  -flto		Link Time Optimization
 #  -pendatic		Strictier warnings
+#  -DHIGHLIGHT		Enable syntax highlighting
 #  -lncursesw		Links to ncurses library for wide characters
 
 #CXXFLAGS = -Og -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
-CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw
-#CXXFLAGS = -Og -g -fopenmp -march=native -lncursesw
+CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw
+#CXXFLAGS = -g -fopenmp -march=native -DHIGHLIGHT -lncursesw 
 
 # the build target executable:
 TARGET = yocto

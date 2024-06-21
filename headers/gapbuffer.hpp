@@ -141,7 +141,6 @@ void apnd_s(gap_buf &a, const char *str)
 	a.gps += a.len;
 }
 
-// TODO: this does not work for multi byte chars
 inline void eras(gap_buf &a)
 {
 	if (a[a.gps - 1] < 0) { // unicode
@@ -181,6 +180,7 @@ char *data(const gap_buf &a, const unsigned from, const unsigned to)
 				tmp[i - gaplen(a) - 1] = a[i];
 			//memcpy(tmp, a.buffer + a.gpe + 1, a.gps - to);
 	}
+	tmp[to - from + 1] = 0;
 	return tmp;
 }
 
@@ -190,8 +190,9 @@ char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
 	memcpy(buffer, a.buffer, a.gps);
 	memcpy(buffer + a.gps, a.buffer + a.gpe + 1, a.len - a.gps);
 
-	char *output = (char*)malloc(to - from + 1);
+	char *output = (char*)malloc(to - from + 2);
 	memcpy(output, buffer + from, to - from + 1);
+	output[to - from + 2] = 0;
 	free(buffer);
 	return output;
 }
