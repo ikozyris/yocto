@@ -1,0 +1,24 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: install buildchain
+    - run: apt install libncurses-dev gcc make
+    - name: build
+      run: make build
+    - name: upload artifact
+      uses: actions/upload-artifact@v4.3.3
+      with:
+        name: yocto
+        path: ./yocto
