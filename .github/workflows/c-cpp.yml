@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: install buildchain
-      run: apt install libncurses-dev gcc make
+      run: sudo apt install libncurses-dev gcc make
     - name: build
       run: make build
     - name: upload artifact
