@@ -1,4 +1,4 @@
-#include "init.c"
+#include "highlight.c"
 
 // pos: (1 left) (3 right) (else center)
 void print2header(const char *msg, unsigned char pos)
@@ -44,11 +44,14 @@ void print_text()
 	std::advance(iter, ofy);
 	wclear(text_win);
 	unsigned ty = 0;
-	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy - 1) && iter != text.end(); ++i, ++iter) {
-		print_line((*iter));
+	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy ) && iter != text.end(); ++i, ++iter) {
+		print_line_no_nl((*iter));
+#ifdef HIGHLIGHT
+		wmove(text_win, ty, 0);
+		apply(ty);
+#endif
 		wmove(text_win, ++ty, 0);
 	}
-	print_line_no_nl((*iter));
 }
 
 // print text with line wrapping

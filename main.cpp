@@ -108,6 +108,10 @@ loop:
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
 				print_line_no_nl(*it);
+#ifdef HIGHLIGHT
+				wmove(text_win, y, 0);
+				apply(y);
+#endif
 				wmove(text_win, y, x);
 			} else
 				wmove(text_win, y + 1, x);
@@ -122,6 +126,10 @@ loop:
 				wmove(text_win, 0, 0);
 				--it; // why can't *(--it) work?
 				print_line(*it);
+#ifdef HIGHLIGHT
+				wmove(text_win, y, 0);
+				apply(y);
+#endif
 				wmove(text_win, 0, x);
 				wrefresh(ln_win);
 				ofx = 0;
@@ -137,6 +145,10 @@ loop:
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
 				print_line_no_nl(*it);
+#ifdef HIGHLIGHT
+				wmove(text_win, y, 0);
+				apply(y);
+#endif
 				ofx -= (maxx - 1);
 				wmove(text_win, y, maxx - 1);
 			} else if (x > 0)
