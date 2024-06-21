@@ -223,7 +223,7 @@ loop:
 				stats();
 			else if (ch == CMD)
 				command();
-			else if (ch == 'r') { // switch file
+			else if (ch == SWITCH) { // switch file
 				argc = 2;
 				strcpy(argv[1], input_header("File to open: "));
 				std::list<gap_buf>::iterator iter;
@@ -236,7 +236,7 @@ loop:
 				it = text.begin();
 				wclear(text_win);
 				goto read;
-			} else if (ch == 'u') { // calculate x offset
+			} else if (ch == OFF) { // calculate x offset
 				wmove(text_win, y, 0);
 				wchar_t temp[256];
 				bzero(temp, 256 * sizeof(wchar_t));
