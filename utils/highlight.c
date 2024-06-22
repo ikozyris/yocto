@@ -1,19 +1,21 @@
 #include "init.c"
 
 const char *types[] = {"int", "char", "float", "double", "unsigned", "void", "const", 
-	"size_t", "signed", "long", "enum", "static", "short", "extern", 0};
+	"size_t", "bool", "signed", "long", "enum", "static", "short", "extern"};
 const char *defs[]  = {"if", "else", "while", "for", "do", "return", "sizeof", "switch",
-	"goto", "case", "break", "struct", "default", "continue", 0};
+	"goto", "case", "break", "struct", "default", "continue", "true", "false"};
 const char *oper[]  = {"=", "+=", "+", "-", "-=", "*", "*=", "/", "/=", "%%", "&", "++",
-	"--", "==", "<", ">", "\'", 0};
+	"--", "==", "<", ">", "\'"};
 
-#define RED     "\x1b[1;31m"
-#define GREEN   "\x1b[1;32m"
-#define YELLOW  "\x1b[1;33m"
-#define BLUE    "\x1b[1;34m"
-#define MAGENTA "\x1b[1;35m"
-#define CYAN    "\x1b[1;36m"
-#define RESET   "\x1b[0m"
+#define DEFINC	COLOR_CYAN
+#define COMMENT	COLOR_GREEN
+#define TYPES	COLOR_RED
+#define OPER	COLOR_YELLOW
+#define DEFS    COLOR_BLUE
+#define STR	COLOR_MAGENTA
+
+#define nelems(x)  (sizeof(x) / sizeof((x)[0]))
+#define isvalid(ch) (ch < 65 || ch > 122)
 
 struct res_t {
 	short len;
@@ -28,7 +30,7 @@ struct res_t get_category2(const char *line)
 
 	unsigned j = 0;
 	bool found = true;
-	for (unsigned i = 0; i < 14; ++i) {
+	for (unsigned i = 0; i < nelems(types); ++i) {
 		found = true;
 		for (j = 0; types[i][j] != 0; ++j)
 			if (types[i][j] != line[j])
@@ -38,7 +40,7 @@ struct res_t get_category2(const char *line)
 			res.type = 't';
 		}
 	}
-	for (unsigned i = 0; i < 14; ++i) {
+	for (unsigned i = 0; i < nelems(defs); ++i) {
 		found = true;
 		for (j = 0; defs[i][j] != 0; ++j)
 			if (defs[i][j] != line[j])
@@ -48,7 +50,7 @@ struct res_t get_category2(const char *line)
 			res.type = 'd';
 		}
 	}
-	for (unsigned i = 0; i < 17; ++i) {
+	for (unsigned i = 0; i < nelems(oper); ++i) {
 		found = true;
 		for (j = 0; oper[i][j] != 0; ++j)
 			if (oper[i][j] != line[j])
@@ -72,12 +74,12 @@ void apply(unsigned line)
 	for (unsigned i = 0; i < len2; ++i) {
 		if (str[i] == '#') { // define / include
 			wmove(text_win, line, i);
-			wchgat(text_win, -1, 0, COLOR_CYAN, 0);
+			wchgat(text_win, -1, 0, DEFINC, 0);
 			return;
 		} // comments
 		else if (str[i] == '/' && str[i + 1] == '/') {
 			wmove(text_win, line, i);
-			wchgat(text_win, -1, 0, COLOR_GREEN, 0);
+			wchgat(text_win, -1, 0, COMMENT, 0);
 			return;
 		} else if (str[i] == '/' && str[i + 1] == '*') {
 			previ = i;
@@ -85,30 +87,33 @@ void apply(unsigned line)
 			wmove(text_win, line, previ);
 			while (str[i] != '*' && str[i + 1] != '/')
 				++i;
-			wchgat(text_win, i-previ+2, 0, COLOR_GREEN, 0);
+			wchgat(text_win, i++ - previ + 2, 0, COMMENT, 0);
 		} // string / char
 		else if (str[i] == '\'') {
 			previ = i++;
 			wmove(text_win, line, previ);
 			while (str[i] != '\'')
 				++i;
-			wchgat(text_win, i-previ+1, 0, COLOR_MAGENTA, 0);
+			wchgat(text_win, i - previ + 1, 0, STR, 0);
 		} else if (str[i] == '\"') {
 			previ = i++;
 			wmove(text_win, line, previ);
 			while (str[i] != '\"')
 				++i;
-			wchgat(text_win, i-previ+1, 0, COLOR_MAGENTA, 0);
+			wchgat(text_win, i - previ + 1, 0, STR, 0);
 		} // type (int, char) / keyword (if, return) / operator (==, +)
 		else {
 			wmove(text_win, line, i);
 			struct res_t res = get_category2(str + i);
-			if (res.type == 't')
-				wchgat(text_win, res.len, 0, COLOR_RED, 0);
-			else if (res.type == 'd')
-				wchgat(text_win, res.len, 0, COLOR_BLUE, 0);
+			if (res.type == 't' && isvalid(str[i + res.len])
+				&& (i == 0 ? 1 : isvalid(str[i - 1])))
+				wchgat(text_win, res.len, 0, TYPES, 0);
+			else if (res.type == 'd' && isvalid(str[i + res.len])
+				&& (i == 0 ? 1 : isvalid(str[i - 1])))
+				wchgat(text_win, res.len, 0, DEFS, 0);
 			else if (res.type == 'o')
-				wchgat(text_win, res.len, 0, COLOR_YELLOW, 0);
+				wchgat(text_win, res.len, 0, OPER, 0);
 		}
 	}
 }
+
