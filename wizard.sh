@@ -42,12 +42,12 @@ key_config() {
 	exec 3>&1 # open stdout fd
 	OUTPUT=$(DIALOG --title "Edit Keybindings" \
 	--form "Edit the fields" $HEIGHT $WIDTH 0 \
-	"Save:"		1 1 "$KEY_SAVE"		1 15 15 0 \
-	"Exit:"		2 1 "$KEY_EXIT"		2 15 15 0 \
-	"Home:"		3 1 "$KEY_HOME"		3 15 15 0 \
-	"End:"		4 1 "$KEY_END"		4 15 15 0 \
-	"Info:"		5 1 "$KEY_INFO"		5 15 15 0 \
-	"Refresh:"	6 1 "$KEY_REFRESH"	6 15 15 0 \
+	"Save"		1 1 "$KEY_SAVE"		1 15 15 0 \
+	"Exit"		2 1 "$KEY_EXIT"		2 15 15 0 \
+	"Home"		3 1 "$KEY_HOME"		3 15 15 0 \
+	"End"		4 1 "$KEY_END"		4 15 15 0 \
+	"Info"		5 1 "$KEY_INFO"		5 15 15 0 \
+	"Refresh"	6 1 "$KEY_REFRESH"	6 15 15 0 \
 	2>&1 1>&3)
 	exit_status=$?
 	case $exit_status in
@@ -72,6 +72,41 @@ key_config() {
 	sed -i "19s/$KEY_REFRESH/${outputarray[5]}/" headers/keybindings.h
 }
 
+color_config() {
+ 	mapfile -t colors <  <(sed "s/.*COLOR_//g" utils/highlight.c | head -n 15 | tail -n 6)
+
+	exec 3>&1 # open stdout fd
+	OUTPUT=$(DIALOG --title "Edit Colors" \
+	--form "Edit the fields" $HEIGHT $WIDTH 0 \
+	"#include/define"	1 1 "${colors[0]}"	1 20 20 0 \
+	"Comments"		2 1 "${colors[1]}"	2 20 20 0 \
+	"Types"			3 1 "${colors[2]}"	3 20 20 0 \
+	"Operators"		4 1 "${colors[3]}"	4 20 20 0 \
+	"if/while"		5 1 "${colors[4]}"	5 20 20 0 \
+	"Strings"		6 1 "${colors[5]}"	6 20 20 0 \
+	2>&1 1>&3)
+	exit_status=$?
+	case $exit_status in
+	"$DIALOG_CANCEL")
+		clear
+		return
+	    	;;
+	"$DIALOG_ESC")
+		clear
+		return
+		;;
+	esac
+	exec 3>&- # delete fd
+
+	outputarray=($OUTPUT) # convert to array
+	# Replace the key* with the output of dialog
+	sed -i "10s/${colors[0]}/${outputarray[0]}/" utils/highlight.c 
+	sed -i "11s/${colors[1]}/${outputarray[1]}/" utils/highlight.c 
+	sed -i "12s/${colors[2]}/${outputarray[2]}/" utils/highlight.c 
+	sed -i "13s/${colors[3]}/${outputarray[3]}/" utils/highlight.c 
+	sed -i "14s/${colors[4]}/${outputarray[4]}/" utils/highlight.c 
+	sed -i "15s/${colors[5]}/${outputarray[5]}/" utils/highlight.c
+}
 
 config_dialog() {
 	high_st="Disable"
@@ -87,6 +122,7 @@ config_dialog() {
 		    "1" "Edit Keybindings" \
 		    "2" "Install dependencies" \
 		    "3" "$high_st syntax highlighting" \
+		    "4" "Change colors of syntax highlighting" \
 		2>&1 1>&3) # redirect output streams
 		exit_status=$?
 		exec 3>&- # delete fd
@@ -127,6 +163,13 @@ config_dialog() {
 				sed -i 's/CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw/CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw/g' Makefile
 			else
 				sed -i 's/CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw/CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw/g' Makefile
+			fi
+			;;
+		4 )
+			if [ $DIAL = "dialog" ]; then
+				color_config
+			else
+				display_result "dialog not installed, but you can still edit utils/highlighting.h lines 10-15"
 			fi
 			;;
 		esac
