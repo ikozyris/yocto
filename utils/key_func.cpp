@@ -79,7 +79,7 @@ void command()
 			iterations++;
 		} while (msec < trigger);
 		char tmp[128];
-		snprintf(tmp, maxx, "%u secs %u millisecs (%u iterations)\n",
+		snprintf(tmp, maxx, "%u,%03u ms (%u iterations)",
   			msec / 1000, msec % 1000, iterations);
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
@@ -97,36 +97,14 @@ void command()
 		}
 	} else if (strcmp(tmp, "fixstr") == 0) {
 		wchar_t temp[256];
-		bzero(temp, 256 * sizeof(wchar_t));
 		winwstr(text_win, temp);
-		unsigned len = wcstombs(it->buffer, temp, it->cpt);
-		it->len = len;
-		it->gps = len + 1;
+		wcstombs(it->buffer, temp, it->cpt);
+		it->len = sizeofline(y);
+		it->gps = it->len + 1;
 		it->gpe = it->cpt;
 	} else
 		print2header("command not found", 3);
 	free(tmp);
-}
-
-void save()
-{
-	if (!filename)
-		filename = (char*)malloc(128);
-	if (strlen(filename) <= 0)
-		filename = (char*)input_header("Enter filename: ");
-	FILE *fo = fopen(filename, "w");
-	unsigned i;
-	std::list<gap_buf>::iterator iter;
-	for (iter = text.begin(), i = 0; iter != text.end() && i < curnum; ++iter, ++i) {
-		char *tmp = data((*iter), 0, iter->cpt);
-		fputs(tmp, fo);
-		free(tmp);
-	}
-	fclose(fo);
-
-	reset_header();
-	print2header("Saved", 1);
-	wmove(text_win, y, x);
 }
 
 void enter()

@@ -31,5 +31,5 @@ unsigned sizeofline(unsigned y) {
 	wmove(text_win, y, i);
 	while ((winch(text_win) & A_CHARTEXT) == ' ')
 		wmove(text_win, y, --i);
-	return i;	
+	return i+2;	
 }
