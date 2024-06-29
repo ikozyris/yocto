@@ -42,8 +42,7 @@ struct gap_buf {
 void init(gap_buf &a)
 {
 	a.buffer = (char*)malloc(array_size);
-	a.len = 0;
-	a.gps = 0;
+	a.len = a.gps = 0;
 	a.gpe = array_size;
 	a.cpt = array_size;
 }
@@ -93,7 +92,7 @@ void insert_c(gap_buf &a, const unsigned pos, const char ch)
 		a[pos] = ch;
 		++a.gps;
 	} else {
-		grow_gap(a, pos);
+		mv_curs(a, pos);
 		a[pos] = ch;
 	}
 	++a.len;
@@ -150,18 +149,15 @@ inline void eras(gap_buf &a)
 	}
 	--a.gps;
 	--a.len;
-	
 }
 
 // TODO: this is a mess
 char *data(const gap_buf &a, const unsigned from, const unsigned to)
 {
+	if (a.len == 0)
+		return 0;
 	char *tmp = (char*)malloc(to - from + 10);
 	bzero(tmp, to - from);
-	if (a.len == 0) {
-		free(tmp);
-		return 0;
-	}
 	// try some special cases where 1 copy is required
 	if (a.gps == a.len && a.gpe == a.cpt) // gap ends at end so don't bother
 		memcpy(tmp, a.buffer + from, min(to, a.gps));
@@ -180,7 +176,7 @@ char *data(const gap_buf &a, const unsigned from, const unsigned to)
 				tmp[i - gaplen(a) - 1] = a[i];
 			//memcpy(tmp, a.buffer + a.gpe + 1, a.gps - to);
 	}
-	tmp[to - from + 1] = 0;
+	tmp[to - from + 2] = 0;
 	return tmp;
 }
 

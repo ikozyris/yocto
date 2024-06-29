@@ -44,7 +44,9 @@ int main(int argc, char *argv[])
 	init_text();
 
 	getmaxyx(text_win, maxy, maxx);
-	wrefresh(ln_win);
+	wnoutrefresh(ln_win);
+	wnoutrefresh(header_win);
+	doupdate();
 
 read:
 	if (argc > 1) {
@@ -58,16 +60,14 @@ read:
 
 		if (argc > 2 && (strcmp(argv[2], "-ro") == 0 ||
 				strcmp(argv[2], "--read-only") == 0)) {
-			read_fread(fi); 
-			print_text_w(0);
+			read_fread_sl(fi);
+			printed = print_text_w(0);
 			print2header("Read-Only", 3);
 			goto ro;
 		} else {
-			read_fread_b(fi);
-			//read_getc(fi);
+			read_fread(fi);
 			print_text();
 		}
-		//read_fgets(fi);
 		fclose(fi);
 	}
 	wmove(text_win, 0, 0);
@@ -80,16 +80,15 @@ loop:
 		if (x >= min(ry < curnum ? (it->len - 1 - ofx) : (it->len - ofx), maxx)) // if out of bounds: move (to avoid bugs)
 			wmove(text_win, y, min((ry != curnum ? it->len - ofx - 1 : it->len - ofx), maxx));
 		getyx(text_win, y, x);
-		ry = y + ofy; // calculate offset
+		ry = y + ofy; // calculate offsets
 		rx = x + ofx;
 		mv_curs(*it, rx);
 
 #ifdef DEBUG
 		print_text(); // debug only
 		char tmp[128];
-		sprintf(tmp, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d", 
+		sprintf(tmp, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d",
 			it->gps, it->gpe, it->cpt, it->len, it->gpe-it->gps, x, it->buffer[x-1]);
-		clear_header();
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 #endif
@@ -242,11 +241,7 @@ loop:
 				bzero(temp, 256 * sizeof(wchar_t));
 				if (winwstr(text_win, temp) == ERR)
 					break;
-				ofx = 0;
-				for (ofx = maxx; ofx > 0; --ofx)
-					if (temp[ofx] != ' ' && temp[ofx] != 0)
-						break;
-				ofx += 2;
+				ofx = sizeofline(y);
 				x = ofx;
 				print2header(itoa(ofx), 1);
 				ofx = (long)it->len - (long)ofx;
@@ -264,9 +259,11 @@ loop:
 			reset_header();
 			print_text();
 			print_lines();
-			wrefresh(text_win);
-			wrefresh(ln_win);
-			wrefresh(header_win);
+			wnoutrefresh(text_win);
+			wnoutrefresh(ln_win);
+			wnoutrefresh(header_win);
+			doupdate();
+			getmaxyx(text_win, maxy, maxx);
 			wmove(text_win, 0, 0);
 			it = text.begin();
 			break;
@@ -295,7 +292,8 @@ loop:
 	}
 	//*/
 ro:
-	while ((ch = wgetch(text_win))) {
+	wclear(ln_win);
+	do {
 		switch (ch) {
 		case UP:
 			if (ppi >= previndx || ppi >= buf_indx)
@@ -315,7 +313,19 @@ ro:
 		case EXIT:
 			goto stop;
 		}
-	}
+		#ifdef HIGHLIGHT
+					for (unsigned i = 0; i < maxy-1; ++i) {
+						wmove(text_win, i, 0);
+						apply(i);
+					}
+		#endif
+		mvwprintw(ln_win, 1, 0, "%3u", buf_indx);
+		mvwprintw(ln_win, 3, 0, "%3u", printed);
+		mvwprintw(ln_win, 5, 0, "%3u", previndx);
+		mvwprintw(ln_win, 7, 0, "%3u", ppi);
+		wrefresh(ln_win);
+
+	} while ((ch = wgetch(text_win)));
 stop:
 	delwin(text_win);
 	delwin(ln_win);

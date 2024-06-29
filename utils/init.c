@@ -50,13 +50,11 @@ void clear_header()
 	wmove(header_win, 0, 0);
 	for (short i = maxx; i != 0; --i)
 		waddch(header_win, ' ');
-	wrefresh(header_win);
 }
 
 inline void print_header_title()
 {
 	mvwprintw(header_win, 0, maxx / 2 - sizeof(name)/2, "%s", name);
-	wrefresh(header_win);
 }
 
 inline void reset_header()

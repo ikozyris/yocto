@@ -60,9 +60,21 @@ void command()
 	} else if (strcmp(tmp, "stats") == 0)
 		stats();
 	else if (strcmp(tmp, "run") == 0) {
-		char *_tmp = input_header("Enter command");
-		system(_tmp);
+		char *_tmp = input_header("Enter command: ");
+		clear();
+		refresh();
+		int res = system(_tmp);
+		if (res != 0)
+			print2header(itoa(res), 1);
 		free(_tmp);
+		getch();
+		reset_header();
+		print_text();
+		print_lines();
+		wnoutrefresh(ln_win);
+		wnoutrefresh(header_win);
+		doupdate();
+		wmove(text_win, y, x);
 	} else if (strcmp(tmp, "help")  == 0)
 		print2header("resetheader, shrink, usg, stats, run, setgap", 1);
 	else if (strcmp(tmp, "setgap") == 0)
@@ -125,7 +137,8 @@ void enter()
 	// somewhere below iterator is invalidated
 	++it;
 	++curnum;
-        ++ofy;
+	if (ofy != 0)
+		++ofy;
 	text.insert(it, *t);
 	free(t);
 	// print text again (or find a better way)
