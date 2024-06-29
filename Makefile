@@ -13,7 +13,7 @@ CC = g++ --std=c++20
 #  -DHIGHLIGHT		Enable syntax highlighting
 #  -lncursesw		Links to ncurses library for wide characters
 
-#CXXFLAGS = -Og -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -lncursesw # Debug only
+#CXXFLAGS = -Og -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -DHIGHLIGHT -lncursesw # Debug only
 CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw
 #CXXFLAGS = -g -fopenmp -march=native -DHIGHLIGHT -lncursesw 
 

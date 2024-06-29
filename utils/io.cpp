@@ -118,7 +118,8 @@ inline void ins_b(char ch)
 	}
 }
 
-void read_fread(FILE *fi)
+// read in single line
+void read_fread_sl(FILE *fi)
 {
 	char tmp[SZ];
 	unsigned a = 0; // bytes read
@@ -126,7 +127,7 @@ void read_fread(FILE *fi)
 		apnd_s(*it, tmp, a);
 }
 
-void read_fread_b(FILE *fi)
+void read_fread(FILE *fi)
 {
 	char tmp[SZ];
 	unsigned a;
