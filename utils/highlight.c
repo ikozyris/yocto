@@ -5,7 +5,7 @@ const char *types[] = {"int", "char", "float", "double", "unsigned", "void", "co
 const char *defs[]  = {"if", "else", "while", "for", "do", "return", "sizeof", "switch",
 	"goto", "case", "break", "struct", "default", "continue", "true", "false"};
 const char *oper[]  = {"=", "+=", "+", "-", "-=", "*", "*=", "/", "/=", "%%", "&", "++",
-	"--", "==", "<", ">", "\'"};
+	"--", "==", "<", ">", "[", "]"};
 
 #define DEFINC	COLOR_CYAN
 #define COMMENT	COLOR_GREEN
@@ -13,12 +13,13 @@ const char *oper[]  = {"=", "+=", "+", "-", "-=", "*", "*=", "/", "/=", "%%", "&
 #define OPER	COLOR_YELLOW
 #define DEFS    COLOR_BLUE
 #define STR	COLOR_MAGENTA
+// TODO: color for numbers?
 
 #define nelems(x)  (sizeof(x) / sizeof((x)[0]))
 #define isvalid(ch) (ch < 65 || ch > 122)
 
 struct res_t {
-	short len;
+	unsigned short len;
 	char type;
 };
 
@@ -77,15 +78,15 @@ void apply(unsigned line)
 			wchgat(text_win, -1, 0, DEFINC, 0);
 			return;
 		} // comments
-		else if (str[i] == '/' && str[i + 1] == '/') {
+		else if (str[i] == '/' && str[i + 1] == '/' && i < maxx) {
 			wmove(text_win, line, i);
 			wchgat(text_win, -1, 0, COMMENT, 0);
 			return;
-		} else if (str[i] == '/' && str[i + 1] == '*') {
+		} else if (str[i] == '/' && str[i + 1] == '*' && i < maxx) {
 			previ = i;
 			i += 2;
 			wmove(text_win, line, previ);
-			while (str[i] != '*' && str[i + 1] != '/')
+			while (str[i] != '*' && str[i + 1] != '/' && i < maxx)
 				++i;
 			wchgat(text_win, i++ - previ + 2, 0, COMMENT, 0);
 		} // string / char
@@ -98,7 +99,7 @@ void apply(unsigned line)
 		} else if (str[i] == '\"') {
 			previ = i++;
 			wmove(text_win, line, previ);
-			while (str[i] != '\"')
+			while (str[i] != '\"' && i < maxx)
 				++i;
 			wchgat(text_win, i - previ + 1, 0, STR, 0);
 		} // type (int, char) / keyword (if, return) / operator (==, +)

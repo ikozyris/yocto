@@ -22,6 +22,5 @@ unsigned maxy, maxx; // to store the maximum rows and columns
 int ch;
 char *filename;
 
-// indx: tmp for lenght of line
-// curnum: total lines
-size_t indx, curnum;
+// total lines
+size_t curnum;
