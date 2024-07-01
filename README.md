@@ -1,13 +1,14 @@
 # Yocto
+[![C/C++ CI](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml)
 A simple, compact and *fast* text editor using ncurses and a gap buffer, written in C++, in <1k lines of code.
 More information is available on the [wiki](https://github.com/ikozyris/yocto/wiki).
 
 ![A C++ file in Yocto](https://github.com/ikozyris/yocto/assets/80053394/8fa12952-272f-41e0-9535-0a77f3652286)
 
-## How to use
+## Usage
 ```
 make build
-make install
+sudo make install
 ```
 
 Or use the user-friendly dialog utility (`wizard.sh`)

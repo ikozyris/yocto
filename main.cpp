@@ -106,7 +106,7 @@ loop:
 				mvwprintw(ln_win, maxy - 1, 0, "%3d", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
-				print_line_no_nl(*it);
+				print_line(*it);
 #ifdef HIGHLIGHT
 				wmove(text_win, y, 0);
 				apply(y);
@@ -140,10 +140,10 @@ loop:
 			break;
 
 		case LEFT:
-			if (x == 0 && rx == maxx - 1) { // line has been wrapped
+			if (x == 0 && rx >= maxx - 1) { // line has been wrapped
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
-				print_line_no_nl(*it);
+				print_line(*it);
 #ifdef HIGHLIGHT
 				wmove(text_win, y, 0);
 				apply(y);
@@ -157,7 +157,7 @@ loop:
 			break;
 
 		case RIGHT:
-			if (x == maxx - 1 && rx < it->len - 1) {
+			if (x == maxx - 1 && x < it->len - 1) {
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
 				// printline() with custom start
@@ -236,15 +236,13 @@ loop:
 				wclear(text_win);
 				goto read;
 			} else if (ch == OFF) { // calculate x offset
-				wmove(text_win, y, 0);
 				wchar_t temp[256];
 				bzero(temp, 256 * sizeof(wchar_t));
 				if (winwstr(text_win, temp) == ERR)
 					break;
-				ofx = sizeofline(y);
-				x = ofx;
-				print2header(itoa(ofx), 1);
-				ofx = (long)it->len - (long)ofx;
+				x = sizeofline(y);
+				print2header(itoa(x), 1);
+				ofx = (long)it->len - (long)x;
 				print2header(itoa(ofx), 2);
 			}
 			wtimeout(text_win, -1);

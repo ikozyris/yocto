@@ -157,7 +157,7 @@ char *data(const gap_buf &a, const unsigned from, const unsigned to)
 	if (a.len == 0)
 		return 0;
 	char *tmp = (char*)malloc(to - from + 10);
-	bzero(tmp, to - from);
+	bzero(tmp, to - from + 1);
 	// try some special cases where 1 copy is required
 	if (a.gps == a.len && a.gpe == a.cpt) // gap ends at end so don't bother
 		memcpy(tmp, a.buffer + from, min(to, a.gps));

@@ -35,17 +35,17 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-#define print_line(a)       {char *t = data((a), 0, maxx); waddnstr(text_win, t, maxx); free(t);}
-#define print_line_no_nl(a) {char *t = data((a), 0, maxx-1); waddnstr(text_win, t, min((a).len-1, maxx-1)); free(t);}
+
+#define print_line(a) {char *t = data((a), 0, (a).len-1);\
+waddnstr(text_win, t, min(get_offset(a), ((long)maxx + ((long)(a).len - get_offset(a))))-1);free(t);}
 
 void print_text()
 {
 	std::list<gap_buf>::iterator iter = text.begin();
 	std::advance(iter, ofy);
 	wclear(text_win);
-	unsigned ty = 0;
-	for (unsigned char i = ofy; i < ofy + min(txt_cpt, maxy ) && iter != text.end(); ++i, ++iter) {
-		print_line_no_nl((*iter));
+	for (unsigned ty = 0; ty < min(curnum, maxy) && iter != text.end(); ++iter) {
+		print_line(*iter);
 #ifdef HIGHLIGHT
 		wmove(text_win, ty, 0);
 		apply(ty);
@@ -59,7 +59,7 @@ unsigned print_text_w(unsigned start)
 {
 	wmove(text_win, 0, 0);
 	buf_indx = start;
-	while ((unsigned)getcury(text_win) < maxy-1 && buf_indx < it->len)
+	while ((unsigned)getcury(text_win) < maxy - 1 && buf_indx < it->len)
 		waddch(text_win, it->buffer[buf_indx++]);
 	wclrtobot(text_win);
 	return buf_indx - start; // how many characters were printed
@@ -134,4 +134,7 @@ void read_fread(FILE *fi)
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi)))
 		for (unsigned i = 0; i < a; ++i)
 			ins_b(tmp[i]);
+	// TODO: find a proper way (in print_line)
+	ins_b('\n');
+	--curnum;
 }
