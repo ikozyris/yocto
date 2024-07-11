@@ -97,7 +97,7 @@ void save()
 }
 
 // For size see: https://github.com/ikozyris/yocto/wiki/Comments-on-optimizations#buffer-size-for-reading
-#define SZ 200 // 512 KB
+#define SZ 524288 // 512 KB
 
 void read_fgets(FILE *fi)
 {
