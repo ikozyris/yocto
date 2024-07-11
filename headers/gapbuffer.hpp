@@ -57,7 +57,7 @@ void resize(gap_buf &a, const unsigned size)
 
 void grow_gap(gap_buf &a, const unsigned pos)
 {
-	if (a.len == a.cpt) {
+	if (a.len >= a.cpt) {
 		resize(a, a.cpt * 2);
 		return; // let mv_curs do the work
 	}
@@ -104,7 +104,7 @@ void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
 	if (a.len + len >= a.cpt) [[unlikely]]
 		resize(a, (a.cpt + len) * 2);
 	if (gaplen(a) <= len)
-		grow_gap(a, pos);
+		mv_curs(a, pos);
 	memcpy(a.buffer + pos, str, len);
 	a.len += len;
 	a.gps += len;
@@ -154,9 +154,11 @@ inline void eras(gap_buf &a)
 // TODO: this is a mess
 char *data(const gap_buf &a, const unsigned from, const unsigned to)
 {
-	if (a.len == 0)
-		return 0;
 	char *tmp = (char*)malloc(to - from + 10);
+	if (a.len == 0) {
+		tmp[0] = 0;
+		return tmp;
+	}
 	bzero(tmp, to - from + 1);
 	// try some special cases where 1 copy is required
 	if (a.gps == a.len && a.gpe == a.cpt) // gap ends at end so don't bother
