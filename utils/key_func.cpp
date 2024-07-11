@@ -3,18 +3,11 @@
 void stats()
 {
 	char *_tmp = (char*)malloc(256);
-	struct stat stat_buf;
-	if (filename && stat(filename, &stat_buf) == 0) {
-		sprintf(_tmp, "%ld lines", curnum + 1);
-		print2header(hrsize(stat_buf.st_size), 3);
-		print2header(_tmp, 1);
-	}
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	snprintf(_tmp, maxx-2, "gap start %u g end %u buffer size %u length %u y %u x %u sum len %u", 
+	snprintf(_tmp, maxx-2, "gap st %u g end %u buff sz %u len %u y %u x %u sum len %u  ", 
 		it->gps, it->gpe, it->cpt, it->len, ry, x, sumlen);
-	clear_header();
 	print2header(_tmp, 1);
 	free(_tmp);
 	_tmp = 0;
@@ -137,13 +130,18 @@ void enter()
 	// somewhere below iterator is invalidated
 	++it;
 	++curnum;
-	if (ofy != 0)
-		++ofy;
 	text.insert(it, *t);
 	free(t);
+	if (ry >= maxy - 1) {
+		++ofy;
+		print_lines();
+		wnoutrefresh(ln_win);
+	}
 	// print text again (or find a better way)
 	print_text();
-	wmove(text_win, y + 1, 0);
+	if (y < maxy-1)
+		wmove(text_win, y + 1, 0);
+	ofx = 0;
 	// TODO: this shouldn't be necessary
 	it = text.begin();
 	std::advance(it, ry + 1);

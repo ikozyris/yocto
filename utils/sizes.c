@@ -33,17 +33,3 @@ unsigned sizeofline(unsigned y) {
 		wmove(text_win, y, --i);
 	return i+2;	
 }
-
-// get length of line with offset by tabs
-long get_offset(gap_buf &buffer)
-{
-	if (buffer.len == 0)
-		return 0;
-	char *rbuff = data(buffer, 0, buffer.len-1);
-	unsigned rlen = buffer.len;
-	for (unsigned i = 0; i < buffer.len && rbuff[i] != 0; ++i)
-		if (rbuff[i] == L'\t')
-			rlen += 7;
-
-	return rlen;
-}

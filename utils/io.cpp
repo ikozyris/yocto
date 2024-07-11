@@ -35,16 +35,26 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-
-#define print_line(a) {char *t = data((a), 0, (a).len-1);\
-waddnstr(text_win, t, min(get_offset(a), ((long)maxx + ((long)(a).len - get_offset(a))))-1);free(t);}
+long print_line(gap_buf &buffer)
+{
+	if (buffer.len == 0)
+		return 0;
+	char *rbuff = data(buffer, 0, buffer.len);
+	unsigned rlen = buffer.len;
+	if (rbuff[buffer.len-1] == '\n')
+		--rlen;
+	for (unsigned i = 0; i < rlen && getcurx(text_win) < maxx-1; ++i)
+		waddnstr(text_win, rbuff + i, 1);
+	free(rbuff);
+	return rlen;
+}
 
 void print_text()
 {
 	std::list<gap_buf>::iterator iter = text.begin();
 	std::advance(iter, ofy);
 	wclear(text_win);
-	for (unsigned ty = 0; ty < min(curnum, maxy) && iter != text.end(); ++iter) {
+	for (unsigned ty = 0; ty < min(curnum+ofy+1, maxy) && iter != text.end(); ++iter) {
 		print_line(*iter);
 #ifdef HIGHLIGHT
 		wmove(text_win, ty, 0);
@@ -74,7 +84,7 @@ void save()
 	FILE *fo = fopen(filename, "w");
 	unsigned i;
 	std::list<gap_buf>::iterator iter;
-	for (iter = text.begin(), i = 0; iter != text.end() && i < curnum; ++iter, ++i) {
+	for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
 		char *tmp = data((*iter), 0, iter->cpt);
 		fputs(tmp, fo);
 		free(tmp);
@@ -87,7 +97,7 @@ void save()
 }
 
 // For size see: https://github.com/ikozyris/yocto/wiki/Comments-on-optimizations#buffer-size-for-reading
-#define SZ 524288 // 512 KB
+#define SZ 200 // 512 KB
 
 void read_fgets(FILE *fi)
 {
@@ -95,7 +105,10 @@ void read_fgets(FILE *fi)
 	while ((fgets_unlocked(tmp, SZ - 2, fi))) {
 		apnd_s(*it, tmp);
 		if (tmp[SZ - 3] == 0) { [[unlikely]]
-			++curnum;
+			if (++curnum >= txt_cpt) { [[unlikely]]
+				txt_cpt *= 2;
+				text.resize(txt_cpt);
+			}
 			++it;
 		}
 	}
@@ -134,7 +147,7 @@ void read_fread(FILE *fi)
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi)))
 		for (unsigned i = 0; i < a; ++i)
 			ins_b(tmp[i]);
-	// TODO: find a proper way (in print_line)
-	ins_b('\n');
-	--curnum;
+	// if last line does not have a newline, gap does not get updated
+	it->gps = it->len;
+	it->gpe = it->cpt;
 }

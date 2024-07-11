@@ -65,6 +65,7 @@ read:
 			print2header("Read-Only", 3);
 			goto ro;
 		} else {
+			//read_fgets(fi);
 			read_fread(fi);
 			print_text();
 		}
@@ -87,7 +88,7 @@ loop:
 #ifdef DEBUG
 		print_text(); // debug only
 		char tmp[128];
-		sprintf(tmp, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d",
+		sprintf(tmp, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d  ",
 			it->gps, it->gpe, it->cpt, it->len, it->gpe-it->gps, x, it->buffer[x-1]);
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
@@ -279,6 +280,13 @@ loop:
 		default:
 			if (s[0] > 0 && s[0] < 32) // not a character
 				break;
+			if (x == maxx - 1) {
+				ofx += maxx - 1;
+				wmove(text_win, y, 0);
+				wclrtoeol(text_win);
+				x = 0;
+				rx = x + ofx;
+			}
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, x + 1);
 			len = wcstombs(s2, s, 4);
