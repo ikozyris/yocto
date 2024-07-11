@@ -35,5 +35,12 @@ exit:
 ```
 
 For pull/merge requests (PR/MR):
-- Descriptive comments in commits, title, description 
+- Descriptive comments in commits, title, description
+	- Use the following format for commits:<br>
+```
+fix: bug when something, regression | perf: x9999 boost in writing
+
+The regression exists since [commit number]
+More optinal information about commit
+```
 - If the change is just a typo create an issue not a PR/MR
