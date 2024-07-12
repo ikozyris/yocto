@@ -1,13 +1,27 @@
 #include "io.cpp"
 
+long memusg()
+{
+	size_t memusg = 0, tmp;
+	char buffer[1024];
+	FILE *file = fopen("/proc/self/smaps", "r");
+	while (fscanf(file, " %1023s", buffer) == 1)
+		if (strcmp(buffer, "Pss:") == 0) {
+			fscanf(file, " %lu", &tmp);
+			memusg += tmp;
+		}
+	fclose(file);
+	return memusg;
+}
+
 void stats()
 {
 	char *_tmp = (char*)malloc(256);
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	snprintf(_tmp, maxx-2, "gap st %u g end %u buff sz %u len %u y %u x %u sum len %u  ", 
-		it->gps, it->gpe, it->cpt, it->len, ry, x, sumlen);
+	snprintf(_tmp, maxx-2, "length %u y %u x %u sum len %u lines %lu ", 
+		it->len, ry, x, sumlen, curnum);
 	print2header(_tmp, 1);
 	free(_tmp);
 	_tmp = 0;
@@ -20,34 +34,30 @@ void command()
 	if (strcmp(tmp, "resetheader") == 0)
 		reset_header();
 	else if (strcmp(tmp, "shrink") == 0) {
+		size_t prev = memusg();
                 txt_cpt = curnum + 1;
                 text.resize(txt_cpt);
 		for (auto &i : text)
 			shrink(i);
+		size_t curr = memusg();
+		char buffer[1024] = "";
+		sprintf(buffer, "saved: %s", hrsize((prev-curr) * 1000));
+		clear_header();
+		print2header(buffer, 1);
 	} else if (strcmp(tmp, "usage") == 0) {
-		size_t memusg = 0, tmp, pid;
+		size_t pid;
 		// stores each word in status file
 		char buffer[1024] = "";
 
 		// Linux-only
 		FILE *file = fopen("/proc/self/status", "r");
-		if (!file)
-			return;
-
 		while (fscanf(file, " %1023s", buffer) == 1)
 			if (strcmp(buffer, "Pid:") == 0) {
 				fscanf(file, " %lu", &pid);
 				break;
 			}
 		fclose(file);
-		file = fopen("/proc/self/smaps", "r");
-		while (fscanf(file, " %1023s", buffer) == 1)
-			if (strcmp(buffer, "Pss:") == 0) {
-				fscanf(file, " %lu", &tmp);
-				memusg += tmp;
-			}
-		fclose(file);
-		sprintf(buffer, "RAM: %s PID: %lu", hrsize(memusg * 1000), pid);
+		sprintf(buffer, "RAM: %s PID: %lu", hrsize(memusg() * 1000), pid);
 		clear_header();
 		print2header(buffer, 1);
 	} else if (strcmp(tmp, "stats") == 0)
@@ -118,7 +128,7 @@ void enter()
 
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
-	if ((it->cpt != it->gpe)) { // newline is not at the end
+	if (it->cpt != it->gpe) { // newline is not at the end
 		char *tmp = data2(*it, rx + 1, it->len + 1);
 		apnd_s(*t, tmp, it->len - rx - 1);
 		free(tmp);
