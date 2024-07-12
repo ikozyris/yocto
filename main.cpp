@@ -162,8 +162,8 @@ loop:
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
 				// printline() with custom start
-				char *tmp = data2(*it, maxx - 1, it->len);
-				waddnstr(text_win, tmp, it->len - maxx);
+				char *tmp = data2(*it, ofx + maxx - 1, ofx + maxx * 2);
+				waddnstr(text_win, tmp, maxx - 1);
 				free(tmp);
 
 				ofx += maxx - 1;
@@ -206,10 +206,31 @@ loop:
 
 		case HOME:
 			wmove(text_win, y, 0);
+			x = 0; rx = ofx;
+			if (x == 0 && rx >= maxx - 1) { // line has been wrapped
+				wclrtoeol(text_win);
+				print_line(*it);
+#ifdef HIGHLIGHT
+				wmove(text_win, y, 0);
+				apply(y);
+#endif
+				ofx = 0;
+				wmove(text_win, y, 0);
+			} 
 			break;
 
 		case END:
 			wmove(text_win, y, ry != curnum ? it->len - 1 : it->len);
+			if (it->len > maxx) {
+				wmove(text_win, y, 0);
+				wclrtoeol(text_win);
+				// printline() with custom start
+				char *tmp = data2(*it, it->len - maxx, it->len);
+				waddnstr(text_win, tmp, maxx - 1);
+				free(tmp);
+
+				ofx = it->len - maxx;
+			}
 			break;
 
 		case SAVE:
@@ -237,10 +258,8 @@ loop:
 				wclear(text_win);
 				goto read;
 			} else if (ch == OFF) { // calculate x offset
-				wchar_t temp[256];
-				bzero(temp, 256 * sizeof(wchar_t));
-				if (winwstr(text_win, temp) == ERR)
-					break;
+				wchar_t *temp = (wchar_t*)malloc(256 * sizeof(wchar_t));
+				winwstr(text_win, temp);
 				x = sizeofline(y);
 				print2header(itoa(x), 1);
 				ofx = (long)it->len - (long)x;
@@ -319,12 +338,12 @@ ro:
 		case EXIT:
 			goto stop;
 		}
-		#ifdef HIGHLIGHT
-					for (unsigned i = 0; i < maxy-1; ++i) {
-						wmove(text_win, i, 0);
-						apply(i);
-					}
-		#endif
+#ifdef HIGHLIGHT
+		for (unsigned i = 0; i < maxy - 1; ++i) {
+			wmove(text_win, i, 0);
+			apply(i);
+		}
+#endif
 		mvwprintw(ln_win, 1, 0, "%3u", buf_indx);
 		mvwprintw(ln_win, 3, 0, "%3u", printed);
 		mvwprintw(ln_win, 5, 0, "%3u", previndx);
