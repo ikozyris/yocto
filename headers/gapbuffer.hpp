@@ -160,9 +160,11 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 	if (src.len == 0)
 		return 0;
 	if (lnbf_cpt < to - from + 3) {
-		lnbuf = (char*)realloc(lnbuf, to - from + 10);
+		free(lnbuf);
 		lnbf_cpt = to - from + 10;
+		lnbuf = (char*)malloc(lnbf_cpt);
 	}
+	lnbuf[to - from] = 0;
 	lnbuf[to - from + 1] = 0;
 	// try some special cases where 1 copy is required
 	if (src.gps == src.len && src.gpe == src.cpt) // gap ends at end so don't bother
@@ -195,11 +197,14 @@ unsigned data2(const gap_buf &src, const unsigned from, const unsigned to) {
 	if (src.len == 0)
 		return 0;
 	if (lnbf_cpt < to - from + 3) {
-		lnbuf = (char*)realloc(lnbuf, to - from + 10);
+		free(lnbuf);
 		lnbf_cpt = to - from + 10;
+		lnbuf = (char*)malloc(lnbf_cpt);
 	}
 	memcpy(lnbuf, buffer + from, to - from + 1);
 	free(buffer);
+	lnbuf[to - from] = 0;
+	lnbuf[to - from + 1] = 0;
 	lnbuf[to - from + 2] = 0;
 	return to - from + 1;
 }
