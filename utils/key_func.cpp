@@ -129,9 +129,8 @@ void enter()
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
 	if (it->cpt != it->gpe) { // newline is not at the end
-		char *tmp = data2(*it, rx + 1, it->len + 1);
-		apnd_s(*t, tmp, it->len - rx - 1);
-		free(tmp);
+		data2(*it, rx + 1, it->len + 1);
+		apnd_s(*t, lnbuf, it->len - rx - 1);
 		it->gps = rx + 1;
 		it->len = rx + 1;
 		it->gpe = it->cpt;

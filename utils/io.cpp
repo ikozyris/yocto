@@ -39,13 +39,11 @@ long print_line(gap_buf &buffer)
 {
 	if (buffer.len == 0)
 		return 0;
-	char *rbuff = data(buffer, 0, buffer.len);
-	unsigned rlen = buffer.len;
-	if (rbuff[buffer.len-1] == '\n')
+	unsigned rlen = data(buffer, 0, buffer.len) - 1;
+	if (lnbuf[buffer.len-1] == '\n')
 		--rlen;
 	for (unsigned i = 0; i < rlen && getcurx(text_win) < maxx-1; ++i)
-		waddnstr(text_win, rbuff + i, 1);
-	free(rbuff);
+		waddnstr(text_win, lnbuf + i, 1);
 	return rlen;
 }
 
@@ -85,9 +83,8 @@ void save()
 	unsigned i;
 	std::list<gap_buf>::iterator iter;
 	for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
-		char *tmp = data((*iter), 0, iter->cpt);
-		fputs(tmp, fo);
-		free(tmp);
+		data(*iter, 0, iter->cpt);
+		fputs(lnbuf, fo);
 	}
 	fclose(fo);
 

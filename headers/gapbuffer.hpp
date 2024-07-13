@@ -1,6 +1,8 @@
 #include "headers.h"
 
 long signed ofx;
+char *lnbuf; // temporary buffer for printing lines
+unsigned lnbf_cpt; // linebuff capacity
 
 #if defined(DEBUG)
 #define gap 2
@@ -152,47 +154,54 @@ inline void eras(gap_buf &a)
 }
 
 // TODO: this is a mess
-char *data(const gap_buf &a, const unsigned from, const unsigned to)
+// NOTE: destination buffer is lnbuf
+unsigned data(const gap_buf &src, unsigned from, unsigned to)
 {
-	char *tmp = (char*)malloc(to - from + 10);
-	if (a.len == 0) {
-		tmp[0] = 0;
-		return tmp;
+	if (src.len == 0)
+		return 0;
+	if (lnbf_cpt < to - from + 3) {
+		lnbuf = (char*)realloc(lnbuf, to - from + 10);
+		lnbf_cpt = to - from + 10;
 	}
-	bzero(tmp, to - from + 1);
+	lnbuf[to - from + 1] = 0;
 	// try some special cases where 1 copy is required
-	if (a.gps == a.len && a.gpe == a.cpt) // gap ends at end so don't bother
-		memcpy(tmp, a.buffer + from, min(to, a.gps));
-	else if (a.gps == 0) // x = 0; gap at start
-		memcpy(tmp, a.buffer + from + a.gpe + 1, min(to, a.len) - from);
+	if (src.gps == src.len && src.gpe == src.cpt) // gap ends at end so don't bother
+		memcpy(lnbuf, src.buffer + from, min(to, src.gps));
+	else if (src.gps == 0) // x = 0; gap at start
+		memcpy(lnbuf, src.buffer + from + src.gpe + 1, min(to, src.len) - from);
 	else {
-		if (from < a.gps) { // worse case
-			for (unsigned i = from; i <= a.gps; ++i)
-				tmp[i] = a[i];
-			for (unsigned i = a.gpe + 1; i <= gaplen(a) + to; ++i)
-				tmp[i - gaplen(a)] = a[i];
-			//memcpy(tmp, a.buffer + from, min(to, a.gps));
-			//memcpy(tmp + min(to, a.gps), a.buffer +, a.gps - to - 1);
+		if (from < src.gps) { // worst case
+			for (unsigned i = from; i <= src.gps; ++i)
+				lnbuf[i] = src[i];
+			for (unsigned i = src.gpe + 1; i <= gaplen(src) + to; ++i)
+				lnbuf[i - gaplen(src)] = src[i];
+			//memcpy(tmp, src.buffer + from, min(to, src.gps));
+			//memcpy(tmp + min(to, src.gps), src.buffer +, src.gps - to - 1);
 		} else
-			for (unsigned i = gaplen(a) + a.gps; i < gaplen(a) + to; ++i)
-				tmp[i - gaplen(a) - 1] = a[i];
-			//memcpy(tmp, a.buffer + a.gpe + 1, a.gps - to);
+			for (unsigned i = gaplen(src) + src.gps; i < gaplen(src) + to; ++i)
+				lnbuf[i - gaplen(src) - 1] = src[i];
+			//memcpy(tmp, src.buffer + src.gpe + 1, src.gps - to);
 	}
-	tmp[to - from + 2] = 0;
-	return tmp;
+	lnbuf[to - from + 2] = 0;
+	return to - from + 1;
 }
 
 // naive, simplier, slower, should be bug free, implementation of above function 
-char *data2(const gap_buf &a, const unsigned from, const unsigned to) {
-	char *buffer = (char*)malloc(a.len + 1);
-	memcpy(buffer, a.buffer, a.gps);
-	memcpy(buffer + a.gps, a.buffer + a.gpe + 1, a.len - a.gps);
+unsigned data2(const gap_buf &src, const unsigned from, const unsigned to) {
+	char *buffer = (char*)malloc(src.len + 1);
+	memcpy(buffer, src.buffer, src.gps);
+	memcpy(buffer + src.gps, src.buffer + src.gpe + 1, src.len - src.gps);
 
-	char *output = (char*)malloc(to - from + 2);
-	memcpy(output, buffer + from, to - from + 1);
-	output[to - from + 2] = 0;
+	if (src.len == 0)
+		return 0;
+	if (lnbf_cpt < to - from + 3) {
+		lnbuf = (char*)realloc(lnbuf, to - from + 10);
+		lnbf_cpt = to - from + 10;
+	}
+	memcpy(lnbuf, buffer + from, to - from + 1);
 	free(buffer);
-	return output;
+	lnbuf[to - from + 2] = 0;
+	return to - from + 1;
 }
 
 // TODO: fix this
@@ -200,4 +209,6 @@ void shrink(gap_buf &a)
 {
 	mv_curs(a, a.len);
 	resize(a, a.len + 1);
+	lnbf_cpt = 16;
+	lnbuf = (char*)realloc(lnbuf, lnbf_cpt);
 }	

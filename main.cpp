@@ -162,9 +162,8 @@ loop:
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
 				// printline() with custom start
-				char *tmp = data2(*it, ofx + maxx - 1, ofx + maxx * 2);
-				waddnstr(text_win, tmp, maxx - 1);
-				free(tmp);
+				data2(*it, ofx + maxx - 1, ofx + maxx * 2);
+				waddnstr(text_win, lnbuf, maxx - 1);
 
 				ofx += maxx - 1;
 				wmove(text_win, y, 0);
@@ -185,11 +184,12 @@ loop:
 				--it;
 				mv_curs(*it, it->len);
 				eras(*it);
-				apnd_s(*it, data(*tmp, 0, tmp->len + 1), tmp->len + 1);
+				data(*tmp, 0, tmp->len + 1);
+				apnd_s(*it, lnbuf, tmp->len + 1);
 				text.erase(tmp);
+				--curnum;
 				print_text();
 				wmove(text_win, y - 1, it->len - 1);
-				--curnum;
 			}
 			break;
 
@@ -225,9 +225,8 @@ loop:
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
 				// printline() with custom start
-				char *tmp = data2(*it, it->len - maxx, it->len);
-				waddnstr(text_win, tmp, maxx - 1);
-				free(tmp);
+				data2(*it, it->len - maxx, it->len);
+				waddnstr(text_win, lnbuf, maxx - 1);
 
 				ofx = it->len - maxx;
 			}
@@ -352,6 +351,7 @@ ro:
 
 	} while ((ch = wgetch(text_win)));
 stop:
+	free(lnbuf);
 	delwin(text_win);
 	delwin(ln_win);
 	delwin(header_win);
