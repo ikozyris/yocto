@@ -78,7 +78,8 @@ loop:
 	//goto stop;
 	while (1) {
 		getyx(text_win, y, x);
-		if (x >= min(ry < curnum ? (it->len - 1 - ofx) : (it->len - ofx), maxx)) // if out of bounds: move (to avoid bugs)
+		// if out of bounds: move (to avoid bugs)
+		if (x >= min(ry < curnum ? (it->len - 1 - ofx) : (it->len - ofx), maxx))
 			wmove(text_win, y, min((ry != curnum ? it->len - ofx - 1 : it->len - ofx), maxx));
 		getyx(text_win, y, x);
 		ry = y + ofy; // calculate offsets

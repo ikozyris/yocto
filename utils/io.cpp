@@ -40,9 +40,9 @@ long print_line(gap_buf &buffer)
 	if (buffer.len == 0)
 		return 0;
 	unsigned rlen = data(buffer, 0, min(buffer.len, maxx)) - 1;
-	if (lnbuf[rlen-1] == '\n')
+	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
-	for (unsigned i = 0; i < rlen && getcurx(text_win) < maxx-1; ++i)
+	for (unsigned i = 0; i < rlen && getcurx(text_win) < maxx - 1; ++i)
 		waddnstr(text_win, lnbuf + i, 1);
 	return rlen;
 }
@@ -111,23 +111,6 @@ void read_fgets(FILE *fi)
 	}
 }
 
-inline void ins_b(char ch)
-{
-	it->buffer[it->len++] = ch;
-	if (it->len >= it->cpt) { [[likely]]
-		it->cpt *= 2;
-		it->buffer = (char*)realloc(it->buffer, it->cpt);
-	} if (ch == '\n')  { [[unlikely]]
-		it->gps = it->len;
-		it->gpe = it->cpt;
-		if (++curnum >= txt_cpt) { [[unlikely]]
-			txt_cpt *= 2;
-			text.resize(txt_cpt);
-		}
-		++it;
-	}
-}
-
 inline long whereis(const char *str,  char ch)
 {
 	const char *end = strchr(str, ch);
@@ -151,7 +134,7 @@ void read_fread(FILE *fi)
 	unsigned a, j = 0;
 	long res;
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi))) {
-		tmp[a+1] = 0;
+		tmp[a + 1] = 0;
 		res = whereis(tmp, '\n');
 		if (res > 0) { // found newline
 			while ((res = whereis(tmp + j, '\n')) > -1) {
