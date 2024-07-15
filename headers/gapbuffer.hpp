@@ -167,7 +167,7 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 	lnbuf[to - from] = 0;
 	lnbuf[to - from + 1] = 0;
 	// try some special cases where 1 copy is required
-	if (src.gps == src.len && src.gpe == src.cpt) // gap ends at end so don't bother
+	if (src.gps == src.len && src.gpe == src.cpt) // gap ends at end
 		memcpy(lnbuf, src.buffer + from, min(to, src.gps));
 	else if (src.gps == 0) // x = 0; gap at start
 		memcpy(lnbuf, src.buffer + from + src.gpe + 1, min(to, src.len) - from);

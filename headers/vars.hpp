@@ -13,10 +13,10 @@ std::list<gap_buf>::iterator it;
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[6];
 char s2[6];
-unsigned char y, x, rx, len;
-// offset in y axis of text and screen
+unsigned char y, x, len;
+// offset in y axis of text and screen, x axis equivalents are in gapbuffer
 long ofy;
-unsigned ry;
+unsigned ry, rx;
 unsigned buf_indx, printed, previndx, ppi;
 unsigned maxy, maxx; // to store the maximum rows and columns
 int ch;
