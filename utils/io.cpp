@@ -149,8 +149,10 @@ void read_fread(FILE *fi)
 {
 	char tmp[SZ];
 	unsigned a, j = 0;
+	long res;
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi))) {
-		long res = whereis(tmp, '\n');
+		tmp[a+1] = 0;
+		res = whereis(tmp, '\n');
 		if (res > 0) { // found newline
 			while ((res = whereis(tmp + j, '\n')) > -1) {
 				apnd_s(*it, tmp + j, res);
