@@ -154,8 +154,12 @@ loop:
 				wmove(text_win, y, maxx - 1);
 			} else if (x > 0)
 				wmove(text_win, y, x - 1);
-			else if (y > 0)
-				wmove(text_win, y - 1, (--it)->len);
+			else if (y > 0) {
+				if (ofx > 0)
+					print_line(*it);
+				wmove(text_win, y - 1, min((--it)->len, maxx -1));
+				ofx = 0;
+			}
 			break;
 
 		case RIGHT:
@@ -171,8 +175,12 @@ loop:
 			} else if (ry != curnum ? rx < it->len - 1 : rx < it->len)
 				wmove(text_win, y, x + 1);
 			else if (ry < curnum) {
+				wmove(text_win, y, 0);
+				if (ofx > 0)
+					print_line(*it);
 				wmove(text_win, y + 1, 0);
 				++it;
+				ofx = 0;
 			}
 			break;
 
@@ -208,7 +216,7 @@ loop:
 		case HOME:
 			wmove(text_win, y, 0);
 			x = 0; rx = ofx;
-			if (x == 0 && rx >= maxx - 1) { // line has been wrapped
+			if (ofx >= it->len - maxx) { // line has been wrapped
 				wclrtoeol(text_win);
 				print_line(*it);
 #ifdef HIGHLIGHT
@@ -229,7 +237,7 @@ loop:
 				data2(*it, it->len - maxx, it->len);
 				waddnstr(text_win, lnbuf, maxx - 1);
 
-				ofx = it->len - maxx;
+				ofx += it->len - maxx;
 			}
 			break;
 

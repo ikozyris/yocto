@@ -35,11 +35,11 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-long print_line(gap_buf &buffer)
+unsigned print_line(gap_buf &buffer)
 {
 	if (buffer.len == 0)
 		return 0;
-	unsigned rlen = data(buffer, 0, min(buffer.len, maxx)) - 1;
+	unsigned rlen = data(buffer, 0, min(buffer.len, maxx * 2)) - 1;
 	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
 	for (unsigned i = 0; i < rlen && getcurx(text_win) < maxx - 1; ++i)
