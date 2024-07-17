@@ -52,7 +52,7 @@ void print_text()
 	std::list<gap_buf>::iterator iter = text.begin();
 	std::advance(iter, ofy);
 	wclear(text_win);
-	for (unsigned ty = 0; ty < min(curnum+ofy+1, maxy) && iter != text.end(); ++iter) {
+	for (unsigned ty = 0; ty < min(curnum + ofy + 1, maxy) && iter != text.end(); ++iter) {
 		print_line(*iter);
 #ifdef HIGHLIGHT
 		wmove(text_win, ty, 0);
@@ -82,7 +82,7 @@ void save()
 	FILE *fo = fopen(filename, "w");
 	unsigned i;
 	std::list<gap_buf>::iterator iter;
-	for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
+	for (iter = text.begin(), i = 0; iter != text.end() && i < curnum; ++iter, ++i) {
 		data(*iter, 0, iter->len);
 		fputs(lnbuf, fo);
 	}
@@ -134,7 +134,7 @@ void read_fread(FILE *fi)
 	unsigned a, j = 0;
 	long res;
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi))) {
-		tmp[a + 1] = 0;
+		tmp[a] = 0;
 		res = whereis(tmp, '\n');
 		if (res > 0) { // found newline
 			while ((res = whereis(tmp + j, '\n')) > -1) {
