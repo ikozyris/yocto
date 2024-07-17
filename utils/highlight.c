@@ -78,8 +78,7 @@ void apply(unsigned line)
 			wmove(text_win, line, i);
 			wchgat(text_win, -1, 0, DEFINC, 0);
 			return;
-		} // comments
-		else if (str[i] == '/' && str[i + 1] == '/' && i < len2) {
+		} else if (str[i] == '/' && str[i + 1] == '/') { // comments
 			wmove(text_win, line, i);
 			wchgat(text_win, -1, 0, COMMENT, 0);
 			return;
@@ -90,8 +89,7 @@ void apply(unsigned line)
 			while (str[i] != '*' && str[i + 1] != '/' && i < len2)
 				++i;
 			wchgat(text_win, i++ - previ + 2, 0, COMMENT, 0);
-		} // string / char
-		else if (str[i] == '\'') {
+		} else if (str[i] == '\'') { // string / char
 			previ = i++;
 			wmove(text_win, line, previ);
 			while (str[i] != '\'' && i < len2)
@@ -103,8 +101,7 @@ void apply(unsigned line)
 			while (str[i] != '\"' && i < len2)
 				++i;
 			wchgat(text_win, i - previ + 1, 0, STR, 0);
-		} // type (int, char) / keyword (if, return) / operator (==, +)
-		else {
+		} else { // type (int, char) / keyword (if, return) / operator (==, +)
 			wmove(text_win, line, i);
 			struct res_t res = get_category2(str + i);
 			if (res.type == 't' && isvalid(str[i + res.len])
@@ -118,4 +115,3 @@ void apply(unsigned line)
 		}
 	}
 }
-
