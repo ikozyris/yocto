@@ -14,8 +14,8 @@ unsigned lnbf_cpt; // linebuff capacity
 #define gaplen(a) ((a).gpe - (a).gps + 1)
 #define ingap(a, pos) (((pos) >= (a).gps && (pos) <= (a).gpe) ? true : false)
 #define mveras(a, pos) (mv_curs(a, pos), eras(a))
-#define min(a, b) (a <= b ? a : b)
-#define max(a, b) (a >= b ? a : b)
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 struct gap_buf {
 	unsigned cpt; 	// allocated size
@@ -139,7 +139,7 @@ void apnd_s(gap_buf &a, const char *str)
 			resize(a, a.cpt * 2); 
 	}
 	a.len += i - a.len;
-	a.gps += a.len;
+	a.gps = a.len;
 }
 
 inline void eras(gap_buf &a)

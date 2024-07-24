@@ -64,11 +64,12 @@ struct res_t get_category2(const char *line)
 	return res;
 }
 
+wchar_t tmp[256];
+char str[256];
+
 void apply(unsigned line)
 {
-	wchar_t tmp[256];
 	winwstr(text_win, tmp);
-	char str[256];
 	unsigned len2 = wcstombs(str, tmp, 256);
 	unsigned previ = 0;
 	len2 = min(len2, maxx);
