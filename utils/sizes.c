@@ -10,8 +10,7 @@ const char *itoa(long a)
 // convert bytes to base-10 human-readable string e.g 1024 = 1.024KB = 1KiB
 const char *hrsize(size_t bytes)
 {
-	char *suffix[] = {(char*)"B", (char*)"KB", (char*)"MB",
-			  (char*)"GB", (char*)"TB"};
+	const char *suffix[] = {"B", "KB", "MB", "GB", "TB"};
 	unsigned char length = sizeof(suffix) / sizeof(suffix[0]);
 
 	double dblBytes = bytes;

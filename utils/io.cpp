@@ -42,7 +42,7 @@ unsigned print_line(gap_buf &buffer)
 	unsigned rlen = data(buffer, 0, min(buffer.len, maxx * 2)) - 1;
 	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
-	for (unsigned i = 0; i < rlen && getcurx(text_win) < maxx - 1; ++i)
+	for (unsigned i = 0; i < rlen && (unsigned)getcurx(text_win) < maxx - 1; ++i)
 		waddnstr(text_win, lnbuf + i, 1);
 	return rlen;
 }
@@ -99,9 +99,9 @@ void save()
 void read_fgets(FILE *fi)
 {
 	char tmp[SZ];
-	while ((fgets_unlocked(tmp, SZ - 2, fi))) {
+	while ((fgets_unlocked(tmp, SZ, fi))) {
 		apnd_s(*it, tmp);
-		if (tmp[SZ - 3] == 0) { [[unlikely]]
+		if (it->buffer[it->len - 1] == '\n') { [[unlikely]]
 			if (++curnum >= txt_cpt) { [[unlikely]]
 				txt_cpt *= 2;
 				text.resize(txt_cpt);
@@ -110,6 +110,7 @@ void read_fgets(FILE *fi)
 		}
 	}
 }
+
 
 inline long whereis(const char *str,  char ch)
 {
@@ -130,7 +131,7 @@ void read_fread_sl(FILE *fi)
 
 void read_fread(FILE *fi)
 {
-	char tmp[SZ];
+	char tmp[SZ + 1];
 	unsigned a, j = 0;
 	long res;
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi))) {

@@ -78,18 +78,18 @@ loop:
 	//goto stop;
 	while (1) {
 		getyx(text_win, y, x);
+		ry = y + ofy;
 		// if out of bounds: move (to avoid bugs)
 		if (x >= min(ry < curnum ? (it->len - 1 - ofx) : (it->len - ofx), maxx))
 			wmove(text_win, y, min((ry != curnum ? it->len - ofx - 1 : it->len - ofx), maxx));
 		getyx(text_win, y, x);
-		ry = y + ofy; // calculate offsets
 		rx = x + ofx;
 		mv_curs(*it, rx);
 
 #ifdef DEBUG
 		print_text(); // debug only
 		char tmp[128];
-		sprintf(tmp, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d  ",
+		snprintf(tmp, 128, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d  ",
 			it->gps, it->gpe, it->cpt, it->len, it->gpe-it->gps, x, it->buffer[x-1]);
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
@@ -105,7 +105,7 @@ loop:
 				ofy++;
 				wscrl(text_win, 1);
 				wscrl(ln_win, 1);
-				mvwprintw(ln_win, maxy - 1, 0, "%3d", ry + 2);
+				mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
 				wrefresh(ln_win);
 				wmove(text_win, y, 0);
 				print_line(*it);
@@ -122,10 +122,10 @@ loop:
 			if (y == 0 && ofy != 0) {
 				wscrl(text_win, -1); // scroll up
 				wscrl(ln_win, -1);
-				mvwprintw(ln_win, 0, 0, "%3d", ry);
+				mvwprintw(ln_win, 0, 0, "%3u", ry);
 				--ofy;
 				wmove(text_win, 0, 0);
-				--it; // why can't *(--it) work?
+				--it;
 				print_line(*it);
 #ifdef HIGHLIGHT
 				wmove(text_win, y, 0);
@@ -150,14 +150,15 @@ loop:
 				wmove(text_win, y, 0);
 				apply(y);
 #endif
-				ofx -= (maxx - 1);
+				ofx -= maxx - 1;
 				wmove(text_win, y, maxx - 1);
 			} else if (x > 0)
 				wmove(text_win, y, x - 1);
-			else if (y > 0) {
-				if (ofx > 0)
+			else if (y > 0) { // x = 0
+				if (ofx > 0) // revert wrap
 					print_line(*it);
-				wmove(text_win, y - 1, min((--it)->len, maxx -1));
+				--it;
+				wmove(text_win, y - 1, min(it->len, maxx) - 1);
 				ofx = 0;
 			}
 			break;
@@ -229,11 +230,11 @@ loop:
 			break;
 
 		case END:
-			wmove(text_win, y, ry != curnum ? it->len - 1 : it->len);
-			if (it->len > maxx) {
+			wmove(text_win, y, ofx + (ry != curnum ? it->len - 1 : it->len));
+			if (it->len >= maxx + ofx) {
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
-				// printline() with custom start
+				// TODO: use actual printline()
 				data2(*it, it->len - maxx, it->len);
 				waddnstr(text_win, lnbuf, maxx - 1);
 
@@ -266,8 +267,6 @@ loop:
 				wclear(text_win);
 				goto read;
 			} else if (ch == OFF) { // calculate x offset
-				wchar_t *temp = (wchar_t*)malloc(256 * sizeof(wchar_t));
-				winwstr(text_win, temp);
 				x = sizeofline(y);
 				print2header(itoa(x), 1);
 				ofx = (long)it->len - (long)x;
