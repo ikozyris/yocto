@@ -88,9 +88,9 @@ loop:
 
 #ifdef DEBUG
 		print_text(); // debug only
-		char tmp[128];
-		snprintf(tmp, 128, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u | currCh %d  ",
-			it->gps, it->gpe, it->cpt, it->len, it->gpe-it->gps, x, it->buffer[x-1]);
+		char tmp[80];
+		snprintf(tmp, 79, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u  ",
+			it->gps, it->gpe, it->cpt, it->len, gaplen(*it), x);
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 #endif

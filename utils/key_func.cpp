@@ -35,10 +35,17 @@ void command()
 		reset_header();
 	else if (strcmp(tmp, "shrink") == 0) {
 		size_t prev = memusg();
-                txt_cpt = curnum + 1;
+
+		// shrink line buffer
+		lnbf_cpt = 16;
+		lnbuf = (char*)realloc(lnbuf, lnbf_cpt);
+                // shrink linked list
+		txt_cpt = curnum + 1;
                 text.resize(txt_cpt);
+		//shrink each line
 		for (auto &i : text)
 			shrink(i);
+
 		size_t curr = memusg();
 		char buffer[1024] = "";
 		sprintf(buffer, "saved: %s", hrsize((prev-curr) * 1000));
@@ -128,12 +135,12 @@ void enter()
 
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
-	if (it->cpt != it->gpe) { // newline is not at the end
+	if (it->gpe < it->cpt - 1) { // newline is not at the end
 		data2(*it, rx + 1, it->len + 1);
 		apnd_s(*t, lnbuf, it->len - rx - 1);
 		it->gps = rx + 1;
 		it->len = rx + 1;
-		it->gpe = it->cpt;
+		it->gpe = it->cpt - 1;
 	}
 
 	// somewhere below iterator is invalidated
