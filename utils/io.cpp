@@ -35,11 +35,11 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-unsigned print_line(gap_buf &buffer)
+unsigned print_line(const gap_buf &buffer)
 {
 	if (buffer.len == 0)
 		return 0;
-	unsigned rlen = data(buffer, 0, min(buffer.len, maxx * 2)) - 1;
+	unsigned rlen = data(buffer, 0, min(buffer.len, maxx * 2));
 	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
 	for (unsigned i = 0; i < rlen && (unsigned)getcurx(text_win) < maxx - 1; ++i)
@@ -111,15 +111,6 @@ void read_fgets(FILE *fi)
 	}
 }
 
-
-inline long whereis(const char *str,  char ch)
-{
-	const char *end = strchr(str, ch);
-	if (end == 0)
-		return -1;
-	return end - str + 1;
-}
-
 // read in single line
 void read_fread_sl(FILE *fi)
 {
@@ -127,6 +118,14 @@ void read_fread_sl(FILE *fi)
 	unsigned a = 0; // bytes read
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi)))
 		apnd_s(*it, tmp, a);
+}
+
+inline long whereis(const char *str,  char ch)
+{
+	const char *end = strchr(str, ch);
+	if (end == 0)
+		return -1;
+	return end - str + 1;
 }
 
 void read_fread(FILE *fi)
