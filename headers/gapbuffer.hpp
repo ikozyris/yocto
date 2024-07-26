@@ -146,8 +146,10 @@ inline void eras(gap_buf &a)
 // NOTE: destination buffer is lnbuf
 unsigned data(const gap_buf &src, unsigned from, unsigned to)
 {
-	if (src.len == 0)
+	if (src.len == 0) {
+		lnbuf[0] = 0;
 		return 0;
+	}
 	if (lnbf_cpt < to - from + 3) {
 		free(lnbuf);
 		lnbf_cpt = to - from + 10;
