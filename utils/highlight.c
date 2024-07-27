@@ -1,5 +1,18 @@
 #include "init.c"
 
+bool eligible;
+
+bool isc(const char *str)
+{
+	long res = whereis(str, '.');
+	if (res == -1)
+		return false;
+	str += res;
+	if (!strcmp(str, "c") || !strcmp(str, "cpp") || !strcmp(str, "cc"))
+		return true;
+	return false;
+}
+
 const char *types[] = {"int", "char", "float", "double", "unsigned", "void", "const", 
 	"size_t", "bool", "signed", "long", "enum", "static", "short", "extern"};
 const char *defs[]  = {"if", "else", "while", "for", "do", "return", "sizeof", "switch",
@@ -69,6 +82,8 @@ char str[256];
 
 void apply(unsigned line)
 {
+	if (!eligible)
+		return;
 	winwstr(text_win, tmp);
 	unsigned len2 = wcstombs(str, tmp, 256);
 	unsigned previ = 0;

@@ -58,6 +58,7 @@ read:
 			goto loop;
 		}
 
+		eligible = isc(argv[1]);
 		if (argc > 2 && (strcmp(argv[2], "-ro") == 0 ||
 				strcmp(argv[2], "--read-only") == 0)) {
 			read_fread_sl(fi);
