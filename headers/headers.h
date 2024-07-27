@@ -6,3 +6,4 @@
 #include <sys/stat.h>	// for file size
 #include <list>
 #include <time.h>
+#include "funcdecl.h"
