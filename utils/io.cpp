@@ -42,17 +42,21 @@ unsigned print_line(const gap_buf &buffer)
 	unsigned rlen = data(buffer, 0, min(buffer.len, maxx * 2));
 	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
-	for (unsigned i = 0; i < rlen && (unsigned)getcurx(text_win) < maxx - 1; ++i)
-		waddnstr(text_win, lnbuf + i, 1);
+	waddnstr(text_win, lnbuf, min(maxy / 2, rlen));
+	// make sure we don't print more than needed
+	for (unsigned i = maxy / 2; i < rlen && (unsigned)getcurx(text_win) < maxx - 1; ++i)
+		waddnstr(text_win, lnbuf + i, 1); // handle unicode
 	return rlen;
 }
 
-void print_text()
+void print_text(unsigned line)
 {
 	std::list<gap_buf>::iterator iter = text.begin();
-	std::advance(iter, ofy);
-	wclear(text_win);
-	for (unsigned ty = 0; ty < min(curnum + ofy + 1, maxy) && iter != text.end(); ++iter) {
+	std::advance(iter, ofy + line);
+	wmove(text_win, line, 0);
+	wclrtobot(text_win);
+	wmove(text_win, line, 0);
+	for (unsigned ty = line; ty < min(curnum + ofy + 1, maxy) && iter != text.end(); ++iter) {
 		print_line(*iter);
 #ifdef HIGHLIGHT
 		wmove(text_win, ty, 0);

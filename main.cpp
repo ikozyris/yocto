@@ -67,7 +67,7 @@ read:
 		} else {
 			//read_fgets(fi);
 			read_fread(fi);
-			print_text();
+			print_text(0);
 		}
 		fclose(fi);
 	}
@@ -198,7 +198,7 @@ loop:
 				apnd_s(*it, lnbuf, tmp->len + 1);
 				text.erase(tmp);
 				--curnum;
-				print_text();
+				print_text(y - 1);
 				wmove(text_win, y - 1, it->len - 1);
 			}
 			break;
@@ -282,7 +282,7 @@ loop:
 			ofy = 0;
 			ofx = 0;
 			reset_header();
-			print_text();
+			print_text(0);
 			print_lines();
 			wnoutrefresh(text_win);
 			wnoutrefresh(ln_win);
