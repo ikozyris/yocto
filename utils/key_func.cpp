@@ -79,7 +79,7 @@ void command()
 		free(_tmp);
 		getch();
 		reset_header();
-		print_text();
+		print_text(0);
 		print_lines();
 		wnoutrefresh(ln_win);
 		wnoutrefresh(header_win);
@@ -114,7 +114,7 @@ void command()
 			ofy = a - 1;
 			print_lines();
 			wrefresh(ln_win);
-			print_text();
+			print_text(0);
 			std::advance(it, ofy - ry);
 		}
 	} else if (strcmp(tmp, "fixstr") == 0) {
@@ -147,18 +147,17 @@ void enter()
 	++it;
 	++curnum;
 	text.insert(it, *t);
+	--it;
 	free(t);
-	if (ry >= maxy - 1) {
-		++ofy;
-		print_lines();
-		wnoutrefresh(ln_win);
-	}
-	// print text again (or find a better way)
-	print_text();
-	if (y < maxy-1)
+	print_text(y);
+	if (y < maxy - 1)
 		wmove(text_win, y + 1, 0);
+	else {
+		wscrl(text_win, 1);
+		++ofy;
+		wmove(text_win, maxy - 1, 0);
+		print_line(*it);
+		wmove(text_win, maxy - 1, x);
+	}
 	ofx = 0;
-	// TODO: this shouldn't be necessary
-	it = text.begin();
-	std::advance(it, ry + 1);
 }
