@@ -30,5 +30,20 @@ unsigned sizeofline(unsigned y) {
 	wmove(text_win, y, i);
 	while ((winch(text_win) & A_CHARTEXT) == ' ')
 		wmove(text_win, y, --i);
+	wmove(text_win, y, i + 1);
 	return i + 2;	
+}
+
+long memusg()
+{
+	size_t memusg = 0, tmp;
+	char buffer[1024];
+	FILE *file = fopen("/proc/self/smaps", "r");
+	while (fscanf(file, " %1023s", buffer) == 1)
+		if (strcmp(buffer, "Pss:") == 0) {
+			fscanf(file, " %lu", &tmp);
+			memusg += tmp;
+		}
+	fclose(file);
+	return memusg;
 }

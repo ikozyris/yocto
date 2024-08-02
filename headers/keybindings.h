@@ -19,5 +19,4 @@
 #define REFRESH		ctrl('R')
 #define KEY_TAB		9
 #define CMD		'c'
-#define OFF		'u'
 #define SWITCH		'r'

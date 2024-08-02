@@ -58,7 +58,7 @@ read:
 			goto loop;
 		}
 
-		eligible = isc(argv[1]);
+		eligible = isc(argv[1]); // syntax highlighting
 		if (argc > 2 && (strcmp(argv[2], "-ro") == 0 ||
 				strcmp(argv[2], "--read-only") == 0)) {
 			read_fread_sl(fi);
@@ -86,12 +86,12 @@ loop:
 		getyx(text_win, y, x);
 		rx = x + ofx;
 		mv_curs(*it, rx);
-
+stats();
 #ifdef DEBUG
-		print_text(); // debug only
+		print_text(y); // debug only
 		char tmp[80];
-		snprintf(tmp, 79, "st %u | end %u | cpt %u | len %u | gapLen %u | x %u  ",
-			it->gps, it->gpe, it->cpt, it->len, gaplen(*it), x);
+		snprintf(tmp, 79, "st %u | end %u | cpt %u | len %u | maxx %u | ofx %ld    ",
+			it->gps, it->gpe, it->cpt, it->len, maxx, ofx);
 		print2header(tmp, 1);
 		wmove(text_win, y, x);
 #endif
@@ -102,40 +102,16 @@ loop:
 				break;
 			++it;
 			ofx = 0; // invalidated
-			if (y == (maxy - 1) && ry < curnum) {
-				ofy++;
-				wscrl(text_win, 1);
-				wscrl(ln_win, 1);
-				mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
-				wrefresh(ln_win);
-				wmove(text_win, y, 0);
-				print_line(*it);
-#ifdef HIGHLIGHT
-				wmove(text_win, y, 0);
-				apply(y);
-#endif
-				wmove(text_win, y, x);
-			} else
+			if (y == (maxy - 1) && ry < curnum)
+				scrolldown();
+			else
 				wmove(text_win, y + 1, x);
 			break;
 
 		case UP:
-			if (y == 0 && ofy != 0) {
-				wscrl(text_win, -1); // scroll up
-				wscrl(ln_win, -1);
-				mvwprintw(ln_win, 0, 0, "%3u", ry);
-				--ofy;
-				wmove(text_win, 0, 0);
-				--it;
-				print_line(*it);
-#ifdef HIGHLIGHT
-				wmove(text_win, y, 0);
-				apply(y);
-#endif
-				wmove(text_win, 0, x);
-				wrefresh(ln_win);
-				ofx = 0;
-			} else if (y != 0) {
+			if (y == 0 && ofy != 0)
+				scrollup();
+			else if (y != 0) {
 				wmove(text_win, y - 1, x);
 				--it;
 				ofx = 0;
@@ -143,7 +119,7 @@ loop:
 			break;
 
 		case LEFT:
-			if (x == 0 && rx >= maxx - 1) { // line has been wrapped
+			if (x == 0 && ofx > 0) { // line has been wrapped
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
 				print_line(*it);
@@ -153,19 +129,23 @@ loop:
 #endif
 				ofx -= maxx - 1;
 				wmove(text_win, y, maxx - 1);
-			} else if (x > 0)
-				wmove(text_win, y, x - 1);
-			else if (y > 0) { // x = 0
+			} else if (x > 0) {
+				if (it->buffer[it->gps - 1] == '\t') {
+					wmove(text_win, y, x - 8);
+					ofx += 7;
+				} else
+					wmove(text_win, y, x - 1);
+			} else if (y > 0) { // x = 0
 				if (ofx > 0) // revert wrap
 					print_line(*it);
 				--it;
-				wmove(text_win, y - 1, min(it->len, maxx) - 1);
-				ofx = 0;
+				--y;
+				eol();
 			}
 			break;
 
 		case RIGHT:
-			if (x == maxx - 1 && x < it->len - 1) {
+			if (x == maxx - 1 && rx < it->len - 1) {
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
 				// printline() with custom start
@@ -174,11 +154,15 @@ loop:
 
 				ofx += maxx - 1;
 				wmove(text_win, y, 0);
-			} else if (ry != curnum ? rx < it->len - 1 : rx < it->len)
-				wmove(text_win, y, x + 1);
-			else if (ry < curnum) {
+			} else if (ry != curnum ? rx < it->len - 1 : rx < it->len) {
+				if (it->buffer[it->gpe + 1] == '\t') {
+					ofx -= 8 - x % 8 - 1;
+					wmove(text_win, y, x + 8 - x % 8);
+				} else
+					wmove(text_win, y, x + 1);
+			} else if (ry < curnum) {
 				wmove(text_win, y, 0);
-				if (ofx > 0)
+				if (ofx > 0) // revert wrap
 					print_line(*it);
 				wmove(text_win, y + 1, 0);
 				++it;
@@ -189,7 +173,14 @@ loop:
 		case BACKSPACE:
 			if (x != 0) {
 				eras(*it);
-				mvwdelch(text_win, y, x - 1);
+				if (it->buffer[it->gps] == '\t') {
+					wmove(text_win, y, 0);
+					print_line(*it);
+					wclrtoeol(text_win);
+					wmove(text_win, y, x - 8);
+					ofx += 7;
+				} else
+					mvwdelch(text_win, y, x - 1);
 			} else if (y != 0) { // delete previous line's \n
 				std::list<gap_buf>::iterator tmp = it;
 				--it;
@@ -207,7 +198,7 @@ loop:
 		case DELETE:
 			wdelch(text_win);
 			mv_curs(*it, rx + 1);
-			if (rx + (unsigned)1 <= it->len)
+			if (rx + 1u <= it->len)
 				mveras(*it, rx + 1);
 			break;
 
@@ -217,8 +208,11 @@ loop:
 
 		case HOME:
 			wmove(text_win, y, 0);
-			x = 0; rx = ofx;
-			if (ofx >= it->len - maxx) { // line has been wrapped
+			if (ofx < 0) {
+				ofx = 0;
+				break;
+			}
+			if (ofx >= (long)it->len - maxx) { // line has been wrapped
 				wclrtoeol(text_win);
 				print_line(*it);
 #ifdef HIGHLIGHT
@@ -231,16 +225,7 @@ loop:
 			break;
 
 		case END:
-			wmove(text_win, y, ofx + (ry != curnum ? it->len - 1 : it->len));
-			if (it->len >= maxx + ofx) {
-				wmove(text_win, y, 0);
-				wclrtoeol(text_win);
-				// TODO: use actual printline()
-				data2(*it, it->len - maxx, it->len);
-				waddnstr(text_win, lnbuf, maxx - 1);
-
-				ofx += it->len - maxx;
-			}
+			eol();
 			break;
 
 		case SAVE:
@@ -259,7 +244,7 @@ loop:
 				strcpy(argv[1], input_header("File to open: "));
 				std::list<gap_buf>::iterator iter;
 				unsigned i;
-				for (iter = text.begin(), i = 0; iter != text.end() && i < curnum; ++iter, ++i) {
+				for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
 					iter->len = iter->gps = 0;
 					iter->gpe = iter->cpt;
 				}
@@ -267,11 +252,6 @@ loop:
 				it = text.begin();
 				wclear(text_win);
 				goto read;
-			} else if (ch == OFF) { // calculate x offset
-				x = sizeofline(y);
-				print2header(itoa(x), 1);
-				ofx = (long)it->len - (long)x;
-				print2header(itoa(ofx), 2);
 			}
 			wtimeout(text_win, -1);
 			wmove(text_win, y, x);
