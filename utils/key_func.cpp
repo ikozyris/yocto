@@ -1,27 +1,13 @@
 #include "io.cpp"
 
-long memusg()
-{
-	size_t memusg = 0, tmp;
-	char buffer[1024];
-	FILE *file = fopen("/proc/self/smaps", "r");
-	while (fscanf(file, " %1023s", buffer) == 1)
-		if (strcmp(buffer, "Pss:") == 0) {
-			fscanf(file, " %lu", &tmp);
-			memusg += tmp;
-		}
-	fclose(file);
-	return memusg;
-}
-
 void stats()
 {
 	char *_tmp = (char*)malloc(256);
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	snprintf(_tmp, maxx-2, "length %u y %u x %u sum len %u lines %lu ", 
-		it->len, ry, x, sumlen, curnum);
+	snprintf(_tmp, maxx-2, "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
+		it->len, ry, x, sumlen, curnum, ofx);
 	print2header(_tmp, 1);
 	free(_tmp);
 	_tmp = 0;
@@ -159,5 +145,56 @@ void enter()
 		print_line(*it);
 		wmove(text_win, maxy - 1, x);
 	}
+	ofx = 0;
+}
+
+// TODO: handle better lines with uncalculated offsets
+void eol()
+{
+	if (it->len < (long)maxx + ofx) {
+		x = sizeofline(y);
+		ofx = (long)it->len - (long)x;
+	} else { // wrap line
+		wmove(text_win, y, 0);
+		wclrtoeol(text_win);
+		// TODO: use actual printline()
+		data2(*it, it->len - maxx - ofx, it->len);
+		waddnstr(text_win, lnbuf, maxx + ofx - 1);
+		ofx = (long)it->len - (long)maxx - ofx;
+	}
+}
+
+void scrolldown()
+{
+	ofy++;
+	wscrl(text_win, 1);
+	wscrl(ln_win, 1);
+	mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
+	wrefresh(ln_win);
+	wmove(text_win, y, 0);
+	print_line(*it);
+#ifdef HIGHLIGHT
+	wmove(text_win, y, 0);
+	apply(y);
+#endif
+	wmove(text_win, y, x);
+
+}
+
+void scrollup()
+{
+	wscrl(text_win, -1); // scroll up
+	wscrl(ln_win, -1);
+	mvwprintw(ln_win, 0, 0, "%3u", ry);
+	--ofy;
+	wmove(text_win, 0, 0);
+	--it;
+	print_line(*it);
+#ifdef HIGHLIGHT
+	wmove(text_win, y, 0);
+	apply(y);
+#endif
+	wmove(text_win, 0, x);
+	wrefresh(ln_win);
 	ofx = 0;
 }
