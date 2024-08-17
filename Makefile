@@ -14,8 +14,8 @@ CC = g++ --std=c++20
 #  -lncursesw		Links to ncurses library for wide characters
 
 #CXXFLAGS = -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -DHIGHLIGHT -lncursesw # Debug only
-#CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw
-CXXFLAGS = -g -fopenmp -march=native -DHIGHLIGHT -lncursesw 
+CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw
+#CXXFLAGS = -g -fopenmp -march=native -DHIGHLIGHT -lncursesw 
 
 # the build target executable:
 TARGET = yocto
