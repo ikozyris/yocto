@@ -141,17 +141,14 @@ void read_fread(FILE *fi)
 	long res;
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi))) {
 		tmp[a] = 0;
-		res = whereis(tmp, '\n');
-		if (res > 0) { // found newline
-			while ((res = whereis(tmp + j, '\n')) > -1) {
-				apnd_s(*it, tmp + j, res);
-				j += res;
-				if (++curnum >= txt_cpt) {
-					txt_cpt *= 2;
-					text.resize(txt_cpt);
-				}
-				++it;
+		while ((res = whereis(tmp + j, '\n')) > -1) {
+			apnd_s(*it, tmp + j, res);
+			j += res;
+			if (++curnum >= txt_cpt) {
+				txt_cpt *= 2;
+				text.resize(txt_cpt);
 			}
+			++it;
 		}
 		// if last character is not a newline
 		apnd_s(*it, tmp + j, a - j);
