@@ -6,7 +6,7 @@ void stats()
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	snprintf(_tmp, maxx-2, "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
+	snprintf(_tmp, maxx, "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
 		it->len, ry, x, sumlen, curnum, ofx);
 	print2header(_tmp, 1);
 	free(_tmp);
@@ -151,16 +151,32 @@ void enter()
 // TODO: handle better lines with uncalculated offsets
 void eol()
 {
-	if (it->len < (long)maxx + ofx) {
+	if (it->len < (long)maxx + ofx) { // line fits in screen
 		x = sizeofline(y);
 		ofx = (long)it->len - (long)x;
 	} else { // wrap line
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
 		// TODO: use actual printline()
-		data2(*it, it->len - maxx - ofx, it->len);
-		waddnstr(text_win, lnbuf, maxx + ofx - 1);
+		print_line(*it, it->len - maxx - ofx, it->len);
 		ofx = (long)it->len - (long)maxx - ofx;
+	}
+}
+
+void sol()
+{
+	wmove(text_win, y, 0);
+	if (ofx < 0)
+		ofx = 0;
+	else if (ofx >= (long)it->len - maxx) { // line has been wrapped
+		wclrtoeol(text_win);
+		print_line(*it);
+#ifdef HIGHLIGHT
+		wmove(text_win, y, 0);
+		apply(y);
+#endif
+		ofx = 0;
+		wmove(text_win, y, 0);
 	}
 }
 
@@ -197,4 +213,42 @@ void scrollup()
 	wmove(text_win, 0, x);
 	wrefresh(ln_win);
 	ofx = 0;
+}
+
+// TODO: is all this complexity needed?
+void right()
+{
+	if (it->buffer[it->gpe + 1] == '\t') {
+		if (x > maxx - 7)
+			goto wrap_line;
+		ofx -= 8 - x % 8 - 1;
+		wmove(text_win, y, x + 8 - x % 8);
+	} else if (x == maxx - 1 && rx < it->len - 1) {
+wrap_line:
+		wmove(text_win, y, 0);
+		wclrtoeol(text_win);
+		// TODO: use print_line()
+		//print_line(*it, ofx + maxx - 1, it->len - maxx - ofx);
+		data2(*it, ofx + maxx - 1, ofx + maxx * 2);
+		waddnstr(text_win, lnbuf, it->len - maxx - ofx);
+		ofx += maxx - 1;
+		wmove(text_win, y, 0);
+	} else {
+		if (ry < curnum) {
+			if (rx < it->len - 1) {
+right_key:
+				wmove(text_win, y, x + 1);
+				if (it->buffer[it->gpe + 1] < 0)
+					++ofx;
+			} else {
+				wmove(text_win, y, 0);
+				if (ofx > 0) // revert wrap
+					print_line(*it);
+				wmove(text_win, y + 1, 0);
+				++it;
+				ofx = 0;
+			}
+		} else if (ry == curnum && rx < it->len)
+			goto right_key;
+	}	
 }
