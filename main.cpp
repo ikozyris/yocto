@@ -86,7 +86,7 @@ loop:
 		getyx(text_win, y, x);
 		rx = x + ofx;
 		mv_curs(*it, rx);
-stats();
+
 #ifdef DEBUG
 		print_text(y); // debug only
 		char tmp[80];
@@ -133,8 +133,11 @@ stats();
 				if (it->buffer[it->gps - 1] == '\t') {
 					wmove(text_win, y, x - 8);
 					ofx += 7;
-				} else
-					wmove(text_win, y, x - 1);
+					break;
+				}
+				wmove(text_win, y, x - 1);
+				if (it->buffer[it->gps - 1] < 0)
+					--ofx;
 			} else if (y > 0) { // x = 0
 				if (ofx > 0) // revert wrap
 					print_line(*it);
@@ -145,29 +148,7 @@ stats();
 			break;
 
 		case RIGHT:
-			if (x == maxx - 1 && rx < it->len - 1) {
-				wmove(text_win, y, 0);
-				wclrtoeol(text_win);
-				// printline() with custom start
-				data2(*it, ofx + maxx - 1, ofx + maxx * 2);
-				waddnstr(text_win, lnbuf, maxx - 1);
-
-				ofx += maxx - 1;
-				wmove(text_win, y, 0);
-			} else if (ry != curnum ? rx < it->len - 1 : rx < it->len) {
-				if (it->buffer[it->gpe + 1] == '\t') {
-					ofx -= 8 - x % 8 - 1;
-					wmove(text_win, y, x + 8 - x % 8);
-				} else
-					wmove(text_win, y, x + 1);
-			} else if (ry < curnum) {
-				wmove(text_win, y, 0);
-				if (ofx > 0) // revert wrap
-					print_line(*it);
-				wmove(text_win, y + 1, 0);
-				++it;
-				ofx = 0;
-			}
+			right();
 			break;
 
 		case BACKSPACE:
@@ -181,25 +162,41 @@ stats();
 					ofx += 7;
 				} else
 					mvwdelch(text_win, y, x - 1);
-			} else if (y != 0) { // delete previous line's \n
-				std::list<gap_buf>::iterator tmp = it;
+			} else if (y != 0) { // x = 0; merge lines
+				std::list<gap_buf>::iterator tmpi = it;
 				--it;
-				mv_curs(*it, it->len);
+				mv_curs(*it, it->len); // delete \n
 				eras(*it);
-				data(*tmp, 0, tmp->len + 1);
-				apnd_s(*it, lnbuf, tmp->len + 1);
-				text.erase(tmp);
+				unsigned temp = tmpi->len;
+				data(*tmpi, 0, temp);
+				apnd_s(*it, lnbuf, temp); // merge
+				text.erase(tmpi); // delete actual line
 				--curnum;
 				print_text(y - 1);
-				wmove(text_win, y - 1, it->len - 1);
+				wmove(text_win, y - 1, it->len - temp);
 			}
 			break;
 
 		case DELETE:
-			wdelch(text_win);
-			mv_curs(*it, rx + 1);
-			if (rx + 1u <= it->len)
-				mveras(*it, rx + 1);
+			if (rx + 1u > it->len)
+				break;
+			if (it->buffer[it->gpe + 1] == '\n') { // similar to backspace
+				std::list<gap_buf>::iterator tmpi = it;
+				it->gpe = it->cpt; // delete newline
+				unsigned temp = it->len--;
+				++it;
+				data(*it, 0, it->len);
+				apnd_s(*tmpi, lnbuf, temp + 1);
+				text.erase(it);
+				it = tmpi;
+				--curnum;
+				print_text(y);
+				wmove(text_win, y, it->len - temp - 1);
+			} else {
+				wdelch(text_win);
+				mv_curs(*it, rx + 1u);
+				mveras(*it, rx + 1u);
+			}
 			break;
 
 		case ENTER:
@@ -207,21 +204,7 @@ stats();
 			break;
 
 		case HOME:
-			wmove(text_win, y, 0);
-			if (ofx < 0) {
-				ofx = 0;
-				break;
-			}
-			if (ofx >= (long)it->len - maxx) { // line has been wrapped
-				wclrtoeol(text_win);
-				print_line(*it);
-#ifdef HIGHLIGHT
-				wmove(text_win, y, 0);
-				apply(y);
-#endif
-				ofx = 0;
-				wmove(text_win, y, 0);
-			} 
+			sol();
 			break;
 
 		case END:

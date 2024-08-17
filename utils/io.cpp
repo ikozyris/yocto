@@ -35,17 +35,19 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-unsigned print_line(const gap_buf &buffer)
+unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = -1)
 {
+	if (to == -1)
+		to = buffer.len;
 	if (buffer.len == 0)
 		return 0;
-	unsigned rlen = data(buffer, 0, min(buffer.len, maxx * 2));
+	unsigned rlen = data2(buffer, from, min(to, maxx * 2));
 	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
 	waddnstr(text_win, lnbuf, min(maxy / 2, rlen));
-	// make sure we don't print more than needed
+	// make sure we don't print more than needed (utf8, tabs...)
 	for (unsigned i = maxy / 2; i < rlen && (unsigned)getcurx(text_win) < maxx - 1; ++i)
-		waddnstr(text_win, lnbuf + i, 1); // handle unicode
+		waddnstr(text_win, lnbuf + i, 1);
 	return rlen;
 }
 

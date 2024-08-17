@@ -25,10 +25,8 @@ which also supports configuring yocto
 * Show info: Alt-I (also command _stats_ in built-in terminal)
 
 ### How fast is it?
-Some define fast as reasonably optimized, in yocto fast means 
-faster than *every* other editor available. As anyone can understand from 
-[these benchmarks](https://github.com/ikozyris/yocto/wiki/Performance-&-Benchmarks)
-yocto is indeed *fast*.
+Yocto is more than 3x faster than emacs, 4x vim and 6x nano at reading a file.
+See the [benchmarks](https://github.com/ikozyris/yocto/wiki/Performance-&-Benchmarks) for more.
 
 ### About the name
 Yocto is the SI (metric) prefix for 10^-24.
