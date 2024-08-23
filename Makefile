@@ -1,26 +1,23 @@
-# The compiler: g++
+# g++ (clang works too with -stdlib=libc++)
+# C++20 minimum for branching prediction hints: [[likely]], otherwise C++11
 CC = g++ --std=c++20
 
 # Compiler flags:
-#  -Wall		Turns on most, but not all, compiler warnings
-#  -Wextra		Turns on extra warnings
-#  -Werror		Warnings will not be tolerated!
-#  -Ofast		Optimizes the code
-#  -fopenmp		Multi-threading
-#  -march=native	Add optimization flags specific to the host
-#  -flto		Link Time Optimization
-#  -pendatic		Strictier warnings
+#  -Ofast		Safe as no floating point arithmetic is done
+#  -march=native	Add optimization flags specific to the host platform
+#  -flto		Link Time Optimizations
+#  -pendatic		Comply with the standards
 #  -DHIGHLIGHT		Enable syntax highlighting
-#  -lncursesw		Links to ncurses library for wide characters
+#  -lncursesw		Links to ncurses library for wide characters (unicode)
 
-#CXXFLAGS = -g -Wall -Wextra -pedantic -fopenmp -DDEBUG -DHIGHLIGHT -lncursesw # Debug only
-CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw
-#CXXFLAGS = -g -fopenmp -march=native -DHIGHLIGHT -lncursesw 
+#CXXFLAGS = Wall -Wextra -pedantic-error -g -DDEBUG -DHIGHLIGHT -lncursesw # Debug only
+CXXFLAGS = -Wall -Wextra -pedantic -Ofast -march=native -flto -DHIGHLIGHT -lncursesw
+#CXXFLAGS = -g -Wall -Wextra -pedantic -march=native -DHIGHLIGHT -lncursesw 
 
 # the build target executable:
 TARGET = yocto
 PATHT = /usr/bin/
-# if available root is not required to install
+# root is not required to install
 #PATHT = ~/.local/bin/
 
 all:

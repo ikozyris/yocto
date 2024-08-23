@@ -40,7 +40,7 @@ void command()
 		clear_header();
 		print2header(buffer, 1);
 	} else if (strcmp(tmp, "usage") == 0) {
-		size_t pid;
+		size_t pid = 0;
 		// stores each word in status file
 		char buffer[1024] = "";
 
@@ -200,7 +200,7 @@ void scrolldown()
 
 void scrollup()
 {
-	wscrl(text_win, -1); // scroll up
+	wscrl(text_win, -1);
 	wscrl(ln_win, -1);
 	mvwprintw(ln_win, 0, 0, "%3u", ry);
 	--ofy;
