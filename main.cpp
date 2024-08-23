@@ -76,7 +76,6 @@ read:
 
 	it = text.begin();
 loop:
-	//goto stop;
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy;
@@ -89,12 +88,10 @@ loop:
 
 #ifdef DEBUG
 		print_text(y); // debug only
-		char tmp[80];
-		snprintf(tmp, 79, "st %u | end %u | cpt %u | len %u | maxx %u | ofx %ld    ",
-			it->gps, it->gpe, it->cpt, it->len, maxx, ofx);
-		print2header(tmp, 1);
+		stats();
 		wmove(text_win, y, x);
 #endif
+	//goto stop;
 		wget_wch(text_win, (wint_t*)s);
 		switch (s[0]) {
 		case DOWN:
@@ -119,36 +116,18 @@ loop:
 			break;
 
 		case LEFT:
-			if (x == 0 && ofx > 0) { // line has been wrapped
-				wmove(text_win, y, 0);
-				wclrtoeol(text_win);
-				print_line(*it);
-#ifdef HIGHLIGHT
-				wmove(text_win, y, 0);
-				apply(y);
-#endif
-				ofx -= maxx - 1;
-				wmove(text_win, y, maxx - 1);
-			} else if (x > 0) {
-				if (it->buffer[it->gps - 1] == '\t') {
-					wmove(text_win, y, x - 8);
-					ofx += 7;
-					break;
-				}
-				wmove(text_win, y, x - 1);
-				if (it->buffer[it->gps - 1] < 0)
-					--ofx;
-			} else if (y > 0) { // x = 0
-				if (ofx > 0) // revert wrap
-					print_line(*it);
-				--it;
-				--y;
-				eol();
-			}
+			if (x == 0 && ofx == 0 && ofy > 0 && y == 0)
+				scrollup();
+			else
+				left();
 			break;
 
 		case RIGHT:
-			right();
+			if (y == maxy - 1 && rx == it->len - 1) {
+				++it;
+				scrolldown();
+			} else
+				right();
 			break;
 
 		case BACKSPACE:

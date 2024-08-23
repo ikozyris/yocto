@@ -17,9 +17,9 @@ unsigned lnbf_cpt; // linebuff capacity
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 struct gap_buf {
-	unsigned cpt; 	// allocated size (1)
+	unsigned cpt; 	// allocated size (1-based)
 	unsigned len;	// length of line (1)
-	unsigned gps;	// gap start (first element of gap) (0)
+	unsigned gps;	// gap start (first element of gap) (0-based)
 	unsigned gpe;	// gap end (last element of gap)    (0)
 	char *buffer;
 
@@ -146,40 +146,32 @@ inline void eras(gap_buf &a)
 // NOTE: destination buffer is lnbuf
 unsigned data(const gap_buf &src, unsigned from, unsigned to)
 {
-	if (src.len == 0) {
-		lnbuf[0] = 0;
-		return 0;
-	}
+	if (src.len == 0)
+		return lnbuf[0] = 0;
 	if (lnbf_cpt < to - from + 3) {
 		free(lnbuf);
 		lnbf_cpt = to - from + 10;
 		lnbuf = (char*)malloc(lnbf_cpt);
 	}
-	lnbuf[to - from] = 0;
-	lnbuf[to - from + 1] = 0;
+	lnbuf[to - from + 1] = lnbuf[to - from] = 0;
 	// try some special cases where 1 copy is required
 	if (src.gps == src.len && src.gpe == src.cpt - 1) // gap ends at end
 		memcpy(lnbuf, src.buffer + from, min(to, src.gps));
 	else if (src.gps == 0) // x = 0; gap at start
 		memcpy(lnbuf, src.buffer + from + src.gpe + 1, min(to, src.len) - from);
 	else {
-		if (from < src.gps) { // worst case
-			for (unsigned i = from; i < src.gps; ++i)
-				lnbuf[i] = src[i];
-			for (unsigned i = src.gpe + 1; i < gaplen(src) + to; ++i)
-				lnbuf[i - gaplen(src)] = src[i];
-			//memcpy(tmp, src.buffer + from, min(to, src.gps));
-			//memcpy(tmp + min(to, src.gps), src.buffer +, src.gps - to - 1);
+		if (from < src.gps) {
+			memcpy(lnbuf, src.buffer + from, min(to, src.gps) - from);
+			if (to > src.gps - 1)
+				memcpy(lnbuf + src.gps, src.buffer + src.gpe + 1, to - from - src.gps);
 		} else
-			for (unsigned i = gaplen(src) + src.gps; i < gaplen(src) + to; ++i)
-				lnbuf[i - gaplen(src) - 1] = src[i];
-			//memcpy(tmp, src.buffer + src.gpe + 1, src.gps - to);
+			memcpy(lnbuf, src.buffer + from + gaplen(src), (to - from) + gaplen(src));
 	}
 	lnbuf[to - from + 2] = 0;
 	return to - from;
 }
 
-// naive, simplier, slower, should be bug free, implementation of above function 
+// naive, simplier, slower, implementation of above function 
 unsigned data2(const gap_buf &src, const unsigned from, const unsigned to) {
 	char *buffer = (char*)malloc(src.len + 3);
 	memcpy(buffer, src.buffer, src.gps);
@@ -194,8 +186,7 @@ unsigned data2(const gap_buf &src, const unsigned from, const unsigned to) {
 	}
 	memcpy(lnbuf, buffer + from, to - from);
 	free(buffer);
-	lnbuf[to - from + 1] = 0;
-	lnbuf[to - from + 2] = 0;
+	lnbuf[to - from + 1] = lnbuf[to - from + 2] = 0;
 	return to - from;
 }
 

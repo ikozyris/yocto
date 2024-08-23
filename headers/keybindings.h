@@ -6,7 +6,7 @@
 
 #define ENTER		KEY_ENTER
 #define SAVE		ctrl('S')
-#define EXIT		ctrl('C')
+#define EXIT		ctrl('X')
 #define UP		KEY_UP
 #define DOWN		KEY_DOWN
 #define LEFT		KEY_LEFT
