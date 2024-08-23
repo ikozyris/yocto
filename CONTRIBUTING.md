@@ -2,7 +2,7 @@ Follow the Linux Kernel coding style. <br>
 With the exception that the maximum lenght of line is 100
 
 The most important things are:
-- Use tabs (*not* spaces)
+- Use tabs (*not* spaces), for flexibility and reduced file size
 - Braces open in the same line as the if, while, switch... except functions
 
 example:
@@ -16,6 +16,7 @@ int main()
 ultimate_question:
 	printf("Which is the best text editor? ");
 	scanf("%5s", input);
+	// 42 is magic number
 	if (strcmp(input, "yocto") == 0 || strcmp(input, "42") == 0) {
 		printf("Correct!\n");
 		goto exit;
@@ -41,6 +42,9 @@ For pull/merge requests (PR/MR):
 fix: bug when something, regression | perf: x9999 boost in writing
 
 The regression exists since [commit number]
-More optinal information about commit
+More optional information about commit
 ```
-- If the change is just a typo create an issue not a PR/MR
+- If the change is just a one-liner create an issue not a PR/MR
+- Try to benchmark any optimizations
+
+Make sure to check any "TODO:"

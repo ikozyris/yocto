@@ -137,7 +137,7 @@ loop:
 					wmove(text_win, y, 0);
 					print_line(*it);
 					wclrtoeol(text_win);
-					wmove(text_win, y, x - 8);
+					wmove(text_win, y, x - 8u);
 					ofx += 7;
 				} else
 					mvwdelch(text_win, y, x - 1);
@@ -151,7 +151,7 @@ loop:
 				apnd_s(*it, lnbuf, temp); // merge
 				text.erase(tmpi); // delete actual line
 				--curnum;
-				print_text(y - 1);
+				print_text(y - 1u);
 				wmove(text_win, y - 1, it->len - temp);
 			}
 			break;
@@ -159,18 +159,18 @@ loop:
 		case DELETE:
 			if (rx + 1u > it->len)
 				break;
-			if (it->buffer[it->gpe + 1] == '\n') { // similar to backspace
+			if (it->buffer[it->gpe + 1u] == '\n') { // similar to backspace
 				std::list<gap_buf>::iterator tmpi = it;
 				it->gpe = it->cpt; // delete newline
 				unsigned temp = it->len--;
 				++it;
-				data(*it, 0, it->len);
-				apnd_s(*tmpi, lnbuf, temp + 1);
+				data(*it, 0u, it->len);
+				apnd_s(*tmpi, lnbuf, temp + 1u);
 				text.erase(it);
 				it = tmpi;
 				--curnum;
 				print_text(y);
-				wmove(text_win, y, it->len - temp - 1);
+				wmove(text_win, y, it->len - temp - 1u);
 			} else {
 				wdelch(text_win);
 				mv_curs(*it, rx + 1u);
@@ -210,7 +210,7 @@ loop:
 					iter->len = iter->gps = 0;
 					iter->gpe = iter->cpt;
 				}
-				curnum = 0;
+				curnum = 0u;
 				it = text.begin();
 				wclear(text_win);
 				goto read;
@@ -223,7 +223,7 @@ loop:
 		case REFRESH:
 			getmaxyx(text_win, maxy, maxx);
 			ofy = 0;
-			ofx = 0;
+			ofx2 = ofx = 0;
 			reset_header();
 			print_text(0);
 			print_lines();
@@ -249,7 +249,7 @@ loop:
 		default:
 			if (s[0] > 0 && s[0] < 32) // not a character
 				break;
-			if (x == maxx - 1) {
+			if (x == maxx - 1) { // wrap line
 				ofx += maxx - 1;
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
@@ -261,11 +261,12 @@ loop:
 			len = wcstombs(s2, s, 4);
 			insert_s(*it, rx, s2, len);
 			if (len > 1)
-				ofx += len - 1; // Unicode character
+				ofx += len - 1; // UTF-8 character
 			break;
 		}
 	}
 	//*/
+// readony mode
 ro:
 	wclear(ln_win);
 	do {
