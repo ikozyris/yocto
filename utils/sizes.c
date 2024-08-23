@@ -7,10 +7,10 @@ const char *itoa(long a)
 	return b;
 }
 
-// convert bytes to base-10 human-readable string e.g 1024 = 1.024KB = 1KiB
+// convert bytes to base-10 (SI) human-readable string e.g 1000B = 1kB
 const char *hrsize(size_t bytes)
 {
-	const char *suffix[] = {"B", "KB", "MB", "GB", "TB"};
+	const char *suffix[] = {"B", "kB", "MB", "GB", "TB"};
 	unsigned char length = sizeof(suffix) / sizeof(suffix[0]);
 
 	double dblBytes = bytes;
@@ -26,10 +26,10 @@ const char *hrsize(size_t bytes)
 
 // get length of line y
 unsigned sizeofline(unsigned y) {
-	unsigned i = maxx - 1;
+	short i = maxx - 1;
 	wmove(text_win, y, i);
 	while ((winch(text_win) & A_CHARTEXT) == ' '
-		&& getcurx(text_win) >= it->len - 1)
+		&& (unsigned)getcurx(text_win) >= it->len - 1 && i >= 0)
 		wmove(text_win, y, --i);
 	wmove(text_win, y, i + 1);
 	return i + 2;

@@ -1,6 +1,6 @@
 # Yocto
 [![C/C++ CI](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml)
-A simple, compact and *fast* text editor using ncurses and a gap buffer, written in C++, in <1k lines of code.
+A simple, compact and *fast* text editor using ncurses and a gap buffer, written in C++, in ~1k lines of code.
 More information is available on the [wiki](https://github.com/ikozyris/yocto/wiki).
 
 ![A C++ file in Yocto](https://github.com/ikozyris/yocto/assets/80053394/8fa12952-272f-41e0-9535-0a77f3652286)
@@ -11,12 +11,12 @@ make build
 sudo make install
 ```
 
-Or use the user-friendly dialog utility (`wizard.sh`)
+Or use the user-friendly dialog utility `wizard.sh`
 which also supports configuring yocto
 
 ### Keybindings
 * Save: Ctrl-S
-* Exit: Ctrl-C
+* Exit: Ctrl-X
 * Go to start of line: Ctrl-A
 * Go to end of line: Ctrl-E
 * Open other file Alt-R
@@ -25,7 +25,7 @@ which also supports configuring yocto
 * Show info: Alt-I (also command _stats_ in built-in terminal)
 
 ### How fast is it?
-Yocto is more than 3x faster than emacs, 4x vim and 6x nano at reading a file.
+Yocto is several times faster than any other text editor at reading files and other operations.
 See the [benchmarks](https://github.com/ikozyris/yocto/wiki/Performance-&-Benchmarks) for more.
 
 ### About the name

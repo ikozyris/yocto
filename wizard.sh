@@ -32,7 +32,7 @@ display_result() {
 }
 
 KEY_SAVE="ctrl('S')"
-KEY_EXIT="ctrl('C')"
+KEY_EXIT="ctrl('X')"
 KEY_INFO="'i'"
 KEY_REFRESH="ctrl('R')"
 KEY_HOME="ctrl('A')"
