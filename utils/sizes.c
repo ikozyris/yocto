@@ -1,16 +1,9 @@
 #include "../headers/vars.hpp"
 
-const char *itoa(long a)
-{
-	static char b[12];
-	sprintf(b, "%ld", a);
-	return b;
-}
-
 // convert bytes to base-10 (SI) human-readable string e.g 1000B = 1kB
-const char *hrsize(size_t bytes)
+char hrsize(size_t bytes, char *dest, unsigned short dest_cpt)
 {
-	const char *suffix[] = {"B", "kB", "MB", "GB", "TB"};
+	const char suffix[] = {0, 'k', 'M', 'G', 'T'};
 	unsigned char length = sizeof(suffix) / sizeof(suffix[0]);
 
 	double dblBytes = bytes;
@@ -19,9 +12,8 @@ const char *hrsize(size_t bytes)
 	for (i = 0; (bytes / 1000) > 0 && i < (unsigned)length - 1; i++, bytes /= 1000)
 		dblBytes = bytes / 1000.0;
 
-	static char output[16];
-	sprintf(output, "%.02lf %s", dblBytes, suffix[i]);
-	return output;
+	snprintf(dest, dest_cpt, "%.02lf %cB", dblBytes, suffix[i]);
+	return suffix[i];
 }
 
 // get length of line y
@@ -35,6 +27,7 @@ unsigned sizeofline(unsigned y) {
 	return i + 2;
 }
 
+// in kB
 long memusg()
 {
 	size_t memusg = 0, tmp;

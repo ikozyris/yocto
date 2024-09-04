@@ -6,9 +6,9 @@ void stats()
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	//snprintf(_tmp, maxx, "st %u | end %u | cpt %u | len %u | maxx %u | ofx %ld wrap %ld x: %u | y: %u     ",
+	//snprintf(_tmp, min(maxx, 256), "st %u | end %u | cpt %u | len %u | maxx %u ofx %ld wrap %ld x: %u | y: %u     ",
 	//	it->gps, it->gpe, it->cpt, it->len, maxx, ofx, wrap, x, y);
-	snprintf(_tmp, maxx, "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
+	snprintf(_tmp, min(maxx, 256), "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
 	it->len, ry, x, sumlen, curnum, ofx);
 	print2header(_tmp, 1);
 	free(_tmp);
@@ -21,7 +21,7 @@ void command()
 	if (strcmp(tmp, "resetheader") == 0)
 		reset_header();
 	else if (strcmp(tmp, "shrink") == 0) {
-		size_t prev = memusg();
+		size_t prev = memusg(); // RAM usage before
 
 		// shrink line buffer
 		lnbf_cpt = 16;
@@ -30,12 +30,20 @@ void command()
 		txt_cpt = curnum + 1;
                 text.resize(txt_cpt);
 		//shrink each line
+		size_t bytes_saved = 0;
 		for (auto &i : text)
-			shrink(i);
+			bytes_saved += shrink(i);
+		char *bytes_saved_str = (char*)malloc(24);
+		hrsize(bytes_saved, bytes_saved_str, 24);
 
-		size_t curr = memusg();
-		char buffer[1024] = "";
-		sprintf(buffer, "saved: %s", hrsize((prev-curr) * 1000));
+		size_t curr = memusg(); // RAM usage after
+		char *prev_curr_str = (char*)malloc(24);
+		hrsize((prev - curr) * 1000, prev_curr_str, 24);
+
+		char buffer[64] = "";
+		snprintf(buffer, 64, "saved: %s | %s", bytes_saved_str, prev_curr_str);
+		free(bytes_saved_str);
+		free(prev_curr_str);
 		clear_header();
 		print2header(buffer, 1);
 	} else if (strcmp(tmp, "usage") == 0) {
@@ -51,7 +59,9 @@ void command()
 				break;
 			}
 		fclose(file);
-		sprintf(buffer, "RAM: %s PID: %lu", hrsize(memusg() * 1000), pid);
+		char ram_usg[24];
+		hrsize(memusg() * 1000, ram_usg, 24);
+		sprintf(buffer, "RAM: %s PID: %lu", ram_usg, pid);
 		clear_header();
 		print2header(buffer, 1);
 	} else if (strcmp(tmp, "stats") == 0)
@@ -61,9 +71,9 @@ void command()
 		clear();
 		refresh();
 		int res = system(_tmp);
-		if (res != 0)
-			print2header(itoa(res), 1);
 		free(_tmp);
+		printw("\nreturned: %d", res);
+
 		getch();
 		reset_header();
 		print_text(0);

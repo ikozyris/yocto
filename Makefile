@@ -12,8 +12,8 @@ CC = g++ --std=c++20
 
 OPTIM = -Ofast -flto -march=native
 DEBUG = -g #-DDEBUG
-CXXFLAGS = -Wall -Wextra -pedantic-errors $(DEBUG) -DHIGHLIGHT -lncursesw # Debug only
-#CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -DHIGHLIGHT -lncursesw
+#CXXFLAGS = -Wall -Wextra -pedantic-errors $(DEBUG) -DHIGHLIGHT -lncursesw # Debug only
+CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -DHIGHLIGHT -lncursesw
 
 # the build target executable:
 TARGET = yocto
