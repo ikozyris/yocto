@@ -15,7 +15,7 @@ wchar_t s[6];
 char s2[6];
 unsigned char y, x, len;
 long ofy; // offset in y axis of text and screen, x axis is in gapbuffer
-long ofx2; // this is last change in ofx
+long wrap; // last offset due to wrap (if 0; line has not been wrapped)
 unsigned ry, rx;
 unsigned buf_indx, printed, previndx, ppi;
 unsigned maxy, maxx; // to store the maximum rows and columns

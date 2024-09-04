@@ -148,6 +148,15 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 {
 	if (src.len == 0)
 		return lnbuf[0] = 0;
+
+	// error checking and recovery
+	if (from > src.len)
+		from = 0;
+	if (to < from)
+		to += from;
+	if (to > src.len)
+		to = src.len;
+
 	if (lnbf_cpt < to - from + 3) {
 		free(lnbuf);
 		lnbf_cpt = to - from + 10;
@@ -156,16 +165,16 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 	lnbuf[to - from + 1] = lnbuf[to - from] = 0;
 	// try some special cases where 1 copy is required
 	if (src.gps == src.len && src.gpe == src.cpt - 1) // gap ends at end
-		memcpy(lnbuf, src.buffer + from, min(to, src.gps));
+		memcpy(lnbuf, src.buffer + from, min(to - from, src.gps));
 	else if (src.gps == 0) // x = 0; gap at start
 		memcpy(lnbuf, src.buffer + from + src.gpe + 1, min(to, src.len) - from);
 	else {
 		if (from < src.gps) {
 			memcpy(lnbuf, src.buffer + from, min(to, src.gps) - from);
-			if (to > src.gps - 1)
-				memcpy(lnbuf + src.gps, src.buffer + src.gpe + 1, to - from - src.gps);
+			if (to > src.gps)
+				memcpy(lnbuf + src.gps - from, src.buffer + src.gpe + 1, to - src.gps);
 		} else
-			memcpy(lnbuf, src.buffer + from + gaplen(src), (to - from) + gaplen(src));
+			memcpy(lnbuf, src.buffer + from + gaplen(src), to - from);
 	}
 	lnbuf[to - from + 2] = 0;
 	return to - from;

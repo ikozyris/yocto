@@ -10,9 +10,10 @@ CC = g++ --std=c++20
 #  -DHIGHLIGHT		Enable syntax highlighting
 #  -lncursesw		Links to ncurses library for wide characters (unicode)
 
-#CXXFLAGS = Wall -Wextra -pedantic-error -g -DDEBUG -DHIGHLIGHT -lncursesw # Debug only
-CXXFLAGS = -Wall -Wextra -pedantic -Ofast -march=native -flto -DHIGHLIGHT -lncursesw
-#CXXFLAGS = -g -Wall -Wextra -pedantic -march=native -DHIGHLIGHT -lncursesw 
+OPTIM = -Ofast -flto -march=native
+DEBUG = -g #-DDEBUG
+CXXFLAGS = -Wall -Wextra -pedantic-errors $(DEBUG) -DHIGHLIGHT -lncursesw # Debug only
+#CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -DHIGHLIGHT -lncursesw
 
 # the build target executable:
 TARGET = yocto
