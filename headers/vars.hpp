@@ -13,7 +13,7 @@ std::list<gap_buf>::iterator it;
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[6];
 char s2[6];
-unsigned char y, x, len;
+unsigned short y, x, len;
 long ofy; // offset in y axis of text and screen, x axis is in gapbuffer
 long wrap; // last offset due to wrap (if 0; line has not been wrapped)
 unsigned ry, rx;

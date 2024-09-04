@@ -73,7 +73,7 @@ key_config() {
 }
 
 color_config() {
- 	mapfile -t colors <  <(sed "s/.*COLOR_//g" utils/highlight.c | head -n 15 | tail -n 6)
+ 	mapfile -t colors <  <(sed "s/.*COLOR_//g" utils/highlight.c | head -n 28 | tail -n 6)
 
 	exec 3>&1 # open stdout fd
 	OUTPUT=$(DIALOG --title "Edit Colors" \

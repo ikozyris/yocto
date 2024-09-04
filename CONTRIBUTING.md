@@ -42,9 +42,10 @@ For pull/merge requests (PR/MR):
 fix: bug when something, regression | perf: x9999 boost in writing
 
 The regression exists since [commit number]
-More optional information about commit
+[More optional information about commit]
 ```
 - If the change is just a one-liner create an issue not a PR/MR
 - Try to benchmark any optimizations
+- Split large commits, and try make commit titles <70 characters
 
 Make sure to check any "TODO:"

@@ -204,6 +204,6 @@ unsigned shrink(gap_buf &a)
 {
 	unsigned bytes = a.cpt;
 	mv_curs(a, a.len);
-	resize(a, a.len + 1);
+	resize(a, a.len + 2);
 	return bytes - a.cpt;
 }	
