@@ -28,8 +28,8 @@ const char *hrsize(size_t bytes)
 unsigned sizeofline(unsigned y) {
 	short i = maxx - 1;
 	wmove(text_win, y, i);
-	while ((winch(text_win) & A_CHARTEXT) == ' '
-		&& (unsigned)getcurx(text_win) >= it->len - 1 && i >= 0)
+	while ((winch(text_win) & A_CHARTEXT) == ' ' && i >= 0)
+		/*&& (unsigned)getcurx(text_win) >= it->len - 1*/
 		wmove(text_win, y, --i);
 	wmove(text_win, y, i + 1);
 	return i + 2;

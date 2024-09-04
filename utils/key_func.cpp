@@ -6,13 +6,12 @@ void stats()
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	//snprintf(_tmp, maxx, "st %u | end %u | cpt %u | len %u | maxx %u | ofx %ld    ",
-	//	it->gps, it->gpe, it->cpt, it->len, maxx, ofx);
+	//snprintf(_tmp, maxx, "st %u | end %u | cpt %u | len %u | maxx %u | ofx %ld wrap %ld x: %u | y: %u     ",
+	//	it->gps, it->gpe, it->cpt, it->len, maxx, ofx, wrap, x, y);
 	snprintf(_tmp, maxx, "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
-		it->len, ry, x, sumlen, curnum, ofx);
+	it->len, ry, x, sumlen, curnum, ofx);
 	print2header(_tmp, 1);
 	free(_tmp);
-	_tmp = 0;
 	wmove(text_win, y, x);
 }
 
@@ -150,17 +149,17 @@ void enter()
 	ofx = 0;
 }
 
-// TODO: handle better lines with uncalculated offsets
+// TODO: handle lines with uncalculated offsets better
 void eol()
 {
-	if (it->len < (long)maxx + ofx) { // line fits in screen
+	if (it->len <= (long)maxx + ofx) { // line fits in screen
 		x = sizeofline(y);
 		ofx = (long)it->len - (long)x;
-	} else { // wrap line
+	} else if (wrap != it->len - maxx) { // wrap line
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		print_line(*it, it->len - maxx - ofx, it->len);
-		ofx = (ofx2 = (long)it->len - (long)maxx - ofx);
+		print_line(*it, it->len - maxx, it->len);
+		ofx = wrap = (long)it->len - (long)maxx;
 	}
 }
 
@@ -168,15 +167,15 @@ void sol()
 {
 	wmove(text_win, y, 0);
 	if (ofx < 0)
-		ofx2 = ofx = 0;
-	else if (ofx >= (long)it->len - maxx) { // line has been wrapped
+		wrap = ofx = 0;
+	else if (wrap) { // line has been wrapped
 		wclrtoeol(text_win);
-		print_line(*it, 0, maxx);
+		print_line(*it);
 #ifdef HIGHLIGHT
 		wmove(text_win, y, 0);
 		apply(y);
 #endif
-		ofx2 = ofx = 0;
+		wrap = ofx = 0;
 		wmove(text_win, y, 0);
 	}
 }
@@ -194,8 +193,8 @@ void scrolldown()
 	wmove(text_win, y, 0);
 	apply(y);
 #endif
-	wmove(text_win, y, x);
-
+	// TODO: calc offset and use current x
+	wmove(text_win, y, 0);
 }
 
 void scrollup()
@@ -222,16 +221,18 @@ void left()
 	if (x == 0 && ofx > 0) { // line has been wrapped
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		print_line(*it);
+		if (wrap == 0) // line has been partially unwrapped
+			wrap = maxx - 1;
+		ofx -= wrap;
+		print_line(*it, ofx, ofx + wrap);
+		wrap = 0;
 #ifdef HIGHLIGHT
 		wmove(text_win, y, 0);
 		apply(y);
 #endif
-		ofx -= ofx2;
-		ofx2 = 0;
 		wmove(text_win, y, maxx - 1);
 	} else if (x > 0) {
-		// TODO: use nextword() to get actual offset
+		// TODO: use prevword() to get actual offset
 		if (it->buffer[it->gps - 1] == '\t') {
 			wmove(text_win, y, x - 8);
 			ofx += 7;
@@ -241,7 +242,7 @@ void left()
 		if (it->buffer[it->gps - 1] < 0)
 			--ofx;
 	} else if (y > 0) { // x = 0
-		if (ofx > 0) // revert wrap
+		if (wrap > 0) // revert wrap
 			print_line(*it);
 		--it;
 		--y;
@@ -260,11 +261,10 @@ void right()
 wrap_line:
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		// TODO: use print_line()
-		//print_line(*it, ofx + maxx - 1, it->len - maxx - ofx);
-		data(*it, ofx + maxx - 1, ofx + maxx * 2);
-		waddnstr(text_win, lnbuf, it->len - maxx - ofx);
-		ofx2 = (ofx += maxx - 1);
+		ofx += (wrap = maxx - 1);
+		print_line(*it, ofx);
+		//data(*it, ofx + maxx - 1, ofx + maxx * 2);
+		//waddnstr(text_win, lnbuf, it->len - maxx - ofx);
 		wmove(text_win, y, 0);
 	} else {
 		if (ry < curnum) {
@@ -275,11 +275,11 @@ right_key:
 					++ofx;
 			} else {
 				wmove(text_win, y, 0);
-				if (ofx > 0) // revert wrap
+				if (wrap > 0) // revert wrap
 					print_line(*it);
 				wmove(text_win, y + 1, 0);
 				++it;
-				ofx = 0;
+				wrap = ofx = 0;
 			}
 		} else if (ry == curnum && rx < it->len)
 			goto right_key;

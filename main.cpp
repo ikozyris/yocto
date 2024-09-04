@@ -79,7 +79,7 @@ loop:
 	while (1) {
 		getyx(text_win, y, x);
 		ry = y + ofy;
-		// if out of bounds: move (to avoid bugs)
+		// if out of bounds: move (to avoid bugs) & TODO: simplify
 		if (x >= min(ry < curnum ? (it->len - 1 - ofx) : (it->len - ofx), maxx))
 			wmove(text_win, y, min((ry != curnum ? it->len - ofx - 1 : it->len - ofx), maxx));
 		getyx(text_win, y, x);
@@ -97,8 +97,12 @@ loop:
 		case DOWN:
 			if (ry >= curnum) // do not scroll indefinetly
 				break;
+			if (wrap > 0) { // revert wrap
+				wmove(text_win, y, 0);
+				print_line(*it);
+			}
 			++it;
-			ofx = 0; // invalidated
+			wrap = ofx = 0; // invalidated
 			if (y == (maxy - 1) && ry < curnum)
 				scrolldown();
 			else
@@ -106,12 +110,15 @@ loop:
 			break;
 
 		case UP:
-			if (y == 0 && ofy != 0)
+			if (wrap > 0) { // revert wrap
+				wmove(text_win, y, 0);
+				print_line(*it);
+			} if (y == 0 && ofy != 0)
 				scrollup();
 			else if (y != 0) {
 				wmove(text_win, y - 1, x);
 				--it;
-				ofx = 0;
+				wrap = ofx = 0;
 			}
 			break;
 
@@ -223,7 +230,7 @@ loop:
 		case REFRESH:
 			getmaxyx(text_win, maxy, maxx);
 			ofy = 0;
-			ofx2 = ofx = 0;
+			wrap = ofx = 0;
 			reset_header();
 			print_text(0);
 			print_lines();
@@ -265,8 +272,7 @@ loop:
 			break;
 		}
 	}
-	//*/
-// readony mode
+//*/ readonly mode
 ro:
 	wclear(ln_win);
 	do {

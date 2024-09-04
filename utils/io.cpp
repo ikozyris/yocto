@@ -35,13 +35,13 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0xffffffff)
+unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 {
 	if (buffer.len == 0)
 		return 0;
-	if (to == 0xffffffff) // 2^32-1
+	if (to == 0)
 		to = buffer.len;
-	unsigned rlen = data(buffer, from, min(to, maxx * 2));
+	unsigned rlen = data(buffer, from, min(to, from + maxx * 2));
 	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
 	// TODO: is there a faster way?
