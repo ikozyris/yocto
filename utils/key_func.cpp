@@ -83,26 +83,8 @@ void command()
 		doupdate();
 		wmove(text_win, y, x);
 	} else if (strcmp(tmp, "help")  == 0)
-		print2header("resetheader, shrink, usg, stats, run, setgap", 1);
-	else if (strcmp(tmp, "setgap") == 0)
-		++it->gps;
-	else if (strcmp(tmp, "fixgap") == 0) {
-		unsigned msec = 0, trigger = 1; /* 1ms */
-		unsigned iterations = 0;
-		clock_t before = clock();
-		do {
-			mv_curs(*it, it->len);
-			mv_curs(*it, x);
-			clock_t difference = clock() - before;
-			msec = difference * 1000 / CLOCKS_PER_SEC;
-			iterations++;
-		} while (msec < trigger);
-		char tmp[128];
-		snprintf(tmp, maxx, "%u,%03u ms (%u iterations)",
-  			msec / 1000, msec % 1000, iterations);
-		print2header(tmp, 1);
-		wmove(text_win, y, x);
-	} else if (strcmp(tmp, "scroll") == 0) {
+		print2header("resetheader, shrink, usage, stats, run, scroll", 1);
+	else if (strcmp(tmp, "scroll") == 0) {
 		char *in = input_header("Scroll to line: ");
 		unsigned a;
 		sscanf(in, "%u", &a);
