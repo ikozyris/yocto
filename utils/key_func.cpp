@@ -114,13 +114,6 @@ void command()
 			print_text(0);
 			std::advance(it, ofy - ry);
 		}
-	} else if (strcmp(tmp, "fixstr") == 0) {
-		wchar_t temp[256];
-		winwstr(text_win, temp);
-		wcstombs(it->buffer, temp, it->cpt);
-		it->len = sizeofline(y);
-		it->gps = it->len + 1;
-		it->gpe = it->cpt;
 	} else
 		print2header("command not found", 3);
 	free(tmp);

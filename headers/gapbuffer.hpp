@@ -188,7 +188,6 @@ char at(const gap_buf &src, unsigned pos)
 	return src[pos];
 }
 
-
 unsigned shrink(gap_buf &a)
 {
 	unsigned bytes = a.cpt;

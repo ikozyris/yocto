@@ -16,7 +16,7 @@ fi
 
 isroot() {
 	if [ "$EUID" -ne 0 ]; then
-		display_result "Please run as root"
+		display_result "Please run as root" "This action requires root privileges"
 		return 1
 	fi
 	return 0
@@ -28,7 +28,7 @@ DIALOG() {
 
 display_result() {
 	DIALOG --title "$1" \
-	--msgbox "$result" $HEIGHT $WIDTH
+	--msgbox "$2" $HEIGHT $WIDTH
 }
 
 KEY_SAVE="ctrl('S')"
@@ -110,7 +110,7 @@ color_config() {
 
 config_dialog() {
 	high_st="Disable"
-	tmp="$(cat Makefile | head -n 17 | tail -n 1)"
+	tmp="$(cat Makefile | head -n 16 | tail -n 1)"
 	if ! grep -q "\-DHIGHLIGHT" <<< "$tmp"; then
 		high_st="Enable"
 	fi
@@ -160,16 +160,18 @@ config_dialog() {
 		   	;;
 		3 )
 			if [ $high_st = "Enable" ]; then
-				sed -i 's/CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw/CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw/g' Makefile
+				sed -i 's/CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -lncursesw/CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -DHIGHLIGHT -lncursesw/g' Makefile
+				high_st="Disable"
 			else
-				sed -i 's/CXXFLAGS = -Ofast -fopenmp -march=native -flto -DHIGHLIGHT -lncursesw/CXXFLAGS = -Ofast -fopenmp -march=native -flto -lncursesw/g' Makefile
+				sed -i 's/CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -DHIGHLIGHT -lncursesw/CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -lncursesw/g' Makefile
+				high_st="Enable"
 			fi
 			;;
 		4 )
 			if [ $DIAL = "dialog" ]; then
 				color_config
 			else
-				display_result "dialog not installed, but you can still edit utils/highlighting.h lines 10-15"
+				display_result "dialog not installed, but you can still edit utils/highlight.c lines 23-28"
 			fi
 			;;
 		esac
@@ -205,35 +207,32 @@ while true; do
 		;;
 	2 )
 		if make build 2>&1 >/dev/null | grep -q Error; then
-			result="Make sure to report the output of make at: https://github.com/ikozyris/yocto/issues"
-			display_result "Failed to build yocto"
+			display_result "Failed to build yocto" "Make sure to report the output of make at: https://github.com/ikozyris/yocto/issues"
 	    	else
-			result="Now you can install!"
-			display_result "Succesfully built yocto"
+			display_result "Succesfully built yocto" "Now you can install!"
 		fi
 		;;
 	3 )
-		if [ -d "$HOME.local/bin" ]; then
-			result="Installed on ~/.local/bin"
-			make install
-			display_result "Installed Yocto"
+		if [ -d ~/.local/bin ]; then
+			cp yocto ~/.local/bin/
+			display_result "Installed Yocto" "Installed in ~/.local/bin"
 		else
 			if isroot; then
-				result="Installed in /usr/bin"
 				cp yocto /usr/bin/
-				display_result "Installed Yocto"
+				display_result "Installed Yocto" "Installed in /usr/bin"
 			fi
 		fi
 		;;
 	4 )
-		if [ -d "$HOME.local/bin/yocto" ]; then
-			result="Uninstalled from ~/.local/bin"
+		if [ -f ~/.local/bin/yocto ]; then
 			rm ~/.local/bin/yocto
+			display_result "We are sorry to see you go." "Uninstalled from ~/.local/bin"
 		else
-			result="Uninstalled from /usr/bin"
-			rm /usr/bin/yocto
+			if isroot; then
+				rm /usr/bin/yocto
+				display_result "We are sorry to see you go." "Uninstalled from /usr/bin"
+			fi
 		fi
-		display_result "We are sorry to see you go."
 		;;
     	esac
 done
