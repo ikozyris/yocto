@@ -180,26 +180,15 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 	return to - from;
 }
 
-// naive, simplier, slower, implementation of above function 
-unsigned data2(const gap_buf &src, const unsigned from, const unsigned to) {
-	char *buffer = (char*)malloc(src.len + 3);
-	memcpy(buffer, src.buffer, src.gps);
-	memcpy(buffer + src.gps, src.buffer + src.gpe + 1, src.len - src.gps);
-
-	if (src.len == 0)
-		return 0;
-	if (lnbf_cpt < to - from + 3) {
-		free(lnbuf);
-		lnbf_cpt = to - from + 10;
-		lnbuf = (char*)malloc(lnbf_cpt);
-	}
-	memcpy(lnbuf, buffer + from, to - from);
-	free(buffer);
-	lnbuf[to - from + 1] = lnbuf[to - from + 2] = 0;
-	return to - from;
+// returns character at pos keeping in mind the gap
+char at(const gap_buf &src, unsigned pos)
+{
+	if (pos > src.gps)
+		return src[pos + gaplen(src)];
+	return src[pos];
 }
 
-// TODO: fix this
+
 unsigned shrink(gap_buf &a)
 {
 	unsigned bytes = a.cpt;

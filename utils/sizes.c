@@ -21,7 +21,6 @@ unsigned sizeofline(unsigned y) {
 	short i = maxx - 1;
 	wmove(text_win, y, i);
 	while ((winch(text_win) & A_CHARTEXT) == ' ' && i >= 0)
-		/*&& (unsigned)getcurx(text_win) >= it->len - 1*/
 		wmove(text_win, y, --i);
 	wmove(text_win, y, i + 1);
 	return i + 2;
@@ -40,4 +39,22 @@ long memusg()
 		}
 	fclose(file);
 	return memusg;
+}
+
+// return offset for current line (*it) until x
+long calc_offset(unsigned short target_x)
+{
+	char ch;
+	unsigned short x = 0, i = 0;
+	while (x < target_x && i < it->len) {
+		ch = at(*it, i);
+		if (ch == '\t')
+			x += 8 - x % 8 - 1; // -1 due to x++ at end
+		// asumes this utf8 code point is 2 bytes
+		else if (ch < 0)
+			i++; // not a real character
+		x++;
+		i++;
+	}
+	return (signed)i - (signed)x;
 }

@@ -176,18 +176,16 @@ void eol()
 void sol()
 {
 	wmove(text_win, y, 0);
-	if (ofx < 0)
-		wrap = ofx = 0;
-	else if (wrap) { // line has been wrapped
+	if (wrap) { // line has been wrapped
 		wclrtoeol(text_win);
 		print_line(*it);
 #ifdef HIGHLIGHT
 		wmove(text_win, y, 0);
 		apply(y);
 #endif
-		wrap = ofx = 0;
 		wmove(text_win, y, 0);
 	}
+	wrap = ofx = 0;
 }
 
 void scrolldown()
