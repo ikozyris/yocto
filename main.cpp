@@ -105,8 +105,10 @@ loop:
 			wrap = ofx = 0; // invalidated
 			if (y == (maxy - 1) && ry < curnum)
 				scrolldown();
-			else
+			else {
 				wmove(text_win, y + 1, x);
+				ofx = calc_offset(x);
+			}
 			break;
 
 		case UP:
@@ -117,9 +119,10 @@ loop:
 				scrollup();
 			else if (y != 0) {
 				wmove(text_win, y - 1, x);
-				--it;
-				wrap = ofx = 0;
+				--it; 
+				ofx = calc_offset(x);
 			}
+			wrap = 0;
 			break;
 
 		case LEFT:
@@ -257,11 +260,11 @@ loop:
 			if (s[0] > 0 && s[0] < 32) // not a character
 				break;
 			if (x == maxx - 1) { // wrap line
-				ofx += maxx - 1;
+				ofx += (wrap = maxx - 1);
+				rx = ofx;
+				x = 0;
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
-				x = 0;
-				rx = x + ofx;
 			}
 			wins_nwstr(text_win, s, 1);
 			wmove(text_win, y, x + 1);
