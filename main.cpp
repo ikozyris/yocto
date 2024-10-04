@@ -58,17 +58,9 @@ read:
 		}
 
 		eligible = isc(argv[1]); // syntax highlighting
-		if (argc > 2 && (strcmp(argv[2], "-ro") == 0 ||
-				strcmp(argv[2], "--read-only") == 0)) {
-			read_fread_sl(fi);
-			printed = print_text_w(0);
-			print2header("Read-Only", 3);
-			goto ro;
-		} else {
-			//read_fgets(fi);
-			read_fread(fi);
-			print_text(0);
-		}
+		//read_fgets(fi);
+		read_fread(fi);
+		print_text(0);
 		fclose(fi);
 	}
 	wmove(text_win, 0, 0);

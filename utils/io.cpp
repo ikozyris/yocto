@@ -67,17 +67,6 @@ void print_text(unsigned line)
 	}
 }
 
-// print text with line wrapping
-unsigned print_text_w(unsigned start)
-{
-	wmove(text_win, 0, 0);
-	buf_indx = start;
-	while ((unsigned)getcury(text_win) < maxy - 1 && buf_indx < it->len)
-		waddch(text_win, it->buffer[buf_indx++]);
-	wclrtobot(text_win);
-	return buf_indx - start; // how many characters were printed
-}
-
 void save()
 {
 	if (!filename)
@@ -114,15 +103,6 @@ void read_fgets(FILE *fi)
 			++it;
 		}
 	}
-}
-
-// read in single line
-void read_fread_sl(FILE *fi)
-{
-	char tmp[SZ];
-	unsigned a = 0; // bytes read
-	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi)))
-		apnd_s(*it, tmp, a);
 }
 
 inline long whereis(const char *str,  char ch)
