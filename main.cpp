@@ -107,7 +107,7 @@ loop:
 				scrolldown();
 			else {
 				wmove(text_win, y + 1, x);
-				ofx = calc_offset(x);
+				ofx = calc_offset_dis(x, 0, *it);
 			}
 			break;
 
@@ -120,7 +120,7 @@ loop:
 			else if (y != 0) {
 				wmove(text_win, y - 1, x);
 				--it; 
-				ofx = calc_offset(x);
+				ofx = calc_offset_dis(x, 0, *it);
 			}
 			wrap = 0;
 			break;

@@ -134,16 +134,16 @@ void enter()
 	ofx = 0;
 }
 
-// TODO: handle lines with uncalculated offsets better
 void eol()
 {
-	if (it->len <= (long)maxx + ofx) { // line fits in screen
-		x = sizeofline(y);
-		ofx = (long)it->len - (long)x;
-	} else if (wrap != it->len - maxx) { // wrap line
+	ofx = calc_offset_act(it->len, 0, *it);
+	if (it->len <= (long)maxx + ofx) // line fits in screen
+		wmove(text_win, y, it->len - ofx);
+	else if (wrap != it->len - maxx) { // wrap line
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		print_line(*it, it->len - maxx, it->len);
+		unsigned bytes = calc_offset_dis(it->len - ofx - maxx + 1, 0, *it) + it->len - ofx - maxx;
+		print_line(*it, bytes, it->len);
 		ofx = wrap = (long)it->len - (long)maxx;
 	}
 }
@@ -207,7 +207,7 @@ void left()
 		if (wrap == 0) // line has been partially unwrapped
 			wrap = maxx - 1;
 		ofx -= wrap;
-		print_line(*it, ofx, ofx + wrap);
+		print_line(*it, ofx);
 		wrap = 0;
 #ifdef HIGHLIGHT
 		wmove(text_win, y, 0);
