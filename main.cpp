@@ -12,7 +12,6 @@ int main(int argc, char *argv[])
 		"License: GNU GPL v3\n");
 		puts("Usage:\n"
 		"       --help, -h          Show this help\n"
-		"<file> --read-only, -ro    Just read, like a pager\n"
 		"<file>                     Open file and allow edits\n"
 		"-                          Ask for file name on save\n\n"
 		"Keybindings:\n"
@@ -275,40 +274,6 @@ loop:
 			break;
 		}
 	}
-//*/ readonly mode
-ro:
-	wclear(ln_win);
-	do {
-		switch (ch) {
-		case UP:
-			if (ppi >= previndx || ppi >= buf_indx)
-				ppi = 0;
-			else
-				ppi = previndx;
-			printed = print_text_w(ppi);
-			if (buf_indx > printed)
-				previndx = buf_indx - printed;
-			else
-				previndx = 0;
-			break;
-		case DOWN:
-			previndx = buf_indx - printed;
-			printed = print_text_w(buf_indx);
-			break;
-		case EXIT:
-			goto stop;
-		}
-#ifdef HIGHLIGHT
-		for (unsigned i = 0; i < maxy - 1; ++i)
-			apply(i);
-#endif
-		mvwprintw(ln_win, 1, 0, "%3u", buf_indx);
-		mvwprintw(ln_win, 3, 0, "%3u", printed);
-		mvwprintw(ln_win, 5, 0, "%3u", previndx);
-		mvwprintw(ln_win, 7, 0, "%3u", ppi);
-		wrefresh(ln_win);
-
-	} while ((ch = wgetch(text_win)));
 stop:
 	free(lnbuf);
 	delwin(text_win);
