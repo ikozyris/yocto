@@ -16,7 +16,7 @@ char s2[6];
 unsigned short y, x, len;
 long ofy; // offset in y axis of text and screen, x axis is in gapbuffer
 long wrap; // last offset due to wrap (if 0; line has not been wrapped)
-unsigned ry, rx;
+unsigned ry, rx; // x, y positions in buffer/list
 unsigned buf_indx, printed, previndx, ppi;
 unsigned maxy, maxx; // to store the maximum rows and columns
 int ch;

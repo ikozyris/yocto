@@ -8,8 +8,8 @@ char hrsize(size_t bytes, char *dest, unsigned short dest_cpt)
 
 	double dblBytes = bytes;
 
-	unsigned i;
-	for (i = 0; (bytes / 1000) > 0 && i < (unsigned)length - 1; i++, bytes /= 1000)
+	unsigned char i;
+	for (i = 0; (bytes / 1000) > 0 && i < length - 1; ++i, bytes /= 1000)
 		dblBytes = bytes / 1000.0;
 
 	snprintf(dest, dest_cpt, "%.02lf %cB", dblBytes, suffix[i]);

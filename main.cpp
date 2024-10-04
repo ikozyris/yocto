@@ -213,7 +213,7 @@ loop:
 				command();
 			else if (ch == SWITCH) { // switch file
 				argc = 2;
-				strcpy(argv[1], input_header("File to open: "));
+				argv[1] = input_header("File to open: ");
 				std::list<gap_buf>::iterator iter;
 				unsigned i;
 				for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {

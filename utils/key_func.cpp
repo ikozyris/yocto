@@ -6,8 +6,8 @@ void stats()
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	//snprintf(_tmp, min(maxx, 256), "st %u | end %u | cpt %u | len %u | maxx %u ofx %ld wrap %ld x: %u | y: %u     ",
-	//	it->gps, it->gpe, it->cpt, it->len, maxx, ofx, wrap, x, y);
+	//snprintf(_tmp, min(maxx, 256), "maxx %u len %u ofx %ld wrap %ld x: %u | y: %u     ",
+	//	maxx, it->len, ofx, wrap, x, y);
 	snprintf(_tmp, min(maxx, 256), "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
 	it->len, ry, x, sumlen, curnum, ofx);
 	print2header(_tmp, 1);

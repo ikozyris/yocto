@@ -8,7 +8,8 @@ bool isc(const char *str)
 	if (res == -1)
 		return false;
 	str += res;
-	if (!strcmp(str, "c") || !strcmp(str, "cpp") || !strcmp(str, "cc"))
+	if (!strcmp(str, "c") || !strcmp(str, "cpp") || !strcmp(str, "cc")
+		|| !strcmp(str, "h") || !strcmp(str, "hpp"))
 		return true;
 	return false;
 }
