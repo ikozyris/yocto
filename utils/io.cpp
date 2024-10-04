@@ -61,7 +61,6 @@ void print_text(unsigned line)
 	for (unsigned ty = line; ty < min(curnum + ofy + 1, maxy) && iter != text.end(); ++iter) {
 		print_line(*iter);
 #ifdef HIGHLIGHT
-		wmove(text_win, ty, 0);
 		apply(ty);
 #endif
 		wmove(text_win, ++ty, 0);
