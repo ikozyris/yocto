@@ -16,16 +16,6 @@ char hrsize(size_t bytes, char *dest, unsigned short dest_cpt)
 	return suffix[i];
 }
 
-// get length of line y
-unsigned sizeofline(unsigned y) {
-	short i = maxx - 1;
-	wmove(text_win, y, i);
-	while ((winch(text_win) & A_CHARTEXT) == ' ' && i >= 0)
-		wmove(text_win, y, --i);
-	wmove(text_win, y, i + 1);
-	return i + 2;
-}
-
 // in kB
 long memusg()
 {
@@ -41,20 +31,36 @@ long memusg()
 	return memusg;
 }
 
-// return offset for current line (*it) until x
-long calc_offset(unsigned short target_x)
+// offset until displayed x from from bytes in buf
+long calc_offset_dis(unsigned displayed_x, unsigned from, const gap_buf &buf)
 {
 	char ch;
-	unsigned short x = 0, i = 0;
-	while (x < target_x && i < it->len) {
-		ch = at(*it, i);
+	unsigned x = 0, i = from;
+	while (x < displayed_x && i < buf.len) {
+		ch = at(buf, i);
 		if (ch == '\t')
 			x += 8 - x % 8 - 1; // -1 due to x++ at end
-		// asumes this utf8 code point is 2 bytes
 		else if (ch < 0)
-			i++; // not a real character
+			i++; // assumes this utf8 code point is 2 bytes
 		x++;
 		i++;
 	}
-	return (signed)i - (signed)x;
+	return (long)i - (long)from - (long)x;
+}
+
+// offset until pos bytes from i bytes in buf
+long calc_offset_act(unsigned pos, unsigned i, const gap_buf &buf)
+{
+	char ch;
+	unsigned x = 0;
+	while (i < pos) {
+		ch = at(buf, i);
+		if (ch == '\t')
+			x += 8 - x % 8 - 1;
+		else if (ch < 0)
+			i++;
+		x++;
+		i++;
+	}
+	return (long)i - (long)x;
 }

@@ -35,20 +35,19 @@ char *input_header(const char *q)
 	return tmp;
 }
 
+// prints substring of buffer, if (to == 0) print until maxx
 unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 {
-	if (buffer.len == 0)
+	if (buffer.len <= 1)
 		return 0;
-	if (to == 0)
-		to = buffer.len;
-	unsigned rlen = data(buffer, from, min(to, from + maxx * 2));
+	if (to == 0) {
+		unsigned prop = (calc_offset_dis(maxx - 1, from, buffer) + maxx - 1);
+		to = min(buffer.len, prop);
+	}
+	unsigned rlen = data(buffer, from, to);
 	if (lnbuf[rlen - 1] == '\n')
 		--rlen;
-	// TODO: is there a faster way?
-	waddnstr(text_win, lnbuf, min(maxy / 2, rlen));
-	// make sure we don't print more than needed (utf8, tabs...)
-	for (unsigned i = maxy / 2; i < rlen && (unsigned)getcurx(text_win) < maxx - 1; ++i)
-		waddnstr(text_win, lnbuf + i, 1);
+	waddnstr(text_win, lnbuf, rlen);
 	return rlen;
 }
 
