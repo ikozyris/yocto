@@ -30,7 +30,7 @@ char *input_header(const char *q)
 		print2header("ERROR", 1);
 		wmove(text_win, y, x);
 	} if (strlen(tmp) <= 0)
-		bzero(tmp, 128);
+		tmp[0] = 0;
 	noecho();
 	return tmp;
 }
