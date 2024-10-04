@@ -85,6 +85,7 @@ void apply(unsigned line)
 {
 	if (!eligible)
 		return;
+	wmove(text_win, line, 0);
 	winwstr(text_win, tmp);
 	unsigned len2 = wcstombs(str, tmp, 256);
 	unsigned previ = 0;

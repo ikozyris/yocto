@@ -299,10 +299,8 @@ ro:
 			goto stop;
 		}
 #ifdef HIGHLIGHT
-		for (unsigned i = 0; i < maxy - 1; ++i) {
-			wmove(text_win, i, 0);
+		for (unsigned i = 0; i < maxy - 1; ++i)
 			apply(i);
-		}
 #endif
 		mvwprintw(ln_win, 1, 0, "%3u", buf_indx);
 		mvwprintw(ln_win, 3, 0, "%3u", printed);

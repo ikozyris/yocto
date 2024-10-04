@@ -155,7 +155,6 @@ void sol()
 		wclrtoeol(text_win);
 		print_line(*it);
 #ifdef HIGHLIGHT
-		wmove(text_win, y, 0);
 		apply(y);
 #endif
 		wmove(text_win, y, 0);
@@ -173,7 +172,6 @@ void scrolldown()
 	wmove(text_win, y, 0);
 	print_line(*it);
 #ifdef HIGHLIGHT
-	wmove(text_win, y, 0);
 	apply(y);
 #endif
 	// TODO: calc offset and use current x
@@ -190,7 +188,6 @@ void scrollup()
 	--it;
 	print_line(*it);
 #ifdef HIGHLIGHT
-	wmove(text_win, y, 0);
 	apply(y);
 #endif
 	wmove(text_win, 0, x);
@@ -210,7 +207,6 @@ void left()
 		print_line(*it, ofx);
 		wrap = 0;
 #ifdef HIGHLIGHT
-		wmove(text_win, y, 0);
 		apply(y);
 #endif
 		wmove(text_win, y, maxx - 1);
