@@ -41,7 +41,7 @@ unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 	if (buffer.len <= 1)
 		return 0;
 	if (to == 0) {
-		unsigned prop = (calc_offset_dis(maxx - 1, from, buffer) + maxx - 1);
+		unsigned prop = from + (calc_offset_dis(maxx - 1, from, buffer) + maxx - 1);
 		to = min(buffer.len, prop);
 	}
 	unsigned rlen = data(buffer, from, to);

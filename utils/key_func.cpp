@@ -139,12 +139,13 @@ void eol()
 	ofx = calc_offset_act(it->len, 0, *it);
 	if (it->len <= (long)maxx + ofx) // line fits in screen
 		wmove(text_win, y, it->len - ofx);
-	else if (wrap != it->len - maxx) { // wrap line
+	else { // wrap line
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		unsigned bytes = calc_offset_dis(it->len - ofx - maxx + 1, 0, *it) + it->len - ofx - maxx;
+		unsigned vis = (it->len - ofx) % (maxx - 1);
+		unsigned bytes = calc_offset_dis(it->len - ofx - vis, 0, *it) + it->len - ofx - vis;
 		print_line(*it, bytes, it->len);
-		ofx = wrap = (long)it->len - (long)maxx;
+		ofx = wrap = (long)it->len - (long)vis;
 	}
 }
 
@@ -242,8 +243,6 @@ wrap_line:
 		wclrtoeol(text_win);
 		ofx += (wrap = maxx - 1);
 		print_line(*it, ofx);
-		//data(*it, ofx + maxx - 1, ofx + maxx * 2);
-		//waddnstr(text_win, lnbuf, it->len - maxx - ofx);
 		wmove(text_win, y, 0);
 	} else {
 		if (ry < curnum) {
