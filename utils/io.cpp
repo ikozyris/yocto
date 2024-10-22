@@ -38,14 +38,14 @@ char *input_header(const char *q)
 // prints substring of buffer, if (to == 0) print until maxx
 unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 {
-	if (buffer.len <= 1)
+	if (buffer.len < 1 || at(buffer, 0) == '\n')
 		return 0;
 	if (to == 0) {
-		unsigned prop = from + (calc_offset_dis(maxx - 1, from, buffer) + maxx - 1);
+		unsigned prop = dchar2bytes(maxx - 1, from, buffer);
 		to = min(buffer.len, prop);
 	}
 	unsigned rlen = data(buffer, from, to);
-	if (lnbuf[rlen - 1] == '\n')
+	if (lnbuf[rlen - 1] == '\n' || lnbuf[rlen - 1] == '\t')
 		--rlen;
 	waddnstr(text_win, lnbuf, rlen);
 	return rlen;

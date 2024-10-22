@@ -183,7 +183,7 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 // returns character at pos keeping in mind the gap
 char at(const gap_buf &src, unsigned pos)
 {
-	if (pos > src.gps)
+	if (pos >= src.gps)
 		return src[pos + gaplen(src)];
 	return src[pos];
 }

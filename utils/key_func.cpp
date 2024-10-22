@@ -137,22 +137,35 @@ void enter()
 void eol()
 {
 	ofx = calc_offset_act(it->len, 0, *it);
-	if (it->len <= (long)maxx + ofx) // line fits in screen
-		wmove(text_win, y, it->len - ofx);
+	if (it->len - ofx <= maxx) // line fits in screen
+		wmove(text_win, y, it->len - ofx - 1);
 	else { // wrap line
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
+
+		// estimation without accounting first tab in line
 		unsigned vis = (it->len - ofx) % (maxx - 1);
-		unsigned bytes = calc_offset_dis(it->len - ofx - vis, 0, *it) + it->len - ofx - vis;
+		// get how many bytes leave 'vis' displayed characters to be printed
+		// it->len - ofx - vis = maxx - 1 (mul by wrapped times)
+		unsigned bytes = dchar2bytes(it->len - ofx - vis, 0, *it);
+		// preliminary calculation of displayed characters in line
+		wrap = bytes - calc_offset_act(bytes, 0, *it);
+		// tab was cut in wrapping, go back to print
+		if (at(*it, bytes - 1) == '\t' && maxx - wrap > 0) {
+			--bytes;
+			vis += 8;
+		}
 		print_line(*it, bytes, it->len);
-		ofx = wrap = (long)it->len - (long)vis;
+		ofx = it->len - vis + maxx - 1 - wrap;
+		//ofx = calc_offset_dis(maxx - 1, 0, *it) + maxx - 1;
+		//ofx += wrap;
 	}
 }
 
 void sol()
 {
 	wmove(text_win, y, 0);
-	if (wrap) { // line has been wrapped
+	if (wrap != 0) { // line has been wrapped
 		wclrtoeol(text_win);
 		print_line(*it);
 #ifdef HIGHLIGHT
@@ -175,8 +188,8 @@ void scrolldown()
 #ifdef HIGHLIGHT
 	apply(y);
 #endif
-	// TODO: calc offset and use current x
 	wmove(text_win, y, 0);
+	wrap = ofx = 0;
 }
 
 void scrollup()
@@ -193,7 +206,7 @@ void scrollup()
 #endif
 	wmove(text_win, 0, x);
 	wrefresh(ln_win);
-	ofx = 0;
+	wrap = ofx = 0;
 }
 
 // TODO: is all this complexity needed?
@@ -202,11 +215,9 @@ void left()
 	if (x == 0 && ofx > 0) { // line has been wrapped
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		if (wrap == 0) // line has been partially unwrapped
-			wrap = maxx - 1;
 		ofx -= wrap;
-		print_line(*it, ofx);
 		wrap = 0;
+		print_line(*it, ofx);
 #ifdef HIGHLIGHT
 		apply(y);
 #endif
@@ -222,7 +233,7 @@ void left()
 		if (it->buffer[it->gps - 1] < 0)
 			--ofx;
 	} else if (y > 0) { // x = 0
-		if (wrap > 0) // revert wrap
+		if (wrap != 0) // revert wrap
 			print_line(*it);
 		--it;
 		--y;
@@ -233,7 +244,7 @@ void left()
 void right()
 {
 	if (it->buffer[it->gpe + 1] == '\t') {
-		if (x > maxx - 7)
+		if (x >= maxx - 7)
 			goto wrap_line;
 		ofx -= 8 - x % 8 - 1;
 		wmove(text_win, y, x + 8 - x % 8);
@@ -241,7 +252,7 @@ void right()
 wrap_line:
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		ofx += (wrap = maxx - 1);
+		ofx += (wrap += x);
 		print_line(*it, ofx);
 		wmove(text_win, y, 0);
 	} else {
@@ -253,7 +264,7 @@ right_key:
 					++ofx;
 			} else {
 				wmove(text_win, y, 0);
-				if (wrap > 0) // revert wrap
+				if (wrap != 0) // revert wrap
 					print_line(*it);
 				wmove(text_win, y + 1, 0);
 				++it;
