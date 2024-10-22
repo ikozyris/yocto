@@ -31,36 +31,40 @@ long memusg()
 	return memusg;
 }
 
-// offset until displayed x from from bytes in buf
-long calc_offset_dis(unsigned displayed_x, unsigned from, const gap_buf &buf)
+inline void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
 {
-	char ch;
+	char ch = at(buf, i);
+	if (ch == '\t')
+		x += 8 - x % 8 - 1; // -1 due to x++ at end
+	else if (ch < 0)
+		i++; // assumes this utf8 code point is 2 bytes
+	x++;
+	i++;
+}
+
+// offset until displayed x from from bytes in buf
+long calc_offset_dis(unsigned dx, unsigned from, const gap_buf &buf)
+{
 	unsigned x = 0, i = from;
-	while (x < displayed_x && i < buf.len) {
-		ch = at(buf, i);
-		if (ch == '\t')
-			x += 8 - x % 8 - 1; // -1 due to x++ at end
-		else if (ch < 0)
-			i++; // assumes this utf8 code point is 2 bytes
-		x++;
-		i++;
-	}
+	while (x < dx && i < buf.len)
+		get_off(x, i, buf);
 	return (long)i - (long)from - (long)x;
+}
+
+// displayed characters dx to bytes
+unsigned dchar2bytes(unsigned dx, unsigned from, const gap_buf &buf)
+{
+	unsigned x = 0, i = from;
+	while (x < dx && i < buf.len)
+		get_off(x, i, buf);
+	return i;
 }
 
 // offset until pos bytes from i bytes in buf
 long calc_offset_act(unsigned pos, unsigned i, const gap_buf &buf)
 {
-	char ch;
 	unsigned x = 0;
-	while (i < pos) {
-		ch = at(buf, i);
-		if (ch == '\t')
-			x += 8 - x % 8 - 1;
-		else if (ch < 0)
-			i++;
-		x++;
-		i++;
-	}
+	while (i < pos)
+		get_off(x, i, buf);
 	return (long)i - (long)x;
 }

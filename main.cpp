@@ -88,7 +88,7 @@ loop:
 		case DOWN:
 			if (ry >= curnum) // do not scroll indefinetly
 				break;
-			if (wrap > 0) { // revert wrap
+			if (wrap != 0) { // revert wrap
 				wmove(text_win, y, 0);
 				print_line(*it);
 			}
@@ -103,7 +103,7 @@ loop:
 			break;
 
 		case UP:
-			if (wrap > 0) { // revert wrap
+			if (wrap != 0) { // revert wrap
 				wmove(text_win, y, 0);
 				print_line(*it);
 			} if (y == 0 && ofy != 0)

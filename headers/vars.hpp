@@ -6,7 +6,7 @@
 #else
 #define DEFAULT_LINES 16
 #endif
-unsigned txt_cpt = DEFAULT_LINES; // capacity
+unsigned txt_cpt = DEFAULT_LINES; // alloced nodes
 std::list<gap_buf> text(DEFAULT_LINES);
 std::list<gap_buf>::iterator it;
 
@@ -15,7 +15,7 @@ wchar_t s[6];
 char s2[6];
 unsigned short y, x, len;
 long ofy; // offset in y axis of text and screen, x axis is in gapbuffer
-long wrap; // last offset due to wrap (if 0; line has not been wrapped)
+long wrap; // wrapped dchars TODO: make this a stack?
 unsigned ry, rx; // x, y positions in buffer/list
 unsigned buf_indx, printed, previndx, ppi;
 unsigned maxy, maxx; // to store the maximum rows and columns
