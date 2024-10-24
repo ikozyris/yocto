@@ -6,10 +6,13 @@ void stats()
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	//snprintf(_tmp, min(maxx, 256), "maxx %u len %u ofx %ld wrap %u x: %u | y: %u     ",
-	//	maxx, it->len, ofx, !wrap.empty() ? wrap.back() : 0, x, y);
+#ifndef RELEASE
+	snprintf(_tmp, min(maxx, 256), "maxx %u len %u ofx %ld wrap %u x: %u | y: %u     ",
+		maxx, it->len, ofx, !wrap.empty() ? wrap.back() : 0, x, y);
+#else	
 	snprintf(_tmp, min(maxx, 256), "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
 		it->len, ry, x, sumlen, curnum, ofx);
+#endif
 	print2header(_tmp, 1);
 	free(_tmp);
 	wmove(text_win, y, x);
@@ -226,10 +229,8 @@ void left()
 #endif
 		wmove(text_win, y, maxx - 1);
 	} else if (x > 0) {
-		// TODO: use prevword() to get actual offset
 		if (it->buffer[it->gps - 1] == '\t') {
-			wmove(text_win, y, x - 8);
-			ofx += 7;
+			ofx += prevword(x, y);
 			return;
 		}
 		wmove(text_win, y, x - 1);
