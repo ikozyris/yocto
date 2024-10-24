@@ -88,12 +88,13 @@ loop:
 		case DOWN:
 			if (ry >= curnum) // do not scroll indefinetly
 				break;
-			if (wrap != 0) { // revert wrap
+			if (!wrap.empty()) { // revert wrap
 				wmove(text_win, y, 0);
 				print_line(*it);
 			}
 			++it;
-			wrap = ofx = 0; // invalidated
+			wrap.clear();
+			ofx = 0; // invalidated
 			if (y == (maxy - 1) && ry < curnum)
 				scrolldown();
 			else {
@@ -103,7 +104,7 @@ loop:
 			break;
 
 		case UP:
-			if (wrap != 0) { // revert wrap
+			if (!wrap.empty()) { // revert wrap
 				wmove(text_win, y, 0);
 				print_line(*it);
 			} if (y == 0 && ofy != 0)
@@ -113,7 +114,7 @@ loop:
 				--it; 
 				ofx = calc_offset_dis(x, 0, *it);
 			}
-			wrap = 0;
+			wrap.clear();
 			break;
 
 		case LEFT:
@@ -223,8 +224,8 @@ loop:
 		case KEY_RESIZE:
 		case REFRESH:
 			getmaxyx(text_win, maxy, maxx);
-			ofy = 0;
-			wrap = ofx = 0;
+			ofy = ofx = 0;
+			wrap.clear();
 			reset_header();
 			print_text(0);
 			print_lines();
@@ -251,7 +252,8 @@ loop:
 			if (s[0] > 0 && s[0] < 32) // not a character
 				break;
 			if (x == maxx - 1) { // wrap line
-				ofx += (wrap = maxx - 1);
+				wrap.push_back(maxx - 1);
+				ofx += maxx - 1;
 				rx = ofx;
 				x = 0;
 				wmove(text_win, y, 0);

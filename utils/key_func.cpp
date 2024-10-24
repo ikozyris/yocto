@@ -6,10 +6,10 @@ void stats()
 	unsigned sumlen = 0;
 	for (auto &i : text)
 		sumlen += i.len;
-	//snprintf(_tmp, min(maxx, 256), "maxx %u len %u ofx %ld wrap %ld x: %u | y: %u     ",
-	//	maxx, it->len, ofx, wrap, x, y);
+	//snprintf(_tmp, min(maxx, 256), "maxx %u len %u ofx %ld wrap %u x: %u | y: %u     ",
+	//	maxx, it->len, ofx, !wrap.empty() ? wrap.back() : 0, x, y);
 	snprintf(_tmp, min(maxx, 256), "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
-	it->len, ry, x, sumlen, curnum, ofx);
+		it->len, ry, x, sumlen, curnum, ofx);
 	print2header(_tmp, 1);
 	free(_tmp);
 	wmove(text_win, y, x);
@@ -149,14 +149,14 @@ void eol()
 		// it->len - ofx - vis = maxx - 1 (mul by wrapped times)
 		unsigned bytes = dchar2bytes(it->len - ofx - vis, 0, *it);
 		// preliminary calculation of displayed characters in line
-		wrap = bytes - calc_offset_act(bytes, 0, *it);
+		wrap.push_back(bytes - calc_offset_act(bytes, 0, *it));
 		// tab was cut in wrapping, go back to print
-		if (at(*it, bytes - 1) == '\t' && maxx - wrap > 0) {
+		if (at(*it, bytes - 1) == '\t' && maxx - wrap.back() > 0) {
 			--bytes;
 			vis += 8;
 		}
 		print_line(*it, bytes, it->len);
-		ofx = it->len - vis + maxx - 1 - wrap;
+		ofx = it->len - vis + maxx - 1 - wrap.back();
 		//ofx = calc_offset_dis(maxx - 1, 0, *it) + maxx - 1;
 		//ofx += wrap;
 	}
@@ -165,7 +165,7 @@ void eol()
 void sol()
 {
 	wmove(text_win, y, 0);
-	if (wrap != 0) { // line has been wrapped
+	if (!wrap.empty()) { // line has been wrapped
 		wclrtoeol(text_win);
 		print_line(*it);
 #ifdef HIGHLIGHT
@@ -173,7 +173,8 @@ void sol()
 #endif
 		wmove(text_win, y, 0);
 	}
-	wrap = ofx = 0;
+	wrap.clear();
+	ofx = 0;
 }
 
 void scrolldown()
@@ -189,7 +190,8 @@ void scrolldown()
 	apply(y);
 #endif
 	wmove(text_win, y, 0);
-	wrap = ofx = 0;
+	wrap.clear();
+	ofx = 0;
 }
 
 void scrollup()
@@ -206,7 +208,8 @@ void scrollup()
 #endif
 	wmove(text_win, 0, x);
 	wrefresh(ln_win);
-	wrap = ofx = 0;
+	wrap.clear();
+	ofx = 0;
 }
 
 // TODO: is all this complexity needed?
@@ -215,9 +218,9 @@ void left()
 	if (x == 0 && ofx > 0) { // line has been wrapped
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		ofx -= wrap;
-		wrap = 0;
-		print_line(*it, ofx);
+		ofx -= wrap.back();
+		wrap.pop_back();
+		print_line(*it, x + ofx);
 #ifdef HIGHLIGHT
 		apply(y);
 #endif
@@ -233,7 +236,7 @@ void left()
 		if (it->buffer[it->gps - 1] < 0)
 			--ofx;
 	} else if (y > 0) { // x = 0
-		if (wrap != 0) // revert wrap
+		if (!wrap.empty()) // revert wrap
 			print_line(*it);
 		--it;
 		--y;
@@ -252,7 +255,8 @@ void right()
 wrap_line:
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-		ofx += (wrap += x);
+		ofx += x;
+		wrap.push_back(x);
 		print_line(*it, ofx);
 		wmove(text_win, y, 0);
 	} else {
@@ -264,11 +268,12 @@ right_key:
 					++ofx;
 			} else {
 				wmove(text_win, y, 0);
-				if (wrap != 0) // revert wrap
+				if (!wrap.empty()) // revert wrap
 					print_line(*it);
 				wmove(text_win, y + 1, 0);
 				++it;
-				wrap = ofx = 0;
+				wrap.clear();
+				ofx = 0;
 			}
 		} else if (ry == curnum && rx < it->len)
 			goto right_key;
