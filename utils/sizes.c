@@ -68,3 +68,20 @@ long calc_offset_act(unsigned pos, unsigned i, const gap_buf &buf)
 		get_off(x, i, buf);
 	return (long)i - (long)x;
 }
+
+// Go to end of previous word and return
+unsigned prevword(unsigned x, unsigned y)
+{
+	unsigned i = x;
+	// skip current word
+	while ((winch(text_win) & A_CHARTEXT) != ' ' && i > 0)
+		wmove(text_win, y, --i);
+	// go past any spaces
+	while ((winch(text_win) & A_CHARTEXT) == ' ' && i > 0)
+		wmove(text_win, y, --i);
+	if ((winch(text_win) & A_CHARTEXT) == ' ') {
+		return x - 1;
+	}
+	wmove(text_win, y, ++i);
+	return x - i - 1;
+}

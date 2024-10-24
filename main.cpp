@@ -77,9 +77,11 @@ loop:
 		rx = x + ofx;
 		mv_curs(*it, rx);
 
+#ifndef RELEASE
+		stats();
+#endif
 #ifdef DEBUG
 		print_text(y); // debug only
-		stats();
 		wmove(text_win, y, x);
 #endif
 	//goto stop;
