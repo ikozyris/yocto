@@ -17,13 +17,13 @@ unsigned lnbf_cpt; // linebuff capacity
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 struct gap_buf {
-	unsigned cpt; 	// allocated size (1-based)
-	unsigned len;	// length of line (1)
-	unsigned gps;	// gap start (first element of gap) (0-based)
-	unsigned gpe;	// gap end (last element of gap)    (0)
+	unsigned cpt; // allocated size (1-based)
+	unsigned len; // length of line (1)
+	unsigned gps; // gap start (first element of gap) (0-based)
+	unsigned gpe; // gap end (last element of gap)    (0)
 	char *buffer;
 
-	char &operator[](const unsigned pos) const {
+	char &operator[](unsigned pos) const {
 		return buffer[pos];
 	}
 
@@ -48,7 +48,7 @@ void init(gap_buf &a)
 	a.cpt = array_size;
 }
 
-void resize(gap_buf &a, const unsigned size)
+void resize(gap_buf &a, unsigned size)
 {
 	a.buffer = (char*)realloc(a.buffer, size);
 	if (a.gpe < a.cpt - 1) {
@@ -59,23 +59,22 @@ void resize(gap_buf &a, const unsigned size)
 	a.cpt = size;
 }
 
-void mv_curs(gap_buf &a, const unsigned pos)
+void mv_curs(gap_buf &a, unsigned pos)
 {
 	if (a.gps == a.gpe) [[unlikely]]
 		resize(a, a.cpt * 2);
-	const unsigned gpl = gaplen(a);
 	if (pos > a.gps) // move gap to right
-		memmove(a.buffer + a.gps, a.buffer + a.gps + gpl, pos - a.gps);
+		memmove(a.buffer + a.gps, a.buffer + a.gpe + 1, pos - a.gps);
 	else if (pos < a.gps) // move gap to left
-		memmove(a.buffer + pos + gpl, a.buffer + pos, a.gps - pos);
+		memmove(a.buffer + pos + gaplen(a), a.buffer + pos, a.gps - pos);
 	if (pos >= a.len)
 		a.gpe = a.cpt - 1;
 	else
-		a.gpe = pos + gpl - 1;
+		a.gpe += pos - a.gps;
 	a.gps = pos;
 }
 
-void insert_c(gap_buf &a, const unsigned pos, const char ch)
+void insert_c(gap_buf &a, unsigned pos, char ch)
 {
 	if (a.len == a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
@@ -89,7 +88,7 @@ void insert_c(gap_buf &a, const unsigned pos, const char ch)
 	++a.len;
 }
 
-void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
+void insert_s(gap_buf &a, unsigned pos, const char *str, unsigned len)
 {
 	// is this uneeded? (later it is also checked indirectly)
 	if (a.len + len >= a.cpt) [[unlikely]]
@@ -101,7 +100,7 @@ void insert_s(gap_buf &a, const unsigned pos, const char *str, unsigned len)
 	a.gps += len;
 }
 
-void apnd_c(gap_buf &a, const char ch)
+void apnd_c(gap_buf &a, char ch)
 {
 	if (a.len >= a.cpt) [[unlikely]]
 		resize(a, a.cpt * 2);
@@ -110,7 +109,7 @@ void apnd_c(gap_buf &a, const char ch)
 	++a.gps;
 }
 
-void apnd_s(gap_buf &a, const char *str, const unsigned size)
+void apnd_s(gap_buf &a, const char *str, unsigned size)
 {
 	if (a.len + size >= a.cpt) [[unlikely]]
 		resize(a, (a.cpt + size) * 2);

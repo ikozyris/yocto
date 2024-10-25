@@ -33,18 +33,18 @@ void command()
 		txt_cpt = curnum + 1;
                 text.resize(txt_cpt);
 		//shrink each line
-		size_t bytes_saved = 0;
+		size_t bytes_freed = 0;
 		for (auto &i : text)
-			bytes_saved += shrink(i);
+			bytes_freed += shrink(i);
 		char *bytes_saved_str = (char*)malloc(24);
-		hrsize(bytes_saved, bytes_saved_str, 24);
+		hrsize(bytes_freed, bytes_saved_str, 24);
 
 		size_t curr = memusg(); // RAM usage after
 		char *prev_curr_str = (char*)malloc(24);
 		hrsize((prev - curr) * 1000, prev_curr_str, 24);
 
 		char buffer[64] = "";
-		snprintf(buffer, 64, "saved: %s | %s", bytes_saved_str, prev_curr_str);
+		snprintf(buffer, 64, "freed: %s | kernel reclaimed %s", bytes_saved_str, prev_curr_str);
 		free(bytes_saved_str);
 		free(prev_curr_str);
 		clear_header();
@@ -230,7 +230,12 @@ void left()
 		wmove(text_win, y, maxx - 1);
 	} else if (x > 0) {
 		if (it->buffer[it->gps - 1] == '\t') {
-			ofx += prevword(x, y);
+			short i = x - 1;
+			wmove(text_win, y, i);
+			while ((winch(text_win) & A_CHARTEXT) == ' ' && x - i-- < 8)
+				wmove(text_win, y, i);
+			wmove(text_win, y, i + 1);
+			ofx += x - i - 2;
 			return;
 		}
 		wmove(text_win, y, x - 1);
