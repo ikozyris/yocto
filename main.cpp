@@ -97,11 +97,11 @@ loop:
 			++it;
 			wrap.clear();
 			ofx = 0; // invalidated
-			if (y == (maxy - 1) && ry < curnum)
+			if (y == maxy - 1 && ry < curnum)
 				scrolldown();
 			else {
-				wmove(text_win, y + 1, x);
-				ofx = calc_offset_dis(x, 0, *it);
+				ofx = calc_offset_dis(x, *it);
+				wmove(text_win, y + 1, x = rx);
 			}
 			break;
 
@@ -112,9 +112,9 @@ loop:
 			} if (y == 0 && ofy != 0)
 				scrollup();
 			else if (y != 0) {
-				wmove(text_win, y - 1, x);
-				--it; 
-				ofx = calc_offset_dis(x, 0, *it);
+				--it;
+				ofx = calc_offset_dis(x, *it);
+				wmove(text_win, y - 1, x = rx);
 			}
 			wrap.clear();
 			break;

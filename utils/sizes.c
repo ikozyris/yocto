@@ -42,13 +42,15 @@ inline void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
 	i++;
 }
 
-// offset until displayed x from from bytes in buf
-long calc_offset_dis(unsigned dx, unsigned from, const gap_buf &buf)
+// returns offset until displayed x from from bytes in buf (bytes - dx)
+// global rx becomes the dx where counting stopped at 
+long calc_offset_dis(unsigned dx, const gap_buf &buf)
 {
-	unsigned x = 0, i = from;
+	unsigned x = 0, i = 0;
 	while (x < dx && i < buf.len)
 		get_off(x, i, buf);
-	return (long)i - (long)from - (long)x;
+	rx = x;
+	return (long)i - (long)x;
 }
 
 // displayed characters dx to bytes
