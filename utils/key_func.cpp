@@ -143,25 +143,18 @@ void eol()
 	if (it->len - ofx <= maxx) // line fits in screen
 		wmove(text_win, y, it->len - ofx - 1);
 	else { // wrap line
+		unsigned bytes = 0;
+		while (bytes < it->len) {
+			unsigned nbytes = dchar2bytes(maxx - 1, bytes, *it) - bytes;
+			if (nbytes + bytes >= it->len)
+				break;
+			wrap.push_back(rx); // rx was changed
+			ofx += (long)wrap.back();
+			bytes += nbytes;
+		}
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
-
-		// estimation without accounting first tab in line
-		unsigned vis = (it->len - ofx) % (maxx - 1);
-		// get how many bytes leave 'vis' displayed characters to be printed
-		// it->len - ofx - vis = maxx - 1 (mul by wrapped times)
-		unsigned bytes = dchar2bytes(it->len - ofx - vis, 0, *it);
-		// preliminary calculation of displayed characters in line
-		wrap.push_back(bytes - calc_offset_act(bytes, 0, *it));
-		// tab was cut in wrapping, go back to print
-		if (at(*it, bytes - 1) == '\t' && maxx - wrap.back() > 0) {
-			--bytes;
-			vis += 8;
-		}
 		print_line(*it, bytes, it->len);
-		ofx = it->len - vis + maxx - 1 - wrap.back();
-		//ofx = calc_offset_dis(maxx - 1, 0, *it) + maxx - 1;
-		//ofx += wrap;
 	}
 }
 
