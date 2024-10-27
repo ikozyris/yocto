@@ -56,9 +56,17 @@ long calc_offset_dis(unsigned dx, const gap_buf &buf)
 // displayed characters dx to bytes
 unsigned dchar2bytes(unsigned dx, unsigned from, const gap_buf &buf)
 {
-	unsigned x = 0, i = from;
-	while (x < dx && i < buf.len)
-		get_off(x, i, buf);
+	unsigned x = 0, nx = 0, ni = from, i = from;
+	while (x < dx && i < buf.len) {
+		get_off(nx, ni, buf);
+		if (nx <= dx && ni <= buf.len) {
+			rx = x = nx;
+			i = ni;
+		} else {
+			rx--;
+			break;
+		}
+	}
 	return i;
 }
 
