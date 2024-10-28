@@ -245,9 +245,9 @@ loop:
 
 		// TODO: use real tab
 		case KEY_TAB:
-			winsnstr(text_win, "        ", 8);
-			wmove(text_win, y, x + 8);
-			insert_s(*it, x, "        ", 8);
+			winsnstr(text_win, "        ", 8 - x % 8);
+			wmove(text_win, y, x + 8 - x % 8);
+			insert_s(*it, x, "        ", 8 - x % 8);
 			break;
 
 		default:
@@ -260,9 +260,14 @@ loop:
 				x = 0;
 				wmove(text_win, y, 0);
 				wclrtoeol(text_win);
+			} if (at(*it, rx) == '\t') {
+				waddnwstr(text_win, s, 1);
+				if (x % 8 >= 7)
+					winsch(text_win, '\t');
+			} else {
+				wins_nwstr(text_win, s, 1);
+				wmove(text_win, y, x + 1);
 			}
-			wins_nwstr(text_win, s, 1);
-			wmove(text_win, y, x + 1);
 			len = wcstombs(s2, s, 4);
 			insert_s(*it, rx, s2, len);
 			if (len > 1)
