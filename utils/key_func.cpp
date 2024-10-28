@@ -7,11 +7,11 @@ void stats()
 	for (auto &i : text)
 		sumlen += i.len;
 #ifndef RELEASE
-	snprintf(_tmp, min(maxx, 256), "maxx %u len %u ofx %ld wrap %u x: %u | y: %u     ",
-		maxx, it->len, ofx, !wrap.empty() ? wrap.back() : 0, x, y);
+	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u ofx %ld wrap %u x: %u y: %u     ",
+		maxx, it->len, it->cpt, ofx, !wrap.empty() ? wrap.back() : 0, x, y);
 #else	
-	snprintf(_tmp, min(maxx, 256), "length %u y %u x %u sum len %u lines %lu ofx %ld  ", 
-		it->len, ry, x, sumlen, curnum, ofx);
+	snprintf(_tmp, min(maxx, 256), "length %u cpt %u y %u x %u sum len %u lines %lu wrap %lu  ", 
+		it->len, it->cpt, ry, x, sumlen, curnum, wrap.size());
 #endif
 	print2header(_tmp, 1);
 	free(_tmp);
@@ -107,7 +107,6 @@ void command()
 void enter()
 {
 	insert_c(*it, rx, '\n');
-
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
 	if (it->gpe < it->cpt - 2) { // newline is not at the end
@@ -117,8 +116,6 @@ void enter()
 		it->len = rx + 1;
 		it->gpe = it->cpt - 1;
 	}
-
-	// somewhere below iterator is invalidated
 	++it;
 	++curnum;
 	text.insert(it, *t);
