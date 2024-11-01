@@ -58,7 +58,6 @@ read:
 		}
 
 		eligible = isc(argv[1]); // syntax highlighting
-		//read_fgets(fi);
 		read_fread(fi);
 		print_text(0);
 		fclose(fi);
@@ -71,8 +70,8 @@ loop:
 		getyx(text_win, y, x);
 		ry = y + ofy;
 		// if out of bounds: move (to avoid bugs) & TODO: simplify
-		if (x >= min(ry < curnum ? (it->len - 1 - ofx) : (it->len - ofx), maxx))
-			wmove(text_win, y, min((ry != curnum ? it->len - ofx - 1 : it->len - ofx), maxx));
+		if (x >= min(it->len - 1 - ofx, maxx))
+			wmove(text_win, y, min(it->len - ofx - 1, maxx));
 		getyx(text_win, y, x);
 		rx = x + ofx;
 		mv_curs(*it, rx);
@@ -101,7 +100,7 @@ loop:
 				scrolldown();
 			else {
 				ofx = calc_offset_dis(x, *it);
-				wmove(text_win, y + 1, x = rx);
+				wmove(text_win, y + 1, x = flag);
 			}
 			break;
 
@@ -114,7 +113,7 @@ loop:
 			else if (y != 0) {
 				--it;
 				ofx = calc_offset_dis(x, *it);
-				wmove(text_win, y - 1, x = rx);
+				wmove(text_win, y - 1, x = flag);
 			}
 			wrap.clear();
 			break;
@@ -255,11 +254,12 @@ loop:
 				break;
 			if (x == maxx - 1) { // wrap line
 				wrap.push_back(maxx - 1);
-				ofx += maxx - 1;
-				rx = ofx;
-				x = 0;
-				wmove(text_win, y, 0);
+				rx = ofx += maxx - 1;
+				wmove(text_win, y, x = 0);
 				wclrtoeol(text_win);
+				wmove(text_win, y, 1);
+				print_line(*it, ofx);
+				wmove(text_win, y, 0);
 			} if (at(*it, rx) == '\t') {
 				waddnwstr(text_win, s, 1);
 				if (x % 8 >= 7)

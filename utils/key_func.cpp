@@ -7,8 +7,8 @@ void stats()
 	for (auto &i : text)
 		sumlen += i.len;
 #ifndef RELEASE
-	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u ofx %ld wrap %u rx: %u ry: %u     ",
-		maxx, it->len, it->cpt, ofx, !wrap.empty() ? wrap.back() : 0, rx, ry);
+	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u wrap %u x: %u ofx: %ld ry: %u     ",
+		maxx, it->len, it->cpt, !wrap.empty() ? wrap.back() : 0, x, ofx, ry);
 #else	
 	snprintf(_tmp, min(maxx, 256), "length %u cpt %u y %u x %u sum len %u lines %lu wrap %lu  ", 
 		it->len, it->cpt, ry, x, sumlen, curnum, wrap.size());
@@ -145,7 +145,7 @@ void eol()
 			unsigned nbytes = dchar2bytes(maxx - 1, bytes, *it) - bytes;
 			if (nbytes + bytes >= it->len)
 				break;
-			wrap.push_back(rx); // rx was changed
+			wrap.push_back(flag); // flag was changed by dchar2bytes
 			ofx += (long)wrap.back();
 			bytes += nbytes;
 		}
