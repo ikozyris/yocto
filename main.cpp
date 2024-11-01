@@ -127,7 +127,7 @@ loop:
 			break;
 
 		case RIGHT:
-			if (y == maxy - 1 && rx == it->len - 1) {
+			if (y == maxy - 1 && ry < curnum && rx == it->len - 1) {
 				++it;
 				scrolldown();
 			} else

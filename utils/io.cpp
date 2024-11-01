@@ -42,7 +42,15 @@ unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 		return 0;
 	if (to == 0) {
 		unsigned prop = dchar2bytes(maxx - 1, from, buffer);
-		to = min(buffer.len, prop);
+		if (prop < buffer.len - 1) {
+			to = prop;
+			cchar_t tmp;
+			setcchar(&tmp, L">", A_STANDOUT, COLOR_BLACK, nullptr);
+			mvwins_wch(text_win, getcury(text_win), maxx - 1, &tmp);
+			wmove(text_win, getcury(text_win), 0);
+		} else
+			to = buffer.len;
+			
 	}
 	unsigned rlen = data(buffer, from, to);
 	if (lnbuf[rlen - 1] == '\n' || lnbuf[rlen - 1] == '\t')

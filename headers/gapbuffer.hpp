@@ -13,8 +13,9 @@ unsigned lnbf_cpt; // linebuff capacity
 #define gaplen(a) ((a).gpe - (a).gps + 1)
 #define ingap(a, pos) (((pos) >= (a).gps && (pos) <= (a).gpe) ? true : false)
 #define mveras(a, pos) (mv_curs(a, pos), eras(a))
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
+
+unsigned min(unsigned a, unsigned b) {return a < b ? a : b;}
+unsigned max(unsigned a, unsigned b) {return a > b ? a : b;}
 
 struct gap_buf {
 	unsigned cpt; // allocated size (1-based)
