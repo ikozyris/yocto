@@ -90,8 +90,7 @@ loop:
 			if (ry >= curnum) // do not scroll indefinetly
 				break;
 			if (!wrap.empty()) { // revert wrap
-				wmove(text_win, y, 0);
-				print_line(*it);
+				mvprint_line(y, 0, *it, 0, 0);
 			}
 			++it;
 			wrap.clear();
@@ -106,8 +105,7 @@ loop:
 
 		case UP:
 			if (!wrap.empty()) { // revert wrap
-				wmove(text_win, y, 0);
-				print_line(*it);
+				mvprint_line(y, 0, *it, 0, 0);
 			} if (y == 0 && ofy != 0)
 				scrollup();
 			else if (y != 0) {
@@ -255,11 +253,9 @@ loop:
 			if (x == maxx - 1) { // wrap line
 				wrap.push_back(maxx - 1);
 				rx = ofx += maxx - 1;
+				clrln;
+				mvprint_line(y, 1, *it, ofx, 0);
 				wmove(text_win, y, x = 0);
-				wclrtoeol(text_win);
-				wmove(text_win, y, 1);
-				print_line(*it, ofx);
-				wmove(text_win, y, 0);
 			} if (at(*it, rx) == '\t') {
 				waddnwstr(text_win, s, 1);
 				if (x % 8 >= 7)

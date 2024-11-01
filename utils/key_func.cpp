@@ -127,8 +127,7 @@ void enter()
 	else {
 		wscrl(text_win, 1);
 		++ofy;
-		wmove(text_win, maxy - 1, 0);
-		print_line(*it);
+		mvprint_line(maxy - 1, 0, *it, 0, 0);
 		wmove(text_win, maxy - 1, x);
 	}
 	ofx = 0;
@@ -149,25 +148,22 @@ void eol()
 			ofx += (long)wrap.back();
 			bytes += nbytes;
 		}
-		wmove(text_win, y, 0);
-		wclrtoeol(text_win);
+		clrln;
 		print_line(*it, bytes, it->len);
 	}
 }
 
 void sol()
 {
-	wmove(text_win, y, 0);
 	if (!wrap.empty()) { // line has been wrapped
-		wclrtoeol(text_win);
+		clrln;
 		print_line(*it);
 #ifdef HIGHLIGHT
 		apply(y);
 #endif
-		wmove(text_win, y, 0);
 	}
 	wrap.clear();
-	ofx = 0;
+	wmove(text_win, y, ofx = 0);
 }
 
 void scrolldown()
@@ -177,8 +173,7 @@ void scrolldown()
 	wscrl(ln_win, 1);
 	mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
 	wrefresh(ln_win);
-	wmove(text_win, y, 0);
-	print_line(*it);
+	mvprint_line(y, 0, *it, 0, 0);
 #ifdef HIGHLIGHT
 	apply(y);
 #endif
@@ -193,9 +188,8 @@ void scrollup()
 	wscrl(ln_win, -1);
 	mvwprintw(ln_win, 0, 0, "%3u", ry);
 	--ofy;
-	wmove(text_win, 0, 0);
 	--it;
-	print_line(*it);
+	mvprint_line(0, 0, *it, 0, 0);
 #ifdef HIGHLIGHT
 	apply(y);
 #endif
@@ -209,8 +203,7 @@ void scrollup()
 void left()
 {
 	if (x == 0 && !wrap.empty()) { // line has been wrapped
-		wmove(text_win, y, 0);
-		wclrtoeol(text_win);
+		clrln;
 		ofx -= wrap.back();
 		wrap.pop_back();
 		print_line(*it, ofx < 0 ? 0 : ofx);
@@ -243,17 +236,15 @@ void left()
 void right()
 {
 	if (rx >= it->len - 1 && ry < curnum) { // go to next line
-		wmove(text_win, y, 0);
 		if (!wrap.empty()) // revert wrap
-			print_line(*it);
+			mvprint_line(y, 0, *it, 0, 0);
 		wmove(text_win, y + 1, 0);
 		++it;
 		wrap.clear();
 		ofx = 0;
 	} else if (x == maxx - 1) { // right to cut part of line
 wrap_line:
-		wmove(text_win, y, 0);
-		wclrtoeol(text_win);
+		clrln;
 		ofx += x;
 		wrap.push_back(x);
 		print_line(*it, ofx);
