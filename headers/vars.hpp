@@ -11,13 +11,13 @@ std::list<gap_buf> text(DEFAULT_LINES);
 std::list<gap_buf>::iterator it;
 
 WINDOW *header_win, *ln_win, *text_win;
-wchar_t s[6];
-char s2[6];
+wchar_t s[4];
+char s2[4];
+unsigned flag;
 unsigned short y, x, len;
 long ofy; // offset in y axis of text and screen, x axis is in gapbuffer
 std::deque<unsigned> wrap; // wrapped dchars TODO: make this a stack?
 unsigned ry, rx; // x, y positions in buffer/list
-unsigned buf_indx, printed, previndx, ppi;
 unsigned maxy, maxx; // to store the maximum rows and columns
 int ch;
 char *filename;
