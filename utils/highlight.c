@@ -87,9 +87,8 @@ void apply(unsigned line)
 		return;
 	wmove(text_win, line, 0);
 	winwstr(text_win, tmp);
-	unsigned len2 = wcstombs(str, tmp, 256);
+	unsigned len2 = wcstombs(str, tmp, min(256, maxx - 2));
 	unsigned previ = 0;
-	len2 = min(len2, maxx);
 
 	for (unsigned i = 0; i < len2; ++i) {
 		if (str[i] == '#') { // define / include

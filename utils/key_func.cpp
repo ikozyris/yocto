@@ -7,8 +7,8 @@ void stats()
 	for (auto &i : text)
 		sumlen += i.len;
 #ifndef RELEASE
-	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u ofx %ld wrap %u x: %u y: %u     ",
-		maxx, it->len, it->cpt, ofx, !wrap.empty() ? wrap.back() : 0, x, y);
+	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u ofx %ld wrap %u rx: %u ry: %u     ",
+		maxx, it->len, it->cpt, ofx, !wrap.empty() ? wrap.back() : 0, rx, ry);
 #else	
 	snprintf(_tmp, min(maxx, 256), "length %u cpt %u y %u x %u sum len %u lines %lu wrap %lu  ", 
 		it->len, it->cpt, ry, x, sumlen, curnum, wrap.size());
@@ -208,12 +208,12 @@ void scrollup()
 // TODO: is all this complexity needed?
 void left()
 {
-	if (x == 0 && ofx > 0) { // line has been wrapped
+	if (x == 0 && !wrap.empty()) { // line has been wrapped
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
 		ofx -= wrap.back();
 		wrap.pop_back();
-		print_line(*it, x + ofx);
+		print_line(*it, ofx < 0 ? 0 : ofx);
 #ifdef HIGHLIGHT
 		apply(y);
 #endif
@@ -242,12 +242,15 @@ void left()
 
 void right()
 {
-	if (it->buffer[it->gpe + 1] == '\t') {
-		if (x >= maxx - 7)
-			goto wrap_line;
-		ofx -= 8 - x % 8 - 1;
-		wmove(text_win, y, x + 8 - x % 8);
-	} else if (x == maxx - 1 && rx < it->len - 1) {
+	if (rx >= it->len - 1 && ry < curnum) { // go to next line
+		wmove(text_win, y, 0);
+		if (!wrap.empty()) // revert wrap
+			print_line(*it);
+		wmove(text_win, y + 1, 0);
+		++it;
+		wrap.clear();
+		ofx = 0;
+	} else if (x == maxx - 1) { // right to cut part of line
 wrap_line:
 		wmove(text_win, y, 0);
 		wclrtoeol(text_win);
@@ -255,23 +258,14 @@ wrap_line:
 		wrap.push_back(x);
 		print_line(*it, ofx);
 		wmove(text_win, y, 0);
-	} else {
-		if (ry < curnum) {
-			if (rx < it->len - 1) {
-right_key:
-				wmove(text_win, y, x + 1);
-				if (it->buffer[it->gpe + 1] < 0)
-					++ofx;
-			} else {
-				wmove(text_win, y, 0);
-				if (!wrap.empty()) // revert wrap
-					print_line(*it);
-				wmove(text_win, y + 1, 0);
-				++it;
-				wrap.clear();
-				ofx = 0;
-			}
-		} else if (ry == curnum && rx < it->len)
-			goto right_key;
-	}	
+	} else { // go right
+		wmove(text_win, y, x + 1);
+		if (it->buffer[it->gpe + 1] == '\t') {
+			if (x >= maxx - 7)
+				goto wrap_line;
+			ofx -= 8 - x % 8 - 1;
+			wmove(text_win, y, x + 8 - x % 8);
+		} else if (it->buffer[it->gpe + 1] < 0)
+			++ofx;
+	}		
 }
