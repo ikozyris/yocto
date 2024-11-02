@@ -35,7 +35,7 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-#define clrln (wmove(text_win, y, 0), wclrtoeol(text_win))
+#define clearline (wmove(text_win, y, 0), wclrtoeol(text_win))
 #define mvprint_line(y, x, buffer, from, to) (wmove(text_win, y,x), print_line(buffer, from, to))
 
 // prints substring of buffer, if (to == 0) print until maxx
@@ -71,9 +71,7 @@ void print_text(unsigned line)
 	wmove(text_win, line, 0);
 	for (unsigned ty = line; ty < min(curnum + ofy + 1, maxy) && iter != text.end(); ++iter) {
 		mvprint_line(ty++, 0, *iter, 0, 0);
-#ifdef HIGHLIGHT
-		apply(ty);
-#endif
+		highlight;
 	}
 }
 

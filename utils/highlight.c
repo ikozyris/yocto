@@ -1,5 +1,6 @@
 #include "init.c"
 
+#define highlight {if (HIGHLIGHT) apply(y);}
 bool eligible;
 
 bool isc(const char *str)
