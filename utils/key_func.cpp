@@ -148,7 +148,7 @@ void eol()
 			ofx += (long)wrap.back();
 			bytes += nbytes;
 		}
-		clrln;
+		clearline;
 		print_line(*it, bytes, it->len);
 	}
 }
@@ -156,11 +156,9 @@ void eol()
 void sol()
 {
 	if (!wrap.empty()) { // line has been wrapped
-		clrln;
+		clearline;
 		print_line(*it);
-#ifdef HIGHLIGHT
-		apply(y);
-#endif
+		highlight;
 	}
 	wrap.clear();
 	wmove(text_win, y, ofx = 0);
@@ -174,9 +172,7 @@ void scrolldown()
 	mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
 	wrefresh(ln_win);
 	mvprint_line(y, 0, *it, 0, 0);
-#ifdef HIGHLIGHT
-	apply(y);
-#endif
+	highlight;
 	wmove(text_win, y, 0);
 	wrap.clear();
 	ofx = 0;
@@ -190,9 +186,7 @@ void scrollup()
 	--ofy;
 	--it;
 	mvprint_line(0, 0, *it, 0, 0);
-#ifdef HIGHLIGHT
-	apply(y);
-#endif
+	highlight;
 	wmove(text_win, 0, x);
 	wrefresh(ln_win);
 	wrap.clear();
@@ -203,13 +197,11 @@ void scrollup()
 void left()
 {
 	if (x == 0 && !wrap.empty()) { // line has been wrapped
-		clrln;
+		clearline;
 		ofx -= wrap.back();
 		wrap.pop_back();
 		print_line(*it, ofx < 0 ? 0 : ofx);
-#ifdef HIGHLIGHT
-		apply(y);
-#endif
+		highlight;
 		wmove(text_win, y, maxx - 1);
 	} else if (x > 0) {
 		if (it->buffer[it->gps - 1] == '\t') {
@@ -244,7 +236,7 @@ void right()
 		ofx = 0;
 	} else if (x == maxx - 1) { // right to cut part of line
 wrap_line:
-		clrln;
+		clearline;
 		ofx += x;
 		wrap.push_back(x);
 		print_line(*it, ofx);

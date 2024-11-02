@@ -73,8 +73,7 @@ loop:
 		ry = y + ofy;
 		// if out of bounds: move (to avoid bugs) & TODO: simplify
 		if (x >= min(it->len - 1 - ofx, maxx))
-			wmove(text_win, y, min(it->len - ofx - 1, maxx));
-		getyx(text_win, y, x);
+			wmove(text_win, y, x = min(it->len - ofx - 1, maxx));
 		rx = x + ofx;
 		mv_curs(*it, rx);
 
@@ -82,7 +81,7 @@ loop:
 		stats();
 #endif
 #ifdef DEBUG
-		print_text(y); // debug only
+		print_text(y);
 		wmove(text_win, y, x);
 #endif
 	//goto stop;
@@ -257,7 +256,7 @@ loop:
 			if (x == maxx - 1) { // wrap line
 				wrap.push_back(maxx - 1);
 				rx = ofx += maxx - 1;
-				clrln;
+				clearline;
 				mvprint_line(y, 1, *it, ofx, 0);
 				wmove(text_win, y, x = 0);
 			} if (at(*it, rx) == '\t') {
