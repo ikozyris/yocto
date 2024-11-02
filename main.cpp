@@ -143,17 +143,17 @@ loop:
 				} else
 					mvwdelch(text_win, y, x - 1);
 			} else if (y != 0) { // x = 0; merge lines
-				std::list<gap_buf>::iterator tmpi = it;
+				std::list<gap_buf>::iterator curln = it;
 				--it;
 				mv_curs(*it, it->len); // delete \n
-				eras(*it);
-				unsigned temp = tmpi->len;
-				data(*tmpi, 0, temp);
-				apnd_s(*it, lnbuf, temp); // merge
-				text.erase(tmpi); // delete actual line
+				it->gpe = it->cpt - 1;
+				unsigned tmp = --(it->len);
+				data(*curln, 0, curln->len);
+				apnd_s(*it, lnbuf, curln->len); // merge
+				text.erase(curln); // delete actual line
 				--curnum;
 				print_text(y - 1);
-				wmove(text_win, y - 1, it->len - temp);
+				wmove(text_win, y - 1, tmp);
 			}
 			break;
 
@@ -162,7 +162,7 @@ loop:
 				break;
 			if (it->buffer[it->gpe + 1u] == '\n') { // similar to backspace
 				std::list<gap_buf>::iterator curln = it; // current line
-				curln->gpe = curln->cpt; // delete newline
+				curln->gpe = curln->cpt - 1; // delete newline
 				curln->len--;
 				++it; // next line
 				data(*it, 0, it->len);
