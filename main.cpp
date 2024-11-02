@@ -152,7 +152,7 @@ loop:
 				apnd_s(*it, lnbuf, temp); // merge
 				text.erase(tmpi); // delete actual line
 				--curnum;
-				print_text(y - 1u);
+				print_text(y - 1);
 				wmove(text_win, y - 1, it->len - temp);
 			}
 			break;
@@ -161,17 +161,17 @@ loop:
 			if (rx + 1u > it->len)
 				break;
 			if (it->buffer[it->gpe + 1u] == '\n') { // similar to backspace
-				std::list<gap_buf>::iterator tmpi = it;
-				it->gpe = it->cpt; // delete newline
-				unsigned temp = it->len--;
-				++it;
-				data(*it, 0u, it->len);
-				apnd_s(*tmpi, lnbuf, temp + 1u);
+				std::list<gap_buf>::iterator curln = it; // current line
+				curln->gpe = curln->cpt; // delete newline
+				curln->len--;
+				++it; // next line
+				data(*it, 0, it->len);
+				apnd_s(*curln, lnbuf, it->len);
 				text.erase(it);
-				it = tmpi;
+				it = curln;
 				--curnum;
 				print_text(y);
-				wmove(text_win, y, it->len - temp - 1u);
+				wmove(text_win, y, x);
 			} else {
 				wdelch(text_win);
 				// or mblen(it->buffer + it->gpe + 1, 3);
