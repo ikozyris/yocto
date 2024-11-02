@@ -174,8 +174,10 @@ loop:
 				wmove(text_win, y, it->len - temp - 1u);
 			} else {
 				wdelch(text_win);
-				mv_curs(*it, rx + 1u);
-				mveras(*it, rx + 1u);
+				// or mblen(it->buffer + it->gpe + 1, 3);
+				unsigned len = it->buffer[it->gpe + 1] < 0 ? 2 : 1;
+				mveras(*it, rx + len);
+				ofx += len - 1;
 			}
 			break;
 
