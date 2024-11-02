@@ -56,9 +56,11 @@ read:
 			print2header("New file", 1);
 			goto loop;
 		}
-
 		eligible = isc(argv[1]); // syntax highlighting
 		read_fread(fi);
+		// all functions think there is a newline at EOL, emulate it
+		if (at(*it, it->len) != '\n')
+			apnd_c(*it, 0);
 		print_text(0);
 		fclose(fi);
 	}
