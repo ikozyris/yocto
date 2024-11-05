@@ -224,17 +224,18 @@ loop:
 
 		case KEY_RESIZE:
 		case REFRESH:
+			endwin();
+			getmaxyx(stdscr, maxy, maxx);
+			init_header();
+			init_lines();
+			init_text();
 			getmaxyx(text_win, maxy, maxx);
-			ofy = ofx = 0;
-			wrap.clear();
-			reset_header();
-			print_text(0);
-			print_lines();
-			wnoutrefresh(text_win);
 			wnoutrefresh(ln_win);
 			wnoutrefresh(header_win);
 			doupdate();
-			getmaxyx(text_win, maxy, maxx);
+			print_text(0);
+			ofy = ofx = 0;
+			wrap.clear();
 			wmove(text_win, 0, 0);
 			it = text.begin();
 			break;
