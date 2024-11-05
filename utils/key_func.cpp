@@ -112,8 +112,7 @@ void enter()
 	if (it->gpe < it->cpt - 2) { // newline is not at the end
 		data(*it, rx + 1, it->len + 1);
 		apnd_s(*t, lnbuf, it->len - rx - 1);
-		it->gps = rx + 1;
-		it->len = rx + 1;
+		it->len = it->gps = rx + 1;
 		it->gpe = it->cpt - 1;
 	}
 	++it;
@@ -142,11 +141,13 @@ void eol()
 		unsigned bytes = 0;
 		while (bytes < it->len) {
 			unsigned nbytes = dchar2bytes(maxx - 1, bytes, *it) - bytes;
-			if (nbytes + bytes >= it->len)
+			if (nbytes + bytes >= it->len - 1)
 				break;
 			wrap.push_back(flag); // flag was changed by dchar2bytes
 			ofx += (long)wrap.back();
 			bytes += nbytes;
+			if (at(*it, bytes) == '\t' && wrap.back() == maxx - 1)
+				ofx--; // TODO: is there a better way?
 		}
 		clearline;
 		print_line(*it, bytes, it->len);

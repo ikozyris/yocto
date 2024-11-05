@@ -58,15 +58,14 @@ read:
 		}
 		eligible = isc(argv[1]); // syntax highlighting
 		read_fread(fi);
-		// all functions think there is a newline at EOL, emulate it
-		if (at(*it, it->len) != '\n')
-			apnd_c(*it, 0);
 		print_text(0);
 		fclose(fi);
 	}
 	wmove(text_win, 0, 0);
-
 	it = text.begin();
+	// all functions think there is a newline at EOL, emulate it
+	if (at(*it, it->len) != '\n')
+		apnd_c(*it, 0);
 loop:
 	while (1) {
 		getyx(text_win, y, x);
