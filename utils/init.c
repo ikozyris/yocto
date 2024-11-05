@@ -1,6 +1,6 @@
 #include "sizes.c"
 
-#define name "yocto 0.8-rc1"
+#define name "yocto 0.8-rc2"
 
 void init_curses()
 {
