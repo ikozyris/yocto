@@ -78,3 +78,14 @@ long calc_offset_act(unsigned pos, unsigned i, const gap_buf &buf)
 		get_off(x, i, buf);
 	return (long)i - (long)x;
 }
+
+// currently on a tab; go to previous char (non-whitespace), requires cursor = x - 1
+unsigned prevdchar()
+{
+	short i = x - 1;
+	while ((winch(text_win) & A_CHARTEXT) == ' ' && x - i-- < 8)
+		wmove(text_win, y, i);
+	wmove(text_win, y, i + 1);
+	ofx += x - i - 2;
+	return x - i;
+}

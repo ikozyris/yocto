@@ -195,7 +195,6 @@ void scrollup()
 	ofx = 0;
 }
 
-// TODO: is all this complexity needed?
 void left()
 {
 	if (x == 0 && !wrap.empty()) { // line has been wrapped
@@ -206,21 +205,13 @@ void left()
 		highlight;
 		wmove(text_win, y, maxx - 1);
 	} else if (x > 0) {
-		if (it->buffer[it->gps - 1] == '\t') {
-			short i = x - 1;
-			wmove(text_win, y, i);
-			while ((winch(text_win) & A_CHARTEXT) == ' ' && x - i-- < 8)
-				wmove(text_win, y, i);
-			wmove(text_win, y, i + 1);
-			ofx += x - i - 2;
-			return;
-		}
 		wmove(text_win, y, x - 1);
-		if (it->buffer[it->gps - 1] < 0)
+		// handle special characters causing offsets
+		if (it->buffer[it->gps - 1] == '\t')
+			prevdchar();
+		else if (it->buffer[it->gps - 1] < 0)
 			--ofx;
 	} else if (y > 0) { // x = 0
-		if (!wrap.empty()) // revert wrap
-			print_line(*it);
 		--it;
 		--y;
 		eol();
