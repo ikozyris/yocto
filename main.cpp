@@ -135,11 +135,13 @@ loop:
 			if (x != 0) {
 				eras(*it);
 				if (it->buffer[it->gps] == '\t') {
+					wmove(text_win, y, x - 1);
+					ofx += prevdchar();
+					x = getcurx(text_win);
 					wmove(text_win, y, 0);
 					print_line(*it);
 					wclrtoeol(text_win);
-					wmove(text_win, y, x - 8u);
-					ofx += 7;
+					wmove(text_win, y, x);
 				} else
 					mvwdelch(text_win, y, x - 1);
 			} else if (y != 0) { // x = 0; merge lines
