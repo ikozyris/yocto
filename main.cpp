@@ -71,7 +71,7 @@ loop:
 		getyx(text_win, y, x);
 		ry = y + ofy;
 		// if out of bounds: move (to avoid bugs) & TODO: simplify
-		if (x >= min(it->len - 1 - ofx, maxx))
+		if (x > min(it->len - 1 - ofx, maxx))
 			wmove(text_win, y, x = min(it->len - ofx - 1, maxx));
 		rx = x + ofx;
 		mv_curs(*it, rx);
@@ -243,11 +243,11 @@ loop:
 		case EXIT:
 			goto stop;
 
-		// TODO: use real tab
 		case KEY_TAB:
 			winsnstr(text_win, "        ", 8 - x % 8);
 			wmove(text_win, y, x + 8 - x % 8);
-			insert_s(*it, x, "        ", 8 - x % 8);
+			//insert_s(*it, rx, "        ", 8 - x % 8);
+			insert_c(*it, rx, '\t');
 			break;
 
 		default:
