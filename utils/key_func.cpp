@@ -137,7 +137,7 @@ void eol()
 	ofx = calc_offset_act(it->len, 0, *it);
 	if (it->len - ofx <= maxx) // line fits in screen
 		wmove(text_win, y, it->len - ofx - 1);
-	else { // wrap line
+	else { // cut line
 		unsigned bytes = 0;
 		while (bytes < it->len) {
 			unsigned nbytes = dchar2bytes(maxx - 1, bytes, *it) - bytes;
@@ -146,11 +146,12 @@ void eol()
 			wrap.push_back(flag); // flag was changed by dchar2bytes
 			ofx += (long)wrap.back();
 			bytes += nbytes;
-			if (at(*it, bytes) == '\t' && wrap.back() == maxx - 1)
-				ofx--; // TODO: is there a better way?
 		}
 		clearline;
 		print_line(*it, bytes, it->len);
+		x = getcurx(text_win);
+		if (x + ofx > it->len - 1)
+			ofx -= x + ofx - it->len + 1;
 	}
 }
 
