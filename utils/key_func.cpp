@@ -143,7 +143,7 @@ void eol()
 			unsigned nbytes = dchar2bytes(maxx - 1, bytes, *it) - bytes;
 			if (nbytes + bytes >= it->len - 1)
 				break;
-			wrap.push_back(flag); // flag was changed by dchar2bytes
+			wrap.push_back(flag +  1); // flag was changed by dchar2bytes
 			ofx += (long)wrap.back();
 			bytes += nbytes;
 		}
@@ -203,7 +203,7 @@ void left()
 		wrap.pop_back();
 		print_line(*it, ofx < 0 ? 0 : ofx);
 		highlight;
-		wmove(text_win, y, maxx - 1);
+		wmove(text_win, y, flag + 1);
 	} else if (x > 0) {
 		wmove(text_win, y, x - 1);
 		// handle special characters causing offsets
