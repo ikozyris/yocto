@@ -89,9 +89,8 @@ loop:
 		case DOWN:
 			if (ry >= curnum) // do not scroll indefinetly
 				break;
-			if (!wrap.empty()) { // revert wrap
+			if (!wrap.empty()) // revert wrap
 				mvprint_line(y, 0, *it, 0, 0);
-			}
 			++it;
 			wrap.clear();
 			ofx = 0; // invalidated
@@ -104,14 +103,14 @@ loop:
 			break;
 
 		case UP:
-			if (!wrap.empty()) { // revert wrap
+			if (!wrap.empty()) // revert wrap
 				mvprint_line(y, 0, *it, 0, 0);
-			} if (y == 0 && ofy != 0)
+			if (y == 0 && ofy != 0)
 				scrollup();
 			else if (y != 0) {
 				--it;
 				ofx = calc_offset_dis(x, *it);
-				wmove(text_win, y - 1, x = flag);
+				wmove(text_win, y - 1, flag);
 			}
 			wrap.clear();
 			break;

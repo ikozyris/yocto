@@ -13,7 +13,7 @@ std::list<gap_buf>::iterator it;
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[4];
 char s2[4];
-unsigned flag;
+unsigned flag; // actual x processed by offset funcs in size.c
 unsigned short y, x, len;
 long ofy; // offset in y axis of text and screen, x axis is in gapbuffer
 std::deque<unsigned> wrap; // wrapped dchars TODO: make this a stack?

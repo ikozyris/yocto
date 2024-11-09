@@ -53,7 +53,6 @@ unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 			wmove(text_win, getcury(text_win), 0);
 		} else
 			to = buffer.len;
-			
 	}
 	unsigned rlen = data(buffer, from, to);
 	if (lnbuf[rlen - 1] == '\n' || lnbuf[rlen - 1] == '\t')
