@@ -8,14 +8,14 @@
 #endif
 unsigned txt_cpt = DEFAULT_LINES; // alloc'ed nodes
 
-std::list<gap_buf> text(DEFAULT_LINES);
-std::list<gap_buf>::iterator it;
+list<gap_buf> text(DEFAULT_LINES);
+list<gap_buf>::iterator it;
 
 // displayed characters of previous wrap (or cut|slice of line)
 #define dchar first
 // bytes printed in current wrap
 #define byte second
-std::deque<std::pair<unsigned, unsigned>> wrap;
+deque<pair<unsigned, unsigned>> wrap;
 
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[4];

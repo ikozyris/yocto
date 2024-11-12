@@ -63,7 +63,7 @@ void resize(gap_buf &a, unsigned size)
 void mv_curs(gap_buf &a, unsigned pos)
 {
 	if (a.gps == a.gpe) [[unlikely]]
-		resize(a, std::__bit_ceil(a.cpt));
+		resize(a, __bit_ceil(a.cpt));
 	if (pos > a.gps) // move gap to right
 		memmove(a.buffer + a.gps, a.buffer + a.gpe + 1, pos - a.gps);
 	else if (pos < a.gps) // move gap to left
@@ -78,7 +78,7 @@ void mv_curs(gap_buf &a, unsigned pos)
 void insert_c(gap_buf &a, unsigned pos, char ch)
 {
 	if (a.len == a.cpt) [[unlikely]]
-		resize(a, std::__bit_ceil(a.cpt));
+		resize(a, __bit_ceil(a.cpt));
 	if (ingap(a, pos)) { [[likely]]
 		a[pos] = ch;
 		++a.gps;
@@ -93,7 +93,7 @@ void insert_s(gap_buf &a, unsigned pos, const char *str, unsigned len)
 {
 	// is this uneeded? (later it is also checked indirectly)
 	if (a.len + len >= a.cpt) [[unlikely]]
-		resize(a, std::__bit_ceil(a.len + len + 2));
+		resize(a, __bit_ceil(a.len + len + 2));
 	if (gaplen(a) <= len)
 		mv_curs(a, pos);
 	memcpy(a.buffer + pos, str, len);
@@ -104,7 +104,7 @@ void insert_s(gap_buf &a, unsigned pos, const char *str, unsigned len)
 void apnd_c(gap_buf &a, char ch)
 {
 	if (a.len >= a.cpt) [[unlikely]]
-		resize(a, std::__bit_ceil(a.cpt));
+		resize(a, __bit_ceil(a.cpt));
 	a[a.len] = ch;
 	++a.len;
 	++a.gps;
@@ -113,7 +113,7 @@ void apnd_c(gap_buf &a, char ch)
 void apnd_s(gap_buf &a, const char *str, unsigned size)
 {
 	if (a.len + size >= a.cpt) [[unlikely]]
-		resize(a, std::__bit_ceil(a.len + size + 2));
+		resize(a, __bit_ceil(a.len + size + 2));
 	memcpy(a.buffer + a.len, str, size);
 	a.len += size;
 	a.gps = a.len;

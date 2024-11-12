@@ -144,7 +144,7 @@ loop:
 				} else
 					mvwdelch(text_win, y, x - 1);
 			} else if (y != 0) { // x = 0; merge lines
-				std::list<gap_buf>::iterator curln = it;
+				list<gap_buf>::iterator curln = it;
 				--it;
 				mv_curs(*it, it->len); // delete \n
 				it->gpe = it->cpt - 1;
@@ -162,7 +162,7 @@ loop:
 			if (rx + 1u > it->len)
 				break;
 			if (it->buffer[it->gpe + 1u] == '\n') { // similar to backspace
-				std::list<gap_buf>::iterator curln = it; // current line
+				list<gap_buf>::iterator curln = it; // current line
 				curln->gpe = curln->cpt - 1; // delete newline
 				curln->len--;
 				++it; // next line
@@ -208,7 +208,7 @@ loop:
 			else if (ch == SWITCH) { // switch file
 				argc = 2;
 				argv[1] = input_header("File to open: ");
-				std::list<gap_buf>::iterator iter;
+				list<gap_buf>::iterator iter;
 				unsigned i;
 				for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
 					iter->len = iter->gps = 0;

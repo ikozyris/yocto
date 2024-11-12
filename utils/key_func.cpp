@@ -102,7 +102,7 @@ void command()
 			print_lines();
 			wrefresh(ln_win);
 			print_text(0);
-			std::advance(it, ofy - ry);
+			advance(it, ofy - ry);
 		}
 	} else
 		print2header("command not found", 3);
@@ -168,7 +168,7 @@ void sol()
 	if (!wrap.empty()) { // line has been wrapped
 		clearline;
 		print_line(*it);
-		highlight;
+		highlight(y);
 	}
 	wrap.clear();
 	wmove(text_win, y, ofx = 0);
@@ -182,7 +182,7 @@ void scrolldown()
 	mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
 	wrefresh(ln_win);
 	mvprint_line(y, 0, *it, 0, 0);
-	highlight;
+	highlight(y);
 	wmove(text_win, y, 0);
 	wrap.clear();
 	ofx = 0;
@@ -196,7 +196,7 @@ void scrollup()
 	--ofy;
 	--it;
 	mvprint_line(0, 0, *it, 0, 0);
-	highlight;
+	highlight(y);
 	wmove(text_win, 0, x);
 	wrefresh(ln_win);
 	wrap.clear();
@@ -210,7 +210,7 @@ void left()
 		ofx -= wrap.back().dchar;
 		wrap.pop_back();
 		print_line(*it, wrap.empty() ? 0 : wrap.back().byte);
-		highlight;
+		highlight(y);
 		wmove(text_win, y, flag + 1);
 	} else if (x > 0) {
 		wmove(text_win, y, x - 1);

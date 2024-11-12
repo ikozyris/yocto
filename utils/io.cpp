@@ -63,14 +63,14 @@ unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 
 void print_text(unsigned line)
 {
-	std::list<gap_buf>::iterator iter = text.begin();
-	std::advance(iter, ofy + line);
+	list<gap_buf>::iterator iter = text.begin();
+	advance(iter, ofy + line);
 	wmove(text_win, line, 0);
 	wclrtobot(text_win);
 	wmove(text_win, line, 0);
-	for (unsigned ty = line; ty < min(curnum + ofy + 1, maxy) && iter != text.end(); ++iter) {
-		mvprint_line(ty++, 0, *iter, 0, 0);
-		highlight;
+	for (unsigned ty = line; ty < min(curnum + ofy + 1, maxy) && iter != text.end(); ++iter, ++ty) {
+		mvprint_line(ty, 0, *iter, 0, 0);
+		highlight(ty);
 	}
 }
 
@@ -82,7 +82,7 @@ void save()
 		filename = (char*)input_header("Enter filename: ");
 	FILE *fo = fopen(filename, "w");
 	unsigned i;
-	std::list<gap_buf>::iterator iter;
+	list<gap_buf>::iterator iter;
 	for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
 		data(*iter, 0, iter->len);
 		fputs(lnbuf, fo);
