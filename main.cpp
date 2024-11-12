@@ -247,7 +247,6 @@ loop:
 		case KEY_TAB:
 			winsnstr(text_win, "        ", 8 - x % 8);
 			wmove(text_win, y, x + 8 - x % 8);
-			//insert_s(*it, rx, "        ", 8 - x % 8);
 			insert_c(*it, rx, '\t');
 			break;
 
@@ -255,8 +254,7 @@ loop:
 			if (s[0] > 0 && s[0] < 32) // not a character
 				break;
 			if (x == maxx - 1) { // wrap line
-				wrap.push_back(maxx - 1);
-				rx = ofx += maxx - 1;
+				wrap.push_back({maxx - 1, ofx});
 				clearline;
 				mvprint_line(y, 1, *it, ofx, 0);
 				wmove(text_win, y, x = 0);
