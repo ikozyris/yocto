@@ -7,8 +7,13 @@ void stats()
 	for (auto &i : text)
 		sumlen += i.len;
 #ifndef RELEASE
-	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u wrap %u x: %u ofx: %ld ry: %u     ",
-		maxx, it->len, it->cpt, !wrap.empty() ? wrap.back() : 0, x, ofx, ry);
+	unsigned wrapd = 0, wrapb = 0;
+	if (!wrap.empty()) {
+		wrapb = wrap.back().byte;
+		wrapd = wrap.back().dchar;
+	}
+	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u wrap[d%u,b%u] x: %u ofx: %ld ry: %u     ",
+		maxx, it->len, it->cpt, wrapd, wrapb, x, ofx, ry);
 #else	
 	snprintf(_tmp, min(maxx, 256), "length %u cpt %u y %u x %u sum len %u lines %lu wrap %lu  ", 
 		it->len, it->cpt, ry, x, sumlen, curnum, wrap.size());
@@ -138,19 +143,22 @@ void eol()
 	if (it->len - ofx <= maxx) // line fits in screen
 		wmove(text_win, y, it->len - ofx - 1);
 	else { // cut line
-		unsigned bytes = 0;
+		wrap.clear();
+		unsigned bytes = 0, nbytes = 0;
 		while (bytes < it->len) {
-			unsigned nbytes = dchar2bytes(maxx - 1, bytes, *it) - bytes;
-			if (nbytes + bytes >= it->len - 1)
+			nbytes = dchar2bytes(maxx - 1, bytes, *it);
+			if (nbytes >= it->len - 1)
 				break;
-			wrap.push_back(flag +  1); // flag was changed by dchar2bytes
-			ofx += (long)wrap.back();
-			bytes += nbytes;
+			wrap.push_back({flag , nbytes}); // flag was changed by dchar2bytes
+			ofx += flag;
+			bytes = nbytes;
 		}
+		wrap.back().byte--; // newline
 		clearline;
 		print_line(*it, bytes, it->len);
+		// TODO: is this still needed?
 		x = getcurx(text_win);
-		if (x + ofx > it->len - 1)
+		if (x + ofx > it->len - 1) 
 			ofx -= x + ofx - it->len + 1;
 	}
 }
@@ -199,9 +207,9 @@ void left()
 {
 	if (x == 0 && !wrap.empty()) { // line has been wrapped
 		clearline;
-		ofx -= wrap.back();
+		ofx -= wrap.back().dchar;
 		wrap.pop_back();
-		print_line(*it, ofx < 0 ? 0 : ofx);
+		print_line(*it, wrap.empty() ? 0 : wrap.back().byte);
 		highlight;
 		wmove(text_win, y, flag + 1);
 	} else if (x > 0) {
@@ -231,8 +239,7 @@ void right()
 wrap_line:
 		clearline;
 		ofx += x;
-		wrap.push_back(x);
-		print_line(*it, ofx);
+		wrap.push_back({x, (wrap.empty() ? 0 : wrap.back().byte) + print_line(*it, ofx)});
 		wmove(text_win, y, 0);
 	} else { // go right
 		wmove(text_win, y, x + 1);
