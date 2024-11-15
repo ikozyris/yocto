@@ -2,8 +2,13 @@
 
 #define name "yocto 0.8-rc2"
 
+// initialize curses mode
 void init_curses()
 {
+	// UTF-8
+	setlocale(LC_ALL, "");
+	setlocale(LC_NUMERIC,"C");
+
 	initscr();
 	cbreak();
 	raw();
@@ -20,6 +25,7 @@ void init_curses()
 #endif
 }
 
+// initialize text window
 void init_text()
 {
 	text_win = newwin(maxy - 1, maxx - 4, 1, 4);
@@ -28,6 +34,7 @@ void init_text()
 	wmove(text_win, 0, 0);
 }
 
+// print line numbering (ln_win)
 void print_lines()
 {
 	short i = maxy;
@@ -36,6 +43,7 @@ void print_lines()
 	while (--i != 0);
 }
 
+// initialize line numbering window (ln_win)
 void init_lines()
 {
 	ln_win = newwin(maxy, 4, 1, 0);
@@ -45,6 +53,7 @@ void init_lines()
 	print_lines();
 }
 
+// clear any text on header (header_win)
 void clear_header()
 {
 	wmove(header_win, 0, 0);
@@ -52,15 +61,11 @@ void clear_header()
 		waddch(header_win, ' ');
 }
 
-inline void print_header_title()
-{
-	mvwprintw(header_win, 0, maxx / 2 - sizeof(name)/2, "%s", name);
-}
-
+// clear header and print title
 inline void reset_header()
 {
 	clear_header();
-	print_header_title();
+	mvwprintw(header_win, 0, maxx / 2 - sizeof(name) / 2, "%s", name);
 }
 
 void init_header()

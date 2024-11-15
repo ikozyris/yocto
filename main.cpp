@@ -30,9 +30,6 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	it = text.begin();
-	// UTF-8
-	setlocale(LC_ALL, "");
-	setlocale(LC_NUMERIC,"C");
 
 	init_curses();
 	getmaxyx(stdscr, maxy, maxx);
@@ -98,7 +95,7 @@ loop:
 				scrolldown();
 			else {
 				ofx = calc_offset_dis(x, *it);
-				wmove(text_win, y + 1, x = flag);
+				wmove(text_win, y + 1, flag);
 			}
 			break;
 

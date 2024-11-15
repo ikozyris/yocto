@@ -1,5 +1,6 @@
 #include "io.cpp"
 
+// display stats on header
 void stats()
 {
 	char *_tmp = (char*)malloc(256);
@@ -23,6 +24,7 @@ void stats()
 	wmove(text_win, y, x);
 }
 
+// prompt for command
 void command()
 {
 	char *tmp = input_header("Enter command: ");
@@ -109,6 +111,7 @@ void command()
 	free(tmp);
 }
 
+// insert enter in rx of buffer, create new line node and reprint
 void enter()
 {
 	insert_c(*it, rx, '\n');
@@ -122,13 +125,13 @@ void enter()
 	}
 	++it;
 	++curnum;
-	text.insert(it, *t);
+	text.insert(it, *t); // insert new node with text after rx
 	--it;
 	free(t);
 	print_text(y);
 	if (y < maxy - 1)
 		wmove(text_win, y + 1, 0);
-	else {
+	else { // y = maxy; scroll
 		wscrl(text_win, 1);
 		++ofy;
 		mvprint_line(maxy - 1, 0, *it, 0, 0);
@@ -137,6 +140,7 @@ void enter()
 	ofx = 0;
 }
 
+// go to end-of-line, if necessary cut line
 void eol()
 {
 	ofx = calc_offset_act(it->len, 0, *it);
@@ -163,6 +167,7 @@ void eol()
 	}
 }
 
+// go to start-of-line, uncut line if needed
 void sol()
 {
 	if (!wrap.empty()) { // line has been wrapped
@@ -174,8 +179,10 @@ void sol()
 	wmove(text_win, y, ofx = 0);
 }
 
+// scroll screen down, print last line
 void scrolldown()
 {
+	// TODO: ++it;
 	ofy++;
 	wscrl(text_win, 1);
 	wscrl(ln_win, 1);
@@ -188,6 +195,7 @@ void scrolldown()
 	ofx = 0;
 }
 
+// scroll screen up, print first byte
 void scrollup()
 {
 	wscrl(text_win, -1);
@@ -203,6 +211,7 @@ void scrollup()
 	ofx = 0;
 }
 
+// left arrow
 void left()
 {
 	if (x == 0 && !wrap.empty()) { // line has been wrapped
@@ -212,7 +221,7 @@ void left()
 		print_line(*it, wrap.empty() ? 0 : wrap.back().byte);
 		highlight(y);
 		wmove(text_win, y, flag + 1);
-	} else if (x > 0) {
+	} else if (x > 0) { // go left
 		wmove(text_win, y, x - 1);
 		// handle special characters causing offsets
 		if (it->buffer[it->gps - 1] == '\t')
@@ -226,6 +235,7 @@ void left()
 	}
 }
 
+// right arrow
 void right()
 {
 	if (rx >= it->len - 1 && ry < curnum) { // go to next line

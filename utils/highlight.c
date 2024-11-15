@@ -1,8 +1,9 @@
 #include "init.c"
 
 #define highlight(y) {if (HIGHLIGHT) apply(y);}
-bool eligible;
+bool eligible; // is syntax highlighting enabled
 
+// checks if file is C source code
 bool isc(const char *str)
 {
 	long res = whereis(str, '.');
@@ -38,7 +39,8 @@ struct res_t {
 	char type;
 };
 
-struct res_t get_category2(const char *line)
+// identify color to use
+struct res_t get_category(const char *line)
 {
 	struct res_t res;
 	res.len = 0;
@@ -82,6 +84,7 @@ struct res_t get_category2(const char *line)
 wchar_t tmp[256];
 char str[256];
 
+// highight line if eligible = true
 void apply(unsigned line)
 {
 	if (!eligible)
@@ -121,7 +124,7 @@ void apply(unsigned line)
 			wchgat(text_win, i - previ + 1, 0, STR, 0);
 		} else { // type (int, char) / keyword (if, return) / operator (==, +)
 			wmove(text_win, line, i);
-			struct res_t res = get_category2(str + i);
+			struct res_t res = get_category(str + i);
 			if (res.type == 't' && isvalid(str[i + res.len])
 				&& (i == 0 ? 1 : isvalid(str[i - 1])))
 				wchgat(text_win, res.len, 0, TYPES, 0);

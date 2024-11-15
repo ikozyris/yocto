@@ -144,6 +144,7 @@ inline void eras(gap_buf &a)
 
 // TODO: this is a mess
 // NOTE: destination buffer is lnbuf
+// extract data from src buffer, returns length extracted (to - from)
 unsigned data(const gap_buf &src, unsigned from, unsigned to)
 {
 	if (src.len == 0)
@@ -188,6 +189,7 @@ char at(const gap_buf &src, unsigned pos)
 	return src[pos];
 }
 
+// shrink buffers to just fit line (reduce RAM usage)
 unsigned shrink(gap_buf &a)
 {
 	unsigned bytes = a.cpt;
