@@ -10,7 +10,8 @@ CC = g++ --std=c++20
 #  -DHIGHLIGHT		Enable syntax highlighting
 #  -lncursesw		Links to ncurses library for wide characters (unicode)
 
-OPTIM = -Ofast -flto -march=native -DRELEASE
+OPTIM = -Ofast -flto -s -march=native -DRELEASE
+SIZE = -Os -s -flto -fdata-sections -ffunction-sections -Wl,--gc-sections
 DEBUG = -g #-DDEBUG
 #CXXFLAGS = -Wall -Wextra -pedantic-errors $(DEBUG) -DHIGHLIGHT -lncursesw # Debug only
 CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -DHIGHLIGHT -lncursesw

@@ -1,8 +1,5 @@
 #include "init.c"
 
-#define highlight(y) {if (HIGHLIGHT) apply(y);}
-bool eligible; // is syntax highlighting enabled
-
 // checks if file is C source code
 bool isc(const char *str)
 {
@@ -16,6 +13,7 @@ bool isc(const char *str)
 	return false;
 }
 
+bool eligible; // is syntax highlighting enabled
 const char *types[] = {"int", "char", "float", "double", "unsigned", "void", "const", 
 	"size_t", "bool", "signed", "long", "enum", "static", "short", "extern"};
 const char *defs[]  = {"if", "else", "while", "for", "do", "return", "sizeof", "switch",
@@ -41,7 +39,7 @@ typedef struct res_s {
 } res_t;
 
 // identify color to use
-res_t get_category(const char *line)
+static res_t get_category(const char *line)
 {
 	res_t res;
 	res.len = 0;
@@ -71,9 +69,8 @@ res_t get_category(const char *line)
 wchar_t tmp[256];
 char str[256];
 
-
 // highight line if eligible = true
-void apply(unsigned line)
+static void apply(unsigned line)
 {
 	if (!eligible)
 		return;
@@ -118,4 +115,11 @@ void apply(unsigned line)
 				wchgat(text_win, res.len, 0, res.type, 0);
 		}
 	}
+}
+
+void highlight(unsigned y)
+{
+#ifdef HIGHLIGHT
+	apply(y);
+#endif
 }

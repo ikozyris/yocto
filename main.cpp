@@ -53,7 +53,9 @@ read:
 			print2header("New file", 1);
 			goto loop;
 		}
+#ifdef HIGHLIGHT
 		eligible = isc(argv[1]); // syntax highlighting
+#endif
 		read_fread(fi);
 		print_text(0);
 		fclose(fi);
