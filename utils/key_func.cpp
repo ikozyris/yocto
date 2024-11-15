@@ -8,16 +8,16 @@ void stats()
 	for (auto &i : text)
 		sumlen += i.len;
 #ifndef RELEASE
-	unsigned wrapd = 0, wrapb = 0;
-	if (!wrap.empty()) {
-		wrapb = wrap.back().byte;
-		wrapd = wrap.back().dchar;
+	unsigned cutd = 0, cutb = 0;
+	if (!cut.empty()) {
+		cutb = cut.back().byte;
+		cutd = cut.back().dchar;
 	}
-	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u wrap[d%u,b%u] x: %u ofx: %ld ry: %u     ",
-		maxx, it->len, it->cpt, wrapd, wrapb, x, ofx, ry);
+	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u cut[d%u,b%u] x: %u ofx: %ld ry: %u     ",
+		maxx, it->len, it->cpt, cutd, cutb, x, ofx, ry);
 #else	
-	snprintf(_tmp, min(maxx, 256), "length %u cpt %u y %u x %u sum len %u lines %lu wrap %lu  ", 
-		it->len, it->cpt, ry, x, sumlen, curnum, wrap.size());
+	snprintf(_tmp, min(maxx, 256), "length %u cpt %u y %u x %u sum len %u lines %lu cut %lu  ", 
+		it->len, it->cpt, ry, x, sumlen, curnum, cut.size());
 #endif
 	print2header(_tmp, 1);
 	free(_tmp);
@@ -147,17 +147,17 @@ void eol()
 	if (it->len - ofx <= maxx) // line fits in screen
 		wmove(text_win, y, it->len - ofx - 1);
 	else { // cut line
-		wrap.clear();
+		cut.clear();
 		unsigned bytes = 0, nbytes = 0;
 		while (bytes < it->len) {
 			nbytes = dchar2bytes(maxx - 1, bytes, *it);
 			if (nbytes >= it->len - 1)
 				break;
-			wrap.push_back({flag , nbytes}); // flag was changed by dchar2bytes
+			cut.push_back({flag , nbytes}); // flag was changed by dchar2bytes
 			ofx += flag;
 			bytes = nbytes;
 		}
-		wrap.back().byte--; // newline
+		cut.back().byte--; // newline
 		clearline;
 		print_line(*it, bytes, it->len);
 		// TODO: is this still needed?
@@ -170,12 +170,12 @@ void eol()
 // go to start-of-line, uncut line if needed
 void sol()
 {
-	if (!wrap.empty()) { // line has been wrapped
+	if (!cut.empty()) { // line has been cutped
 		clearline;
 		print_line(*it);
 		highlight(y);
 	}
-	wrap.clear();
+	cut.clear();
 	wmove(text_win, y, ofx = 0);
 }
 
@@ -191,7 +191,7 @@ void scrolldown()
 	mvprint_line(y, 0, *it, 0, 0);
 	highlight(y);
 	wmove(text_win, y, 0);
-	wrap.clear();
+	cut.clear();
 	ofx = 0;
 }
 
@@ -207,18 +207,18 @@ void scrollup()
 	highlight(y);
 	wmove(text_win, 0, x);
 	wrefresh(ln_win);
-	wrap.clear();
+	cut.clear();
 	ofx = 0;
 }
 
 // left arrow
 void left()
 {
-	if (x == 0 && !wrap.empty()) { // line has been wrapped
+	if (x == 0 && !cut.empty()) { // line has been cutped
 		clearline;
-		ofx -= wrap.back().dchar;
-		wrap.pop_back();
-		print_line(*it, wrap.empty() ? 0 : wrap.back().byte);
+		ofx -= cut.back().dchar;
+		cut.pop_back();
+		print_line(*it, cut.empty() ? 0 : cut.back().byte);
 		highlight(y);
 		wmove(text_win, y, flag + 1);
 	} else if (x > 0) { // go left
@@ -239,23 +239,23 @@ void left()
 void right()
 {
 	if (rx >= it->len - 1 && ry < curnum) { // go to next line
-		if (!wrap.empty()) // revert wrap
+		if (!cut.empty()) // revert cut
 			mvprint_line(y, 0, *it, 0, 0);
 		wmove(text_win, y + 1, 0);
 		++it;
-		wrap.clear();
+		cut.clear();
 		ofx = 0;
 	} else if (x == maxx - 1) { // right to cut part of line
-wrap_line:
+cut_line:
 		clearline;
 		ofx += x;
-		wrap.push_back({x, (wrap.empty() ? 0 : wrap.back().byte) + print_line(*it, ofx)});
+		cut.push_back({x, (cut.empty() ? 0 : cut.back().byte) + print_line(*it, ofx)});
 		wmove(text_win, y, 0);
 	} else { // go right
 		wmove(text_win, y, x + 1);
 		if (it->buffer[it->gpe + 1] == '\t') {
 			if (x >= maxx - 7)
-				goto wrap_line;
+				goto cut_line;
 			ofx -= 8 - x % 8 - 1;
 			wmove(text_win, y, x + 8 - x % 8);
 		} else if (it->buffer[it->gpe + 1] < 0)

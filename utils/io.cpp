@@ -114,15 +114,6 @@ void read_fgets(FILE *fi)
 	}
 }
 
-// locate character in string, -1 if not found
-inline long whereis(const char *str,  char ch)
-{
-	const char *end = strchr(str, ch);
-	if (end == 0)
-		return -1;
-	return end - str + 1;
-}
-
 void read_fread(FILE *fi)
 {
 	char tmp[SZ + 1];

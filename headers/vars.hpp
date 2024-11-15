@@ -11,11 +11,11 @@ unsigned txt_cpt = DEFAULT_LINES; // alloc'ed nodes
 list<gap_buf> text(DEFAULT_LINES);
 list<gap_buf>::iterator it;
 
-// displayed characters of previous wrap (or cut|slice of line)
+// displayed characters of previous cut (or cut|slice of line)
 #define dchar first
-// bytes printed in current wrap
+// bytes printed in current cut
 #define byte second
-deque<pair<unsigned, unsigned>> wrap;
+deque<pair<unsigned, unsigned>> cut;
 
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[4];

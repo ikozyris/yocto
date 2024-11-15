@@ -31,6 +31,16 @@ long memusg()
 	return memusg;
 }
 
+// locate character in string, -1 if not found
+long whereis(const char *str,  char ch)
+{
+	const char *end = strchr(str, ch);
+	if (end == 0)
+		return -1;
+	return end - str + 1;
+}
+
+
 inline void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
 {
 	char ch = at(buf, i);
