@@ -61,6 +61,7 @@ unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
 	return rlen;
 }
 
+// print text starting from line
 void print_text(unsigned line)
 {
 	list<gap_buf>::iterator iter = text.begin();
@@ -74,6 +75,7 @@ void print_text(unsigned line)
 	}
 }
 
+// save buffer to global filename, if empty ask for it on header
 void save()
 {
 	if (!filename)
@@ -95,7 +97,7 @@ void save()
 }
 
 // For size see: https://github.com/ikozyris/yocto/wiki/Comments-on-optimizations#buffer-size-for-reading
-#define SZ 524288 // 512 KB
+#define SZ 524288 // 512 KiB
 
 void read_fgets(FILE *fi)
 {
@@ -112,6 +114,7 @@ void read_fgets(FILE *fi)
 	}
 }
 
+// locate character in string, -1 if not found
 inline long whereis(const char *str,  char ch)
 {
 	const char *end = strchr(str, ch);
