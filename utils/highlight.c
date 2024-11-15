@@ -20,8 +20,9 @@ const char *types[] = {"int", "char", "float", "double", "unsigned", "void", "co
 	"size_t", "bool", "signed", "long", "enum", "static", "short", "extern"};
 const char *defs[]  = {"if", "else", "while", "for", "do", "return", "sizeof", "switch",
 	"goto", "case", "break", "struct", "default", "continue", "true", "false"};
-const char *oper[]  = {"=", "+=", "+", "-", "-=", "*", "*=", "/", "/=", "%%", "&", "++",
-	"--", "==", "<", ">", "[", "]"};
+const char oper[]  = {'=', '+', '-', '*', '/', '&', '|', '^', '~', '<', '>', '[', ']'};
+unsigned char types_len[] = {3, 4, 5, 6, 8, 4, 5, 6, 4, 6, 4, 4, 6, 5, 6};
+unsigned char defs_len[] = {2, 4, 5, 3, 2, 6, 6, 6, 4, 4, 5, 6, 7, 8, 4, 5};
 
 #define DEFINC	COLOR_CYAN
 #define COMMENT	COLOR_GREEN
@@ -32,57 +33,44 @@ const char *oper[]  = {"=", "+=", "+", "-", "-=", "*", "*=", "/", "/=", "%%", "&
 // TODO: color for numbers?
 
 #define nelems(x)  (sizeof(x) / sizeof((x)[0]))
-#define isvalid(ch) (ch < 65 || ch > 122)
+#define is_separator(ch) ((ch > 31 && ch < 48) || (ch > 57 && ch < 65) || (ch > 90 && ch < 95) || ch > 122)
 
-struct res_t {
-	unsigned short len;
+typedef struct res_s {
+	unsigned char len;
 	char type;
-};
+} res_t;
 
 // identify color to use
-struct res_t get_category(const char *line)
+res_t get_category(const char *line)
 {
-	struct res_t res;
+	res_t res;
 	res.len = 0;
-	res.type = 0;
+	res.type = COLOR_WHITE;
 
-	unsigned j = 0;
-	bool found = true;
-	for (unsigned i = 0; i < nelems(types); ++i) {
-		found = true;
-		for (j = 0; types[i][j] != 0; ++j)
-			if (types[i][j] != line[j])
-				found = false;
-		if (found == true) {
-			res.len = strlen(types[i]);
-			res.type = 't';
+	for (unsigned i = 0; i < nelems(types); ++i)
+		if (strncmp(types[i], line, types_len[i]) == 0) {
+			res.len = types_len[i];
+			res.type = TYPES;
+			return res;
 		}
-	}
-	for (unsigned i = 0; i < nelems(defs); ++i) {
-		found = true;
-		for (j = 0; defs[i][j] != 0; ++j)
-			if (defs[i][j] != line[j])
-				found = false;
-		if (found == true) {
-			res.len = strlen(defs[i]);
-			res.type = 'd';
+	for (unsigned i = 0; i < nelems(defs); ++i)
+		if (strncmp(defs[i], line, defs_len[i]) == 0) {
+			res.len = defs_len[i];
+			res.type = DEFS;
+			return res;
 		}
-	}
-	for (unsigned i = 0; i < nelems(oper); ++i) {
-		found = true;
-		for (j = 0; oper[i][j] != 0; ++j)
-			if (oper[i][j] != line[j])
-				found = false;
-		if (found == true) {
-			res.len = strlen(oper[i]);
-			res.type = 'o';
+	for (unsigned i = 0; i < nelems(oper); ++i)
+		if (oper[i] == line[0]) {
+			res.len = 1;
+			res.type = OPER;
+			return res;
 		}
-	}
 	return res;
 }
 
 wchar_t tmp[256];
 char str[256];
+
 
 // highight line if eligible = true
 void apply(unsigned line)
@@ -91,48 +79,43 @@ void apply(unsigned line)
 		return;
 	wmove(text_win, line, 0);
 	winwstr(text_win, tmp);
-	unsigned len2 = wcstombs(str, tmp, min(256, maxx - 2));
+	unsigned len = wcstombs(str, tmp, min(256, maxx - 2));
 	unsigned previ = 0;
 
-	for (unsigned i = 0; i < len2; ++i) {
+	for (unsigned i = 0; i < len; ++i) {
+		wmove(text_win, line, i);
 		if (str[i] == '#') { // define / include
-			wmove(text_win, line, i);
 			wchgat(text_win, -1, 0, DEFINC, 0);
 			return;
 		} else if (str[i] == '/' && str[i + 1] == '/') { // comments
-			wmove(text_win, line, i);
 			wchgat(text_win, -1, 0, COMMENT, 0);
 			return;
 		} else if (str[i] == '/' && str[i + 1] == '*') {
 			previ = i;
 			i += 2;
-			wmove(text_win, line, previ);
-			while (str[i] != '*' && str[i + 1] != '/' && i < len2)
+			// TODO: end of multi-line comment might be in next line
+			while (str[i] != '*' && str[i + 1] != '/' && i < len)
 				++i;
 			wchgat(text_win, i++ - previ + 2, 0, COMMENT, 0);
 		} else if (str[i] == '\'') { // string / char
 			previ = i++;
-			wmove(text_win, line, previ);
-			while (str[i] != '\'' && i < len2)
+			while (str[i] != '\'' && i < len)
 				++i;
 			wchgat(text_win, i - previ + 1, 0, STR, 0);
 		} else if (str[i] == '\"') {
 			previ = i++;
-			wmove(text_win, line, previ);
-			while (str[i] != '\"' && i < len2)
+			while (str[i] != '\"' && i < len)
 				++i;
 			wchgat(text_win, i - previ + 1, 0, STR, 0);
-		} else { // type (int, char) / keyword (if, return) / operator (==, +)
-			wmove(text_win, line, i);
-			struct res_t res = get_category(str + i);
-			if (res.type == 't' && isvalid(str[i + res.len])
-				&& (i == 0 ? 1 : isvalid(str[i - 1])))
-				wchgat(text_win, res.len, 0, TYPES, 0);
-			else if (res.type == 'd' && isvalid(str[i + res.len])
-				&& (i == 0 ? 1 : isvalid(str[i - 1])))
-				wchgat(text_win, res.len, 0, DEFS, 0);
-			else if (res.type == 'o')
-				wchgat(text_win, res.len, 0, OPER, 0);
+		} else { // type (int, char) / keyword (if, return) / operator (=, +)
+			res_t res = get_category(str + i);
+
+			// no highlight for non-separated matches
+			bool next = is_separator(str[i + res.len]);
+			bool prev = i == 0 ? 1 : is_separator(str[i - 1]);
+			// except for operators which are separators
+			if ((next && prev) || res.type == OPER)
+				wchgat(text_win, res.len, 0, res.type, 0);
 		}
 	}
 }
