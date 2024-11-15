@@ -6,5 +6,4 @@
 #include <list>
 #include <deque>
 #include <bit>
-#include "funcdecl.h"
 using namespace std;
