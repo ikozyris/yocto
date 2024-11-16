@@ -10,7 +10,6 @@ void init_curses()
 	setlocale(LC_NUMERIC,"C");
 
 	initscr();
-	cbreak();
 	raw();
 	noecho(); // only temporarly enabled when asking for input in header
 #ifdef HIGHLIGHT
