@@ -63,8 +63,8 @@ read:
 	wmove(text_win, 0, 0);
 	it = text.begin();
 	// all functions think there is a newline at EOL, emulate it
-	if (at(*it, it->len) != '\n')
-		apnd_c(*it, 0);
+	if (at(text.back(), it->len) != '\n')
+		apnd_c(text.back(), 0);
 loop:
 	while (1) {
 		getyx(text_win, y, x);
@@ -90,12 +90,12 @@ loop:
 				break;
 			if (!cut.empty()) // revert cut
 				mvprint_line(y, 0, *it, 0, 0);
-			++it;
 			cut.clear();
 			ofx = 0; // invalidated
 			if (y == maxy - 1 && ry < curnum)
 				scrolldown();
 			else {
+				++it;
 				ofx = calc_offset_dis(x, *it);
 				wmove(text_win, y + 1, flag);
 			}
@@ -115,18 +115,19 @@ loop:
 			break;
 
 		case LEFT:
-			if (x == 0 && ofx == 0 && ofy > 0 && y == 0)
-				scrollup();
-			else
-				left();
+			left();
+			break;
+
+		case KEY_SLEFT:
+			prevword();
 			break;
 
 		case RIGHT:
-			if (y == maxy - 1 && ry < curnum && rx == it->len - 1) {
-				++it;
-				scrolldown();
-			} else
-				right();
+			right();
+			break;
+
+		case KEY_SRIGHT:
+			nextword();
 			break;
 
 		case BACKSPACE:

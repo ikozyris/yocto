@@ -96,6 +96,5 @@ unsigned prevdchar()
 	while ((winch(text_win) & A_CHARTEXT) == ' ' && x - i-- < 8)
 		wmove(text_win, y, i);
 	wmove(text_win, y, i + 1);
-	ofx += x - i - 2;
-	return x - i;
+	return x - i - 2;
 }

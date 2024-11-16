@@ -16,8 +16,8 @@ void stats()
 	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u cut[d%u,b%u] x: %u ofx: %ld ry: %u     ",
 		maxx, it->len, it->cpt, cutd, cutb, x, ofx, ry);
 #else	
-	snprintf(_tmp, min(maxx, 256), "length %u cpt %u y %u x %u sum len %u lines %lu cut %lu  ", 
-		it->len, it->cpt, ry, x, sumlen, curnum, cut.size());
+	snprintf(_tmp, min(maxx, 256), "len %u  cpt %u  y %u  x %u  sum len %u  lines %lu  cut %lu  ofx %ld  ", 
+		it->len, it->cpt, ry, x, sumlen, curnum, cut.size(), ofx);
 #endif
 	print2header(_tmp, 1);
 	free(_tmp);
@@ -153,14 +153,13 @@ void eol()
 			nbytes = dchar2bytes(maxx - 1, bytes, *it);
 			if (nbytes >= it->len - 1)
 				break;
-			cut.push_back({flag , nbytes}); // flag was changed by dchar2bytes
+			cut.push_back({flag, nbytes}); // flag was changed by dchar2bytes
 			ofx += flag;
 			bytes = nbytes;
 		}
 		cut.back().byte--; // newline
 		clearline;
 		print_line(*it, bytes, it->len);
-		// TODO: is this still needed?
 		x = getcurx(text_win);
 		if (x + ofx > it->len - 1) 
 			ofx -= x + ofx - it->len + 1;
@@ -182,8 +181,8 @@ void sol()
 // scroll screen down, print last line
 void scrolldown()
 {
-	// TODO: ++it;
-	ofy++;
+	++it;
+	++ofy;
 	wscrl(text_win, 1);
 	wscrl(ln_win, 1);
 	mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
@@ -195,7 +194,7 @@ void scrolldown()
 	ofx = 0;
 }
 
-// scroll screen up, print first byte
+// scroll screen up, print first line
 void scrollup()
 {
 	wscrl(text_win, -1);
@@ -211,46 +210,60 @@ void scrollup()
 	ofx = 0;
 }
 
+enum status {CUT, NORMAL, LN_CHANGE, SCROLL, NOTHING};
+
 // left arrow
-void left()
+unsigned short left()
 {
-	if (x == 0 && !cut.empty()) { // line has been cutped
+	if (x == 0 && ofx == 0 && ofy > 0 && y == 0) {
+		scrollup();
+		eol();
+		return SCROLL;
+	} else if (x == 0 && !cut.empty()) { // line has been cut
 		clearline;
 		ofx -= cut.back().dchar;
 		cut.pop_back();
 		print_line(*it, cut.empty() ? 0 : cut.back().byte);
 		highlight(y);
 		wmove(text_win, y, flag + 1);
+		return CUT;
 	} else if (x > 0) { // go left
 		wmove(text_win, y, x - 1);
 		// handle special characters causing offsets
 		if (it->buffer[it->gps - 1] == '\t')
-			prevdchar();
+			ofx += prevdchar();
 		else if (it->buffer[it->gps - 1] < 0)
 			--ofx;
+		return NORMAL;
 	} else if (y > 0) { // x = 0
 		--it;
 		--y;
 		eol();
+		return LN_CHANGE;
 	}
+	return NOTHING;
 }
 
 // right arrow
-void right()
-{
+unsigned short right() {
 	if (rx >= it->len - 1 && ry < curnum) { // go to next line
-		if (!cut.empty()) // revert cut
+		if (y == maxy - 1) {
+			scrolldown();
+			return SCROLL;
+		} else if (!cut.empty()) // revert cut
 			mvprint_line(y, 0, *it, 0, 0);
 		wmove(text_win, y + 1, 0);
 		++it;
 		cut.clear();
 		ofx = 0;
+		return LN_CHANGE;
 	} else if (x == maxx - 1) { // right to cut part of line
 cut_line:
 		clearline;
 		ofx += x;
 		cut.push_back({x, (cut.empty() ? 0 : cut.back().byte) + print_line(*it, ofx)});
 		wmove(text_win, y, 0);
+		return CUT;
 	} else { // go right
 		wmove(text_win, y, x + 1);
 		if (it->buffer[it->gpe + 1] == '\t') {
@@ -260,5 +273,29 @@ cut_line:
 			wmove(text_win, y, x + 8 - x % 8);
 		} else if (it->buffer[it->gpe + 1] < 0)
 			++ofx;
-	}		
+		return NORMAL;
+	}
+	return NOTHING;
+}
+
+// go to end of previous word
+void prevword()
+{
+	unsigned short status;
+	do {
+		status = left();
+		x = getcurx(text_win);
+		mv_curs(*it, x + ofx);
+	} while ((winch(text_win) & A_CHARTEXT) != ' ' && status == NORMAL);
+}
+
+// go to end of next word
+void nextword()
+{
+	unsigned short status;
+	do {
+		status = right();
+		x = getcurx(text_win);
+		mv_curs(*it, x + ofx);
+	} while ((winch(text_win) & A_CHARTEXT) != ' ' && status == NORMAL);
 }
