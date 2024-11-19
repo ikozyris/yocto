@@ -157,7 +157,6 @@ void eol()
 			ofx += flag;
 			bytes = nbytes;
 		}
-		cut.back().byte--; // newline
 		clearline;
 		print_line(*it, bytes, it->len);
 		x = getcurx(text_win);
@@ -298,4 +297,13 @@ void nextword()
 		x = getcurx(text_win);
 		mv_curs(*it, x + ofx);
 	} while ((winch(text_win) & A_CHARTEXT) != ' ' && status == NORMAL);
+}
+
+void reset_view()
+{
+	ofy = ofx = 0;
+	cut.clear();
+	it = text.begin();
+	print_text(0);
+	wmove(text_win, 0, 0);
 }
