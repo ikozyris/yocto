@@ -61,10 +61,10 @@ read:
 		fclose(fi);
 	}
 	wmove(text_win, 0, 0);
-	it = text.begin();
 	// all functions think there is a newline at EOL, emulate it
-	if (at(text.back(), it->len) != '\n')
-		apnd_c(text.back(), 0);
+	if (at(*it, it->len) != '\n')
+		apnd_c(*it, 0);
+	it = text.begin();
 loop:
 	while (1) {
 		getyx(text_win, y, x);
@@ -223,22 +223,24 @@ loop:
 			wmove(text_win, y, x);
 			break;
 
-		case KEY_RESIZE:
 		case REFRESH:
+			reset_view();
+			break;
+
+		case KEY_RESIZE:
 			endwin();
+			refresh();
 			getmaxyx(stdscr, maxy, maxx);
-			init_header();
+			reset_header();
 			init_lines();
+			print_lines();
+			delwin(text_win);
 			init_text();
-			getmaxyx(text_win, maxy, maxx);
 			wnoutrefresh(ln_win);
 			wnoutrefresh(header_win);
 			doupdate();
-			print_text(0);
-			ofy = ofx = 0;
-			cut.clear();
-			wmove(text_win, 0, 0);
-			it = text.begin();
+			getmaxyx(text_win, maxy, maxx);
+			reset_view();
 			break;
 
 		case EXIT:
