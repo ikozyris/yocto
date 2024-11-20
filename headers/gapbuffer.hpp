@@ -142,28 +142,27 @@ inline void eras(gap_buf &a)
 	--a.len;
 }
 
+#define error_check {\
+	if (src.len == 0)\
+		return lnbuf[0] = 0;\
+	/* error checking and recovery */\
+	if (from > src.len)\
+		from = 0;\
+	if (to < from || to > src.len)\
+		to = src.len;\
+	if (lnbf_cpt < to - from + 3) {\
+		free(lnbuf);\
+		lnbf_cpt = to - from + 10;\
+		lnbuf = (char*)malloc(lnbf_cpt);\
+	}\
+}
+
 // TODO: this is a mess
 // NOTE: destination buffer is lnbuf
 // extract data from src buffer, returns length extracted (to - from)
 unsigned data(const gap_buf &src, unsigned from, unsigned to)
 {
-	if (src.len == 0)
-		return lnbuf[0] = 0;
-
-	// error checking and recovery
-	if (from > src.len)
-		from = 0;
-	if (to < from)
-		to += from;
-	if (to > src.len)
-		to = src.len;
-
-	if (lnbf_cpt < to - from + 3) {
-		free(lnbuf);
-		lnbf_cpt = to - from + 10;
-		lnbuf = (char*)malloc(lnbf_cpt);
-	}
-	lnbuf[to - from + 1] = lnbuf[to - from] = 0;
+	error_check;
 	// try some special cases where 1 copy is required
 	if (src.gps == src.len && src.gpe == src.cpt - 1) // gap ends at end
 		memcpy(lnbuf, src.buffer + from, min(to - from, src.gps));
@@ -177,16 +176,24 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 		} else
 			memcpy(lnbuf, src.buffer + from + gaplen(src), to - from);
 	}
-	lnbuf[to - from + 2] = 0;
+	lnbuf[to - from] = 0;
 	return to - from;
 }
 
 // returns character at pos keeping in mind the gap
-char at(const gap_buf &src, unsigned pos)
+inline char at(const gap_buf &src, unsigned pos)
 {
 	if (pos >= src.gps)
 		return src[pos + gaplen(src)];
 	return src[pos];
+}
+
+unsigned data2(const gap_buf &src, unsigned from, unsigned to)
+{
+	error_check;
+	for (unsigned i = from; i < to; ++i)
+		lnbuf[i - from] = at(src, i);
+	return to - from;
 }
 
 // shrink buffers to just fit line (reduce RAM usage)
