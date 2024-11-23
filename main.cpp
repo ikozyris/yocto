@@ -119,7 +119,7 @@ loop:
 			break;
 
 		case KEY_SLEFT:
-			prevword();
+			prnxt_word(left);
 			break;
 
 		case RIGHT:
@@ -127,7 +127,7 @@ loop:
 			break;
 
 		case KEY_SRIGHT:
-			nextword();
+			prnxt_word(right);
 			break;
 
 		case BACKSPACE:

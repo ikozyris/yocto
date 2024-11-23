@@ -168,7 +168,7 @@ void eol()
 // go to start-of-line, uncut line if needed
 void sol()
 {
-	if (!cut.empty()) { // line has been cutped
+	if (!cut.empty()) { // line has been cut
 		clearline;
 		print_line(*it);
 		highlight(y);
@@ -182,6 +182,8 @@ void scrolldown()
 {
 	++it;
 	++ofy;
+	cut.clear();
+	ofx = 0;
 	wscrl(text_win, 1);
 	wscrl(ln_win, 1);
 	mvwprintw(ln_win, maxy - 1, 0, "%3u", ry + 2);
@@ -189,24 +191,22 @@ void scrolldown()
 	mvprint_line(y, 0, *it, 0, 0);
 	highlight(y);
 	wmove(text_win, y, 0);
-	cut.clear();
-	ofx = 0;
 }
 
 // scroll screen up, print first line
 void scrollup()
 {
+	--ofy;
+	--it;
+	cut.clear();
+	ofx = 0;
 	wscrl(text_win, -1);
 	wscrl(ln_win, -1);
 	mvwprintw(ln_win, 0, 0, "%3u", ry);
-	--ofy;
-	--it;
-	mvprint_line(0, 0, *it, 0, 0);
-	highlight(y);
-	wmove(text_win, 0, x);
 	wrefresh(ln_win);
-	cut.clear();
-	ofx = 0;
+	mvprint_line(0, 0, *it, 0, 0);
+	highlight(0);
+	wmove(text_win, 0, 0);
 }
 
 enum status {CUT, NORMAL, LN_CHANGE, SCROLL, NOTHING};
@@ -277,23 +277,12 @@ cut_line:
 	return NOTHING;
 }
 
-// go to end of previous word
-void prevword()
+// go to end/start of previous word (call like (prnxt_word(left)))
+void prnxt_word(unsigned short func(void))
 {
 	unsigned short status;
 	do {
-		status = left();
-		x = getcurx(text_win);
-		mv_curs(*it, x + ofx);
-	} while ((winch(text_win) & A_CHARTEXT) != ' ' && status == NORMAL);
-}
-
-// go to end of next word
-void nextword()
-{
-	unsigned short status;
-	do {
-		status = right();
+		status = func();
 		x = getcurx(text_win);
 		mv_curs(*it, x + ofx);
 	} while ((winch(text_win) & A_CHARTEXT) != ' ' && status == NORMAL);
