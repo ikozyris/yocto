@@ -1,45 +1,11 @@
-#include "headers.h"
+#include "headers/gapbuffer.h"
 
 long signed ofx;
 char *lnbuf; // temporary buffer for printing lines
-unsigned lnbf_cpt; // linebuff capacity
-
-#if defined(DEBUG)
-#define array_size 8
-#else
-#define array_size 32
-#endif
-
-#define gaplen(a) ((a).gpe - (a).gps + 1)
-#define ingap(a, pos) (((pos) >= (a).gps && (pos) <= (a).gpe) ? true : false)
-#define mveras(a, pos) (mv_curs(a, pos), eras(a))
+unsigned lnbf_cpt; // linebuffer capacity
 
 unsigned min(unsigned a, unsigned b) {return a < b ? a : b;}
 unsigned max(unsigned a, unsigned b) {return a > b ? a : b;}
-
-struct gap_buf {
-	unsigned cpt; // allocated size (1-based)
-	unsigned len; // length of line (1)
-	unsigned gps; // gap start (first element of gap) (0-based)
-	unsigned gpe; // gap end (last element of gap)    (0)
-	char *buffer;
-
-	char &operator[](unsigned pos) const {
-		return buffer[pos];
-	}
-
-	gap_buf() {
-		buffer = (char*)malloc(array_size);
-		len = 0;
-		gps = 0;
-		gpe = array_size - 1;
-		cpt = array_size;
-	}
-	~gap_buf() {
-		free(buffer);
-		buffer = 0;
-	}
-};
 
 void init(gap_buf &a)
 {
@@ -131,7 +97,7 @@ void apnd_s(gap_buf &a, const char *str)
 	a.gps = a.len;
 }
 
-inline void eras(gap_buf &a)
+void eras(gap_buf &a)
 {
 	if (a[a.gps - 1] < 0) { // unicode
 		--a.gps;
@@ -181,7 +147,7 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 }
 
 // returns character at pos keeping in mind the gap
-inline char at(const gap_buf &src, unsigned pos)
+char at(const gap_buf &src, unsigned pos)
 {
 	if (pos >= src.gps)
 		return src[pos + gaplen(src)];

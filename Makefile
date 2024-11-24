@@ -22,18 +22,35 @@ PATHT = /usr/bin/
 # root is not required to install
 #PATHT = ~/.local/bin/
 
-all:
-	$(CC) main.cpp -o $(TARGET) $(CXXFLAGS)
-	cp $(TARGET) $(PATHT)$(TARGET)
+# Source files
+SRCS = main.cpp \
+	utils/key_func.cpp \
+	utils/io.cpp \
+	screen/highlight.cpp \
+	screen/init.cpp \
+	utils/sizes.cpp \
+	utils/gapbuffer.cpp
 
-build:
-	$(CC) main.cpp -o $(TARGET) $(CXXFLAGS)
+# Object files
+OBJS = $(SRCS:.cpp=.o)
+
+# Default target
+build: $(TARGET)
+
+# Link the object files to create the executable
+$(TARGET): $(OBJS)
+	$(CXX) -o $@ $^ $(CXXFLAGS)
+
+# Compile .cpp files
+%.o: %.cpp
+	$(CXX) -c $< -o $@ $(CXXFLAGS)
 
 install:
 	cp $(TARGET) $(PATHT)$(TARGET)
 
-uninstall:
-	rm $(PATHT)$(TARGET)
-
+# Clean up
 clean:
-	$(RM) $(TARGET)
+	rm $(OBJS) $(TARGET)
+
+# Phony targets
+.PHONY: build install clean

@@ -1,6 +1,4 @@
-#include "sizes.c"
-
-#define name "yocto 0.8-rc2"
+#include "headers/init.h"
 
 // initialize curses mode
 void init_curses()
@@ -61,7 +59,7 @@ void clear_header()
 }
 
 // clear header and print title
-inline void reset_header()
+ void reset_header()
 {
 	clear_header();
 	mvwprintw(header_win, 0, maxx / 2 - sizeof(name) / 2, "%s", name);
