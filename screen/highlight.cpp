@@ -1,4 +1,16 @@
-#include "init.c"
+#include "headers/highlight.h"
+
+bool eligible; // is syntax highlighting enabled
+const char *types[] = {"int", "char", "float", "double", "unsigned", "void", "const", 
+	"size_t", "bool", "signed", "long", "enum", "static", "short", "extern"};
+const char *defs[]  = {"if", "else", "while", "for", "do", "return", "sizeof", "switch",
+	"goto", "case", "break", "struct", "default", "continue", "true", "false"};
+const char oper[]  = {'=', '+', '-', '*', '/', '&', '|', '^', '~', '<', '>', '[', ']'};
+unsigned char types_len[] = {3, 4, 5, 6, 8, 4, 5, 6, 4, 6, 4, 4, 6, 5, 6};
+unsigned char defs_len[] = {2, 4, 5, 3, 2, 6, 6, 6, 4, 4, 5, 6, 7, 8, 4, 5};
+
+wchar_t tmp[256];
+char str[256];
 
 // checks if file is C source code
 bool isc(const char *str)
@@ -13,33 +25,8 @@ bool isc(const char *str)
 	return false;
 }
 
-bool eligible; // is syntax highlighting enabled
-const char *types[] = {"int", "char", "float", "double", "unsigned", "void", "const", 
-	"size_t", "bool", "signed", "long", "enum", "static", "short", "extern"};
-const char *defs[]  = {"if", "else", "while", "for", "do", "return", "sizeof", "switch",
-	"goto", "case", "break", "struct", "default", "continue", "true", "false"};
-const char oper[]  = {'=', '+', '-', '*', '/', '&', '|', '^', '~', '<', '>', '[', ']'};
-unsigned char types_len[] = {3, 4, 5, 6, 8, 4, 5, 6, 4, 6, 4, 4, 6, 5, 6};
-unsigned char defs_len[] = {2, 4, 5, 3, 2, 6, 6, 6, 4, 4, 5, 6, 7, 8, 4, 5};
-
-#define DEFINC	COLOR_CYAN
-#define COMMENT	COLOR_GREEN
-#define TYPES	COLOR_RED
-#define OPER	COLOR_YELLOW
-#define DEFS    COLOR_BLUE
-#define STR	COLOR_MAGENTA
-// TODO: color for numbers?
-
-#define nelems(x)  (sizeof(x) / sizeof((x)[0]))
-#define is_separator(ch) ((ch > 31 && ch < 48) || (ch > 57 && ch < 65) || (ch > 90 && ch < 95) || ch > 122)
-
-typedef struct res_s {
-	unsigned char len;
-	char type;
-} res_t;
-
 // identify color to use
-static res_t get_category(const char *line)
+res_t get_category(const char *line)
 {
 	res_t res;
 	res.len = 0;
@@ -66,11 +53,8 @@ static res_t get_category(const char *line)
 	return res;
 }
 
-wchar_t tmp[256];
-char str[256];
-
 // highight line if eligible = true
-static void apply(unsigned line)
+void apply(unsigned line)
 {
 	if (!eligible)
 		return;

@@ -73,7 +73,7 @@ key_config() {
 }
 
 color_config() {
- 	mapfile -t colors <  <(sed "s/.*COLOR_//g" utils/highlight.c | head -n 28 | tail -n 6)
+ 	mapfile -t colors <  <(sed "s/.*COLOR_//g" utils/highlight.cpp | head -n 28 | tail -n 6)
 
 	exec 3>&1 # open stdout fd
 	OUTPUT=$(DIALOG --title "Edit Colors" \
@@ -100,12 +100,12 @@ color_config() {
 
 	outputarray=($OUTPUT) # convert to array
 	# Replace the key* with the output of dialog
-	sed -i "10s/${colors[0]}/${outputarray[0]}/" utils/highlight.c 
-	sed -i "11s/${colors[1]}/${outputarray[1]}/" utils/highlight.c 
-	sed -i "12s/${colors[2]}/${outputarray[2]}/" utils/highlight.c 
-	sed -i "13s/${colors[3]}/${outputarray[3]}/" utils/highlight.c 
-	sed -i "14s/${colors[4]}/${outputarray[4]}/" utils/highlight.c 
-	sed -i "15s/${colors[5]}/${outputarray[5]}/" utils/highlight.c
+	sed -i "10s/${colors[0]}/${outputarray[0]}/" utils/highlight.cpp 
+	sed -i "11s/${colors[1]}/${outputarray[1]}/" utils/highlight.cpp 
+	sed -i "12s/${colors[2]}/${outputarray[2]}/" utils/highlight.cpp 
+	sed -i "13s/${colors[3]}/${outputarray[3]}/" utils/highlight.cpp 
+	sed -i "14s/${colors[4]}/${outputarray[4]}/" utils/highlight.cpp 
+	sed -i "15s/${colors[5]}/${outputarray[5]}/" utils/highlight.cpp
 }
 
 config_dialog() {
@@ -171,7 +171,7 @@ config_dialog() {
 			if [ $DIAL = "dialog" ]; then
 				color_config
 			else
-				display_result "dialog not installed, but you can still edit utils/highlight.c lines 23-28"
+				display_result "dialog not installed, but you can still edit utils/highlight.cpp lines 23-28"
 			fi
 			;;
 		esac

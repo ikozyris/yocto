@@ -1,4 +1,4 @@
-#include "io.cpp"
+#include "headers/key_func.h"
 
 // display stats on header
 void stats()
@@ -170,7 +170,7 @@ void sol()
 {
 	if (!cut.empty()) { // line has been cut
 		clearline;
-		print_line(*it);
+		print_line(*it, 0, 0);
 		highlight(y);
 	}
 	cut.clear();
@@ -209,8 +209,6 @@ void scrollup()
 	wmove(text_win, 0, 0);
 }
 
-enum status {CUT, NORMAL, LN_CHANGE, SCROLL, NOTHING};
-
 // left arrow
 unsigned short left()
 {
@@ -222,7 +220,7 @@ unsigned short left()
 		clearline;
 		ofx -= cut.back().dchar;
 		cut.pop_back();
-		print_line(*it, cut.empty() ? 0 : cut.back().byte);
+		print_line(*it, cut.empty() ? 0 : cut.back().byte, 0);
 		highlight(y);
 		wmove(text_win, y, flag + 1);
 		return CUT;
@@ -260,7 +258,7 @@ unsigned short right() {
 cut_line:
 		clearline;
 		ofx += x;
-		cut.push_back({x, (cut.empty() ? 0 : cut.back().byte) + print_line(*it, ofx)});
+		cut.push_back({x, (cut.empty() ? 0 : cut.back().byte) + print_line(*it, ofx, 0)});
 		wmove(text_win, y, 0);
 		return CUT;
 	} else { // go right

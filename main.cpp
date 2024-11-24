@@ -1,5 +1,19 @@
-#include "utils/key_func.cpp"
+#include "utils/headers/key_func.h"
 #include "headers/keybindings.h"
+
+unsigned txt_cpt = DEFAULT_LINES;
+list<gap_buf> text(DEFAULT_LINES);
+list<gap_buf>::iterator it;
+deque<pair<unsigned, unsigned>> cut;
+WINDOW *header_win, *ln_win, *text_win;
+wchar_t s[4];
+char s2[4];
+unsigned flag, ry, rx, maxy, maxx;
+unsigned short y, x, len;
+long ofy;
+int ch;
+char *filename;
+size_t curnum;
 
 int main(int argc, char *argv[])
 {
@@ -138,7 +152,7 @@ loop:
 					ofx += prevdchar();
 					x = getcurx(text_win);
 					wmove(text_win, y, 0);
-					print_line(*it);
+					print_line(*it, 0, 0);
 					wclrtoeol(text_win);
 					wmove(text_win, y, x);
 				} else

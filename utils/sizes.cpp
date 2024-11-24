@@ -1,4 +1,4 @@
-#include "../headers/vars.hpp"
+#include "headers/sizes.h"
 
 // convert bytes to base-10 (SI) human-readable string e.g 1000B = 1kB
 char hrsize(size_t bytes, char *dest, unsigned short dest_cpt)
@@ -41,7 +41,7 @@ long whereis(const char *str,  char ch)
 }
 
 
-inline void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
+ void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
 {
 	char ch = at(buf, i);
 	if (ch == '\t')

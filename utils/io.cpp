@@ -1,4 +1,4 @@
-#include "highlight.c"
+#include "headers/io.h"
 
 // pos: (1 left) (3 right) (else center)
 void print2header(const char *msg, unsigned char pos)
@@ -39,7 +39,7 @@ char *input_header(const char *q)
 #define mvprint_line(y, x, buffer, from, to) (wmove(text_win, y,x), print_line(buffer, from, to))
 
 // prints substring of buffer, if (to == 0) print until maxx
-unsigned print_line(const gap_buf &buffer, unsigned from = 0, unsigned to = 0)
+unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 {
 	if (buffer.len < 1 || at(buffer, 0) == '\n')
 		return 0;
