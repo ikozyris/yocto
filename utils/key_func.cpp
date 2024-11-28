@@ -16,7 +16,7 @@ void stats()
 	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u cut[d%u,b%u] x: %u ofx: %ld ry: %u     ",
 		maxx, it->len, it->cpt, cutd, cutb, x, ofx, ry);
 #else	
-	snprintf(_tmp, min(maxx, 256), "len %u  cpt %u  y %u  x %u  sum len %u  lines %lu  cut %lu  ofx %ld  ", 
+	snprintf(_tmp, min(maxx, 256), "len %u  cpt %u  y %u  x %u  sum len %u  lines %u  cut %lu  ofx %ld  ", 
 		it->len, it->cpt, ry, x, sumlen, curnum, cut.size(), ofx);
 #endif
 	print2header(_tmp, 1);

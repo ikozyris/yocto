@@ -1,11 +1,8 @@
 #include "headers/gapbuffer.h"
 
 long signed ofx;
-char *lnbuf; // temporary buffer for printing lines
-unsigned lnbf_cpt; // linebuffer capacity
-
-unsigned min(unsigned a, unsigned b) {return a < b ? a : b;}
-unsigned max(unsigned a, unsigned b) {return a > b ? a : b;}
+char *lnbuf;
+unsigned lnbf_cpt;
 
 void init(gap_buf &a)
 {

@@ -1,16 +1,11 @@
 #pragma once
 #include "../../headers/headers.h"
 
-extern long signed ofx;
-extern char *lnbuf; // temporary buffer for printing lines
-extern unsigned lnbf_cpt; // linebuff capacity
+extern long signed ofx; // offset in x-axis
+extern char *lnbuf; // temporary buffer for output of data()
+extern unsigned lnbf_cpt; // lnbuf capacity
 
-#if defined(DEBUG)
 #define array_size 8
-#else
-#define array_size 32
-#endif
-
 #define gaplen(a) ((a).gpe - (a).gps + 1)
 #define ingap(a, pos) (((pos) >= (a).gps && (pos) <= (a).gpe) ? true : false)
 #define mveras(a, pos) (mv_curs(a, pos), eras(a))
@@ -38,18 +33,19 @@ struct gap_buf {
 		buffer = 0;
 	}
 };
-unsigned min(unsigned a, unsigned b);
-unsigned max(unsigned a, unsigned b);
-void init(gap_buf &a);
-void resize(gap_buf &a, unsigned size);
-void mv_curs(gap_buf &a, unsigned pos);
-void insert_c(gap_buf &a, unsigned pos, char ch);
-void insert_s(gap_buf &a, unsigned pos, const char *str, unsigned len);
-void apnd_c(gap_buf &a, char ch);
-void apnd_s(gap_buf &a, const char *str, unsigned size);
-void apnd_s(gap_buf &a, const char *str);
-void eras(gap_buf &a);
-unsigned data(const gap_buf &src, unsigned from, unsigned to);
-char at(const gap_buf &src, unsigned pos);
-unsigned data2(const gap_buf &src, unsigned from, unsigned to);
-unsigned shrink(gap_buf &a);
+
+inline unsigned min(unsigned a, unsigned b) {return a < b ? a : b;}
+inline unsigned max(unsigned a, unsigned b) {return a > b ? a : b;}
+void init(gap_buf &a); // initialize the gap buffer (should already be called by constructor)
+void resize(gap_buf &a, unsigned size); // resize the buffer
+void mv_curs(gap_buf &a, unsigned pos); // move the cursor to position
+void insert_c(gap_buf &a, unsigned pos, char ch); // insert character at position
+void insert_s(gap_buf &a, unsigned pos, const char *str, unsigned len); // insert string with given length at pos
+void apnd_c(gap_buf &a, char ch); // append character
+void apnd_s(gap_buf &a, const char *str, unsigned size); // append string with given size
+void apnd_s(gap_buf &a, const char *str); // append null-terminated string
+void eras(gap_buf &a); // erase the character at current cursor position
+unsigned data(const gap_buf &src, unsigned from, unsigned to); // copy buffer with range to lnbuf
+char at(const gap_buf &src, unsigned pos); // return character at position calculating the gap
+unsigned data2(const gap_buf &src, unsigned from, unsigned to); // same as data(), different implementation
+unsigned shrink(gap_buf &a); // shrink buffer to just fit size (gap = 2 bytes)

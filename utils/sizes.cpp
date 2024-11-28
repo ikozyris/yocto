@@ -40,8 +40,8 @@ long whereis(const char *str,  char ch)
 	return end - str + 1;
 }
 
-
- void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
+// helper function for calc_offset_[dis|act](), dcahr2bytes()
+void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
 {
 	char ch = at(buf, i);
 	if (ch == '\t')

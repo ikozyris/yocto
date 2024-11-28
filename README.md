@@ -1,12 +1,12 @@
 # Yocto
-[![C/C++ CI](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml)
-A simple, compact and *fast* text editor using ncurses and a gap buffer, written in C++, in ~1.2k lines of code.
+<!--[![C/C++ CI](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml)-->
+A simple, compact and *fast* text editor using ncurses and a gap buffer, written in C++, in ~1.4k lines of code.
 More information is available on the [wiki](https://github.com/ikozyris/yocto/wiki).
 
 ![A C++ file in Yocto](https://github.com/ikozyris/yocto/assets/80053394/8fa12952-272f-41e0-9535-0a77f3652286)
 
-## Usage
-```
+## Build
+```sh
 make build
 sudo make install
 ```
@@ -14,13 +14,20 @@ sudo make install
 Or use the user-friendly dialog utility `wizard.sh`
 which also supports configuring yocto
 
+## Usage
+```sh
+yocto text.txt # open existing file or create if it doesn't exist
+yocto --help # show help page
+yocto # ask for filename on save file operation
+```
+
 ### Keybindings
 * Save: Ctrl-S
 * Exit: Ctrl-X
 * Go to start of line: Ctrl-A
 * Go to end of line: Ctrl-E
 * Open other file Alt-R
-* Calculate x offset (for UTF-8): Alt-U
+* Go to previous/next word: Shift + Left/Right arrow
 * Enter built-in terminal: Alt-C
 * Show info: Alt-I (also command _stats_ in built-in terminal)
 
@@ -34,8 +41,7 @@ Since this text editor is tiny, yocto is a suitable name.
 
 ### License
 
-Copyright (C) 2022-2024  ikozyris<br>
-Copyright (C) 2022-2024  gkozyris
+Copyright (C) 2022-2024  ikozyris
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

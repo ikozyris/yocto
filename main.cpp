@@ -7,20 +7,17 @@ list<gap_buf>::iterator it;
 deque<pair<unsigned, unsigned>> cut;
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[4];
-char s2[4];
-unsigned flag, ry, rx, maxy, maxx;
+char s2[4], *filename;
+unsigned flag, ry, rx, maxy, maxx, curnum;
 unsigned short y, x, len;
 long ofy;
-int ch;
-char *filename;
-size_t curnum;
 
 int main(int argc, char *argv[])
 {
 	if (argc > 1 && (strcmp(argv[1], "-h") == 0 ||
 	strcmp(argv[1], "--help") == 0)) {
 		puts(name);
-		puts("A simple, compact and fast text editor.\n"
+		puts("Yocto: a simple, compact and fast text editor.\n"
 		"Source code: https://github.com/ikozyris/yocto\n"
 		"Wiki: https://github.com/ikozyris/yocto/wiki\n"
 		"License: GNU GPL v3\n");
@@ -34,6 +31,8 @@ int main(int argc, char *argv[])
 		"Go to start of line:       Ctrl-A\n"
 		"Go to end of line:         Ctrl-E\n"
 		"Enter built-in terminal:   Alt-C\n"
+		"Open other file:	    Alt-R\n"
+		"Previous/Next word         Shift + Left/Right arrow\n"
 		"Show debbuging info:       Alt-I (also command stats in built-in terminal)\n\n"
 		"Built-in terminal commands:\n"
 		"scroll                     Scroll to line\n"
@@ -212,9 +211,9 @@ loop:
 			save();
 			break;
 
-		case 27: // ALT or ESC
+		case 27: { // ALT or ESC
 			wtimeout(text_win, 1000);
-			ch = wgetch(text_win);
+			int ch = wgetch(text_win);
 			if (ch == INFO)
 				stats();
 			else if (ch == CMD)
@@ -228,7 +227,7 @@ loop:
 					iter->len = iter->gps = 0;
 					iter->gpe = iter->cpt;
 				}
-				curnum = 0u;
+				curnum = 0;
 				it = text.begin();
 				wclear(text_win);
 				goto read;
@@ -236,6 +235,7 @@ loop:
 			wtimeout(text_win, -1);
 			wmove(text_win, y, x);
 			break;
+		}
 
 		case REFRESH:
 			reset_view();
