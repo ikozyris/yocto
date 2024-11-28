@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>	// for setting locale
-#include <sys/stat.h>	// for file size
 #include <list>
 #include <deque>
-#include <bit>
+#include <bit>	// for __bit_ceil (cntlz)
 using namespace std;
