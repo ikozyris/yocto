@@ -73,7 +73,7 @@ key_config() {
 }
 
 color_config() {
- 	mapfile -t colors <  <(sed "s/.*COLOR_//g" utils/highlight.cpp | head -n 28 | tail -n 6)
+ 	mapfile -t colors <  <(sed "s/.*COLOR_//g" screen/highlight.cpp | head -n 17 | tail -n 6)
 
 	exec 3>&1 # open stdout fd
 	OUTPUT=$(DIALOG --title "Edit Colors" \
@@ -100,12 +100,12 @@ color_config() {
 
 	outputarray=($OUTPUT) # convert to array
 	# Replace the key* with the output of dialog
-	sed -i "10s/${colors[0]}/${outputarray[0]}/" utils/highlight.cpp 
-	sed -i "11s/${colors[1]}/${outputarray[1]}/" utils/highlight.cpp 
-	sed -i "12s/${colors[2]}/${outputarray[2]}/" utils/highlight.cpp 
-	sed -i "13s/${colors[3]}/${outputarray[3]}/" utils/highlight.cpp 
-	sed -i "14s/${colors[4]}/${outputarray[4]}/" utils/highlight.cpp 
-	sed -i "15s/${colors[5]}/${outputarray[5]}/" utils/highlight.cpp
+	sed -i "12s/${colors[0]}/${outputarray[0]}/" screen/highlight.cpp 
+	sed -i "13s/${colors[1]}/${outputarray[1]}/" screen/highlight.cpp 
+	sed -i "14s/${colors[2]}/${outputarray[2]}/" screen/highlight.cpp 
+	sed -i "15s/${colors[3]}/${outputarray[3]}/" screen/highlight.cpp 
+	sed -i "16s/${colors[4]}/${outputarray[4]}/" screen/highlight.cpp 
+	sed -i "17s/${colors[5]}/${outputarray[5]}/" screen/highlight.cpp
 }
 
 config_dialog() {
