@@ -35,14 +35,11 @@ char *input_header(const char *q)
 	return tmp;
 }
 
-#define clearline (wmove(text_win, y, 0), wclrtoeol(text_win))
-#define mvprint_line(y, x, buffer, from, to) (wmove(text_win, y,x), print_line(buffer, from, to))
-
 // prints substring of buffer, if (to == 0) print until maxx
 unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 {
 	// only newline or emulated newline ('\0') is in buffer
-	if (buffer.len < 1 || at(buffer, 0) == 0)
+	if (buffer.len <= 1)
 		return 0;
 	if (to == 0) {
 		unsigned prop = dchar2bytes(maxx - 1, from, buffer);
