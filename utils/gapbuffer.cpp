@@ -106,7 +106,7 @@ void eras(gap_buf &a)
 }
 
 #define error_check {\
-	if (src.len == 0)\
+	if (src.len == 0 || from == to)\
 		return lnbuf[0] = 0;\
 	/* error checking and recovery */\
 	if (from > src.len)\
@@ -146,6 +146,8 @@ unsigned data(const gap_buf &src, unsigned from, unsigned to)
 // returns character at pos keeping in mind the gap
 char at(const gap_buf &src, unsigned pos)
 {
+	if (pos >= src.len)
+		return 0;
 	if (pos >= src.gps)
 		return src[pos + gaplen(src)];
 	return src[pos];

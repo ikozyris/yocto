@@ -41,7 +41,8 @@ char *input_header(const char *q)
 // prints substring of buffer, if (to == 0) print until maxx
 unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 {
-	if (buffer.len < 1 || at(buffer, 0) == '\n')
+	// only newline or emulated newline ('\0') is in buffer
+	if (buffer.len < 1 || at(buffer, 0) == 0)
 		return 0;
 	if (to == 0) {
 		unsigned prop = dchar2bytes(maxx - 1, from, buffer);
