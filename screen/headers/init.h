@@ -1,5 +1,6 @@
 #pragma once
 #include "../../utils/headers/sizes.h"
+
 #define name "yocto 0.8-rc2"
 void init_curses();
 void init_text();

@@ -26,8 +26,8 @@ char str[256];
 // checks if file is C source code
 bool isc(const char *str)
 {
-	long res = whereis(str, '.');
-	if (res == -1)
+	unsigned res = whereis(str, '.');
+	if (res == 0)
 		return false;
 	str += res;
 	if (!strcmp(str, "c") || !strcmp(str, "cpp") || !strcmp(str, "cc")

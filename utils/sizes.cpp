@@ -17,9 +17,9 @@ char hrsize(size_t bytes, char *dest, unsigned short dest_cpt)
 }
 
 // in kB
-long memusg()
+unsigned memusg()
 {
-	size_t memusg = 0, tmp;
+	unsigned memusg = 0, tmp;
 	char buffer[1024];
 	FILE *file = fopen("/proc/self/smaps", "r");
 	while (fscanf(file, " %1023s", buffer) == 1)
@@ -32,15 +32,15 @@ long memusg()
 }
 
 // locate character in string, -1 if not found
-long whereis(const char *str,  char ch)
+unsigned whereis(const char *str,  char ch)
 {
 	const char *end = strchr(str, ch);
 	if (end == 0)
-		return -1;
+		return 0;
 	return end - str + 1;
 }
 
-// helper function for calc_offset_[dis|act](), dcahr2bytes()
+// helper function for calc_offset_[dis|act](), dchar2bytes()
 void get_off(unsigned &x, unsigned &i, const gap_buf &buf)
 {
 	char ch = at(buf, i);

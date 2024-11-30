@@ -112,11 +112,10 @@ void read_fgets(FILE *fi)
 void read_fread(FILE *fi)
 {
 	char tmp[SZ + 1];
-	unsigned a, j = 0;
-	long res;
+	unsigned a, j = 0, res;
 	while ((a = fread(tmp, sizeof(tmp[0]), SZ, fi))) {
 		tmp[a] = 0;
-		while ((res = whereis(tmp + j, '\n')) > -1) {
+		while ((res = whereis(tmp + j, '\n')) > 0) {
 			apnd_s(*it, tmp + j, res);
 			j += res;
 			if (++curnum >= txt_cpt) {
