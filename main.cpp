@@ -246,7 +246,6 @@ loop:
 			refresh();
 			getmaxyx(stdscr, maxy, maxx);
 			reset_header();
-			init_lines();
 			print_lines();
 			delwin(text_win);
 			init_text();

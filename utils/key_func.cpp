@@ -13,8 +13,8 @@ void stats()
 		cutb = cut.back().byte;
 		cutd = cut.back().dchar;
 	}
-	snprintf(_tmp, min(maxx, 256), "maxx %u len %u cpt %u cut[d%u,b%u] x: %u ofx: %ld ry: %u     ",
-		maxx, it->len, it->cpt, cutd, cutb, x, ofx, ry);
+	snprintf(_tmp, min(maxx, 256), "maxx %u len %u gs %u ge %u cpt %u cut[d%u,b%u] x: %u ofx: %ld ry: %u     ",
+		maxx, it->len, it->gps, it->gpe, it->cpt, cutd, cutb, x, ofx, ry);
 #else	
 	snprintf(_tmp, min(maxx, 256), "len %u  cpt %u  y %u  x %u  sum len %u  lines %u  cut %lu  ofx %ld  ", 
 		it->len, it->cpt, ry, x, sumlen, curnum, cut.size(), ofx);
@@ -117,13 +117,16 @@ void enter()
 	insert_c(*it, rx, '\n');
 	gap_buf *t = (gap_buf*)malloc(sizeof(gap_buf));
 	init(*t);
-	if (it->gpe < it->cpt - 2) { // newline is not at the end
-		data(*it, rx + 1, it->len + 1);
-		apnd_s(*t, lnbuf, it->len - rx - 1);
-		it->len = it->gps = rx + 1;
-		it->gpe = it->cpt - 1;
-	}
-	++it;
+	/* If buffer's last char is a newline; rx = it->len - 1; gpe = cpt - 2
+	 * so the last character (newline or emulated) will be copied over
+	 * Otherwise, (x != EOL) copy the remaining bytes
+	 */
+	data(*it, rx + 1, it->len + 1);
+	apnd_s(*t, lnbuf, it->len - rx - 1);
+	it->len = it->gps = rx + 1;
+	it->gpe = it->cpt - 1;
+
+	++it; // insert is on previous than current it
 	++curnum;
 	text.insert(it, *t); // insert new node with text after rx
 	--it;
