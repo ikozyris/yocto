@@ -258,6 +258,7 @@ loop:
 			winsnstr(text_win, "        ", 8 - x % 8);
 			wmove(text_win, y, x + 8 - x % 8);
 			insert_c(*it, rx, '\t');
+			ofx -= 7 - x % 8;
 			break;
 
 		default:
@@ -268,7 +269,7 @@ loop:
 				clearline;
 				mvprint_line(y, 1, *it, ofx, 0);
 				wmove(text_win, y, x = 0);
-			} if (at(*it, rx) == '\t') {
+			} if (it->buffer[it->gpe + 1] == '\t') { // next character is newline
 				waddnwstr(text_win, s, 1);
 				if (x % 8 >= 7)
 					winsch(text_win, '\t');

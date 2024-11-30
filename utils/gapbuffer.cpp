@@ -15,11 +15,9 @@ void init(gap_buf &a)
 void resize(gap_buf &a, unsigned size)
 {
 	a.buffer = (char*)realloc(a.buffer, size);
-	if (a.gpe < a.cpt - 1) {
-		memmove(a.buffer + size - a.len + a.gps, a.buffer + a.gpe + 1, a.len - a.gps);
-		a.gpe = size - a.len + a.gps - 1;
-	} else
-		a.gpe = size - 1;
+	// copy after gap (newline or more) 
+	memmove(a.buffer + size - a.len + a.gps, a.buffer + a.gpe + 1, a.len - a.gps);
+	a.gpe = size - a.len + a.gps - 1;
 	a.cpt = size;
 }
 
