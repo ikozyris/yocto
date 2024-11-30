@@ -77,13 +77,10 @@ void print_text(unsigned line)
 void save()
 {
 	if (!filename)
-		filename = (char*)malloc(128);
-	if (!strlen(filename))
 		filename = (char*)input_header("Enter filename: ");
 	FILE *fo = fopen(filename, "w");
-	unsigned i;
-	list<gap_buf>::iterator iter;
-	for (iter = text.begin(), i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
+	list<gap_buf>::iterator iter = text.begin();
+	for (unsigned i = 0; iter != text.end() && i <= curnum; ++iter, ++i) {
 		data(*iter, 0, iter->len);
 		fputs(lnbuf, fo);
 	}
