@@ -295,5 +295,10 @@ void reset_view()
 	cut.clear();
 	it = text.begin();
 	print_text(0);
+	reset_header();
+	print_lines();
 	wmove(text_win, 0, 0);
+	wnoutrefresh(ln_win);
+	wnoutrefresh(header_win);
+	doupdate();
 }

@@ -245,13 +245,8 @@ loop:
 			endwin();
 			refresh();
 			getmaxyx(stdscr, maxy, maxx);
-			reset_header();
-			print_lines();
 			delwin(text_win);
 			init_text();
-			wnoutrefresh(ln_win);
-			wnoutrefresh(header_win);
-			doupdate();
 			getmaxyx(text_win, maxy, maxx);
 			reset_view();
 			break;
