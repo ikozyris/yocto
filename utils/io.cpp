@@ -91,7 +91,7 @@ void save()
 	wmove(text_win, y, x);
 }
 
-// For size see: https://github.com/ikozyris/yocto/wiki/Comments-on-optimizations#buffer-size-for-reading
+// For size see: https://github.com/ikozyris/kri/wiki/Comments-on-optimizations#buffer-size-for-reading
 #define SZ 524288 // 512 KiB
 
 void read_fgets(FILE *fi)

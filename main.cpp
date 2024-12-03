@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
 	if (argc > 1 && (strcmp(argv[1], "-h") == 0 ||
 	strcmp(argv[1], "--help") == 0)) {
 		puts(name);
-		puts("Yocto: a simple, compact and fast text editor.\n"
-		"Source code: https://github.com/ikozyris/yocto\n"
-		"Wiki: https://github.com/ikozyris/yocto/wiki\n"
+		puts("kri: a simple, compact and fast text editor.\n"
+		"Source code: https://github.com/ikozyris/kri\n"
+		"Wiki: https://github.com/ikozyris/kri/wiki\n"
 		"License: GNU GPL v3\n");
 		puts("Usage:\n"
 		"       --help, -h          Show this help\n"
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 		"Show debbuging info:       Alt-I (also command stats in built-in terminal)\n\n"
 		"Built-in terminal commands:\n"
 		"scroll                     Scroll to line\n"
-		"usage                      Show RAM usage and PID of yocto\n"
+		"usage                      Show RAM usage and PID of kri\n"
 		"run                        Execute a command\n"
 		"help                       List commands\n"
 		"fixgap                     Benchmark move gap to end and back");

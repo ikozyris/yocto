@@ -20,5 +20,5 @@ jobs:
     - name: upload artifact
       uses: actions/upload-artifact@v4.3.3
       with:
-        name: yocto
-        path: ./yocto
+        name: kri
+        path: ./kri

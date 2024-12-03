@@ -17,7 +17,7 @@ ultimate_question:
 	printf("Which is the best text editor? ");
 	scanf("%5s", input);
 	// 42 is magic number
-	if (strcmp(input, "yocto") == 0 || strcmp(input, "42") == 0) {
+	if (strcmp(input, "kri") == 0 || strcmp(input, "42") == 0) {
 		printf("Correct!\n");
 		goto exit;
 	} else {

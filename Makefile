@@ -17,7 +17,7 @@ DEBUG = -g #-DDEBUG
 CXXFLAGS = -Wall -Wextra -pedantic $(OPTIM) -DHIGHLIGHT -lncursesw
 
 # the build target executable:
-TARGET = yocto
+TARGET = kri
 PATHT = /usr/bin/
 # root is not required to install
 #PATHT = ~/.local/bin/

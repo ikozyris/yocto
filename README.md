@@ -1,9 +1,9 @@
-# Yocto
-<!--[![C/C++ CI](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ikozyris/yocto/actions/workflows/c-cpp.yml)-->
+# kri
+<!--[![C/C++ CI](https://github.com/ikozyris/kri/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/ikozyris/kri/actions/workflows/c-cpp.yml)-->
 A simple, compact and *fast* text editor using ncurses and a gap buffer, written in C++, in ~1.3k lines of code.
-More information is available on the [wiki](https://github.com/ikozyris/yocto/wiki).
+More information is available on the [wiki](https://github.com/ikozyris/kri/wiki).
 
-![A C++ file in Yocto](https://github.com/ikozyris/yocto/assets/80053394/8fa12952-272f-41e0-9535-0a77f3652286)
+![A C++ file in kri](https://github.com/ikozyris/kri/assets/80053394/8fa12952-272f-41e0-9535-0a77f3652286)
 
 ## Build
 ```sh
@@ -12,13 +12,13 @@ sudo make install
 ```
 
 Or use the user-friendly dialog utility `wizard.sh`
-which also supports configuring yocto
+which also supports configuring kri
 
 ## Usage
 ```sh
-yocto text.txt # open existing file or create if it doesn't exist
-yocto --help # show help page
-yocto # ask for filename on save file operation
+kri text.txt # open existing file or create if it doesn't exist
+kri --help # show help page
+kri # ask for filename on save file operation
 ```
 
 ### Keybindings
@@ -32,12 +32,12 @@ yocto # ask for filename on save file operation
 * Show info: Alt-I (also command _stats_ in built-in terminal)
 
 ### How fast is it?
-Yocto is several times faster than any other text editor at reading files and other operations.
-See the [benchmarks](https://github.com/ikozyris/yocto/wiki/Performance-&-Benchmarks) for more.
+kri is several times faster than any other text editor at reading files and other operations.
+See the [benchmarks](https://github.com/ikozyris/kri/wiki/Performance-&-Benchmarks) for more.
 
 ### About the name
-Yocto is the SI (metric) prefix for 10^-24.
-Since this text editor is tiny, yocto is a suitable name.
+kri is the SI (metric) prefix for 10^-24.
+Since this text editor is tiny, kri is a suitable name.
 
 ### License
 

@@ -23,7 +23,7 @@ isroot() {
 }
 
 DIALOG() {
-	$DIAL --clear --backtitle "Yocto Installation Wizard" "$@"
+	$DIAL --clear --backtitle "kri Installation Wizard" "$@"
 }
 
 display_result() {
@@ -207,29 +207,29 @@ while true; do
 		;;
 	2 )
 		if make build 2>&1 >/dev/null | grep -q Error; then
-			display_result "Failed to build yocto" "Make sure to report the output of make at: https://github.com/ikozyris/yocto/issues"
+			display_result "Failed to build kri" "Make sure to report the output of make at: https://github.com/ikozyris/kri/issues"
 	    	else
-			display_result "Succesfully built yocto" "Now you can install!"
+			display_result "Succesfully built kri" "Now you can install!"
 		fi
 		;;
 	3 )
 		if [ -d ~/.local/bin ]; then
-			cp yocto ~/.local/bin/
-			display_result "Installed Yocto" "Installed in ~/.local/bin"
+			cp kri ~/.local/bin/
+			display_result "Installed kri" "Installed in ~/.local/bin"
 		else
 			if isroot; then
-				cp yocto /usr/bin/
-				display_result "Installed Yocto" "Installed in /usr/bin"
+				cp kri /usr/bin/
+				display_result "Installed kri" "Installed in /usr/bin"
 			fi
 		fi
 		;;
 	4 )
-		if [ -f ~/.local/bin/yocto ]; then
-			rm ~/.local/bin/yocto
+		if [ -f ~/.local/bin/kri ]; then
+			rm ~/.local/bin/kri
 			display_result "We are sorry to see you go." "Uninstalled from ~/.local/bin"
 		else
 			if isroot; then
-				rm /usr/bin/yocto
+				rm /usr/bin/kri
 				display_result "We are sorry to see you go." "Uninstalled from /usr/bin"
 			fi
 		fi
