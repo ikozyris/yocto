@@ -35,10 +35,6 @@ kri # ask for filename on save file operation
 kri is several times faster than any other text editor at reading files and other operations.
 See the [benchmarks](https://github.com/ikozyris/kri/wiki/Performance-&-Benchmarks) for more.
 
-### About the name
-kri is the SI (metric) prefix for 10^-24.
-Since this text editor is tiny, kri is a suitable name.
-
 ### License
 
 Copyright (C) 2022-2024  ikozyris

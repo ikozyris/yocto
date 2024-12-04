@@ -24,7 +24,7 @@ unsigned memusg()
 	FILE *file = fopen("/proc/self/smaps", "r");
 	while (fscanf(file, " %1023s", buffer) == 1)
 		if (strcmp(buffer, "Pss:") == 0) {
-			fscanf(file, " %lu", &tmp);
+			fscanf(file, " %u", &tmp);
 			memusg += tmp;
 		}
 	fclose(file);
