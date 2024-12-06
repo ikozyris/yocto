@@ -1,6 +1,6 @@
 #pragma once
 #include "../utils/headers/gapbuffer.h"
-#define DEFAULT_LINES 16
+#define DEFAULT_LINES 4
 extern unsigned txt_cpt; // pre-allocated nodes
 extern list<gap_buf> text;
 extern list<gap_buf>::iterator it;

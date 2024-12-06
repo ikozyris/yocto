@@ -206,6 +206,7 @@ loop:
 			break;
 
 		case SAVE:
+			s2[0] = 0;
 			save();
 			break;
 
@@ -250,6 +251,16 @@ loop:
 			break;
 
 		case EXIT:
+			if (s2[0] != 0 || argc < 2 || text.size() % 2 == 1 /*allocations are multiples of 2*/) {
+				char *in = input_header("Unsaved changes, proceed? (y,n) ");
+				s[3] = in[0];
+				free(in);
+				if (s[3] != 'y') {
+					reset_header();
+					wmove(text_win, y, x);
+					break;
+				}
+			}
 			goto stop;
 
 		case KEY_TAB:
