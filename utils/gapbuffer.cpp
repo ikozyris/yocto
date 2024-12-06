@@ -15,16 +15,18 @@ void init(gap_buf &a)
 void resize(gap_buf &a, unsigned size)
 {
 	a.buffer = (char*)realloc(a.buffer, size);
-	// copy after gap (newline or more) 
+	if (a.gpe < a.cpt - 1) { // copy after gap (newline + more)
 	memmove(a.buffer + size - a.len + a.gps, a.buffer + a.gpe + 1, a.len - a.gps);
-	a.gpe = size - a.len + a.gps - 1;
+		a.gpe = size - a.len + a.gps - 1;
+	} else
+		a.gpe = size - 1;
 	a.cpt = size;
 }
 
 void mv_curs(gap_buf &a, unsigned pos)
 {
 	if (a.gps == a.gpe) [[unlikely]]
-		resize(a, __bit_ceil(a.cpt));
+		resize(a, __bit_ceil(a.cpt + 1));
 	if (pos > a.gps) // move gap to right
 		memmove(a.buffer + a.gps, a.buffer + a.gpe + 1, pos - a.gps);
 	else if (pos < a.gps) // move gap to left
@@ -39,7 +41,7 @@ void mv_curs(gap_buf &a, unsigned pos)
 void insert_c(gap_buf &a, unsigned pos, char ch)
 {
 	if (a.len == a.cpt) [[unlikely]]
-		resize(a, __bit_ceil(a.cpt));
+		resize(a, __bit_ceil(a.cpt + 1));
 	if (ingap(a, pos)) { [[likely]]
 		a[pos] = ch;
 		++a.gps;
@@ -52,7 +54,7 @@ void insert_c(gap_buf &a, unsigned pos, char ch)
 
 void insert_s(gap_buf &a, unsigned pos, const char *str, unsigned len)
 {
-	// is this uneeded? (later it is also checked indirectly)
+	// TODO: are both checks needed? (checked indirectly?)
 	if (a.len + len >= a.cpt) [[unlikely]]
 		resize(a, __bit_ceil(a.len + len + 2));
 	if (gaplen(a) <= len)
@@ -65,7 +67,7 @@ void insert_s(gap_buf &a, unsigned pos, const char *str, unsigned len)
 void apnd_c(gap_buf &a, char ch)
 {
 	if (a.len >= a.cpt) [[unlikely]]
-		resize(a, __bit_ceil(a.cpt));
+		resize(a, __bit_ceil(a.cpt + 1));
 	a[a.len] = ch;
 	++a.len;
 	++a.gps;
@@ -111,9 +113,9 @@ void eras(gap_buf &a)
 		from = 0;\
 	if (to < from || to > src.len)\
 		to = src.len;\
-	if (lnbf_cpt < to - from + 3) {\
+	if (lnbf_cpt < to - from + 1) {\
 		free(lnbuf);\
-		lnbf_cpt = to - from + 10;\
+		lnbf_cpt = __bit_ceil(to - from + 1);\
 		lnbuf = (char*)malloc(lnbf_cpt);\
 	}\
 }

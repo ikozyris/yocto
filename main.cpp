@@ -172,8 +172,6 @@ loop:
 			break;
 
 		case DELETE:
-			if (rx + 1u > it->len)
-				break;
 			if (it->buffer[it->gpe + 1u] == '\n') { // similar to backspace
 				list<gap_buf>::iterator curln = it; // current line
 				curln->gpe = curln->cpt - 1; // delete newline
@@ -186,7 +184,7 @@ loop:
 				--curnum;
 				print_text(y);
 				wmove(text_win, y, x);
-			} else {
+			} else if (rx + 1 < it->len) {
 				wdelch(text_win);
 				// or mblen(it->buffer + it->gpe + 1, 3);
 				unsigned len = it->buffer[it->gpe + 1] < 0 ? 2 : 1;
