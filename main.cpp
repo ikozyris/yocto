@@ -110,7 +110,13 @@ loop:
 			else {
 				++it;
 				ofx = calc_offset_dis(x, *it);
-				wmove(text_win, y + 1, flag);
+				if (flag < maxx)
+					wmove(text_win, y + 1, flag);
+				else { // tab cut
+					y++;
+					x = flag;
+					ofx += prevdchar();
+				}
 			}
 			break;
 
@@ -122,7 +128,13 @@ loop:
 			else if (y != 0) {
 				--it;
 				ofx = calc_offset_dis(x, *it);
-				wmove(text_win, y - 1, flag);
+				if (flag < maxx)
+					wmove(text_win, y - 1, flag);
+				else { // tab cut
+					y--;
+					x = flag;
+					ofx += prevdchar();
+				}
 			}
 			cut.clear();
 			break;
@@ -156,7 +168,7 @@ loop:
 					wmove(text_win, y, x);
 				} else
 					mvwdelch(text_win, y, x - 1);
-			} else if (y != 0) { // x = 0; merge lines
+			} else if (y != 0 && cut.empty()) { // x = 0; merge lines
 				list<gap_buf>::iterator curln = it;
 				--it;
 				mv_curs(*it, it->len); // delete \n
@@ -168,6 +180,9 @@ loop:
 				--curnum;
 				print_text(y - 1);
 				wmove(text_win, y - 1, tmp);
+			} else {
+				eras(*it);
+				left();
 			}
 			break;
 

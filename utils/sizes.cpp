@@ -89,7 +89,7 @@ long calc_offset_act(unsigned pos, unsigned i, const gap_buf &buf)
 	return (long)i - (long)x;
 }
 
-// currently on a tab; go to previous char (non-whitespace), requires cursor = x - 1
+// currently on a tab; go to previous char
 unsigned prevdchar()
 {
 	long prev_ofx = calc_offset_dis(x - 7, *it);
