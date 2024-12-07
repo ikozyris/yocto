@@ -3,6 +3,6 @@
 #include <string.h>
 #include <locale.h>	// for setting locale
 #include <list>
-#include <deque>
+#include <vector>
 #include <bit>	// for __bit_ceil (cntlz)
 using namespace std;

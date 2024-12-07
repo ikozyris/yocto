@@ -1,10 +1,9 @@
 #include "utils/headers/key_func.h"
 #include "headers/keybindings.h"
 
-unsigned txt_cpt = DEFAULT_LINES;
-list<gap_buf> text(DEFAULT_LINES);
+list<gap_buf> text(4);
 list<gap_buf>::iterator it;
-deque<pair<unsigned, unsigned>> cut;
+vector<pair<unsigned, unsigned>> cut(4);
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[4];
 char s2[4], *filename;
@@ -213,7 +212,6 @@ loop:
 		case DELLINE:
 			if (curnum > 0 && text.size() > 2) {
 				curnum--;
-				txt_cpt--;
 				list<gap_buf>::iterator curln = it;
 				++it;
 				text.erase(curln);

@@ -1,7 +1,5 @@
 #pragma once
 #include "../utils/headers/gapbuffer.h"
-#define DEFAULT_LINES 4
-extern unsigned txt_cpt; // pre-allocated nodes
 extern list<gap_buf> text;
 extern list<gap_buf>::iterator it;
 
@@ -9,7 +7,7 @@ extern list<gap_buf>::iterator it;
 #define dchar first
 // bytes printed in current cut
 #define byte second
-extern deque<pair<unsigned, unsigned>> cut;
+extern vector<pair<unsigned, unsigned>> cut;
 
 extern WINDOW *header_win, *ln_win, *text_win;
 extern wchar_t s[4];

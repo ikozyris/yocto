@@ -37,8 +37,7 @@ void command()
 		lnbf_cpt = 16;
 		lnbuf = (char*)realloc(lnbuf, lnbf_cpt);
                 // shrink linked list
-		txt_cpt = curnum + 1;
-                text.resize(txt_cpt);
+                text.resize(curnum + 1);
 		//shrink each line
 		size_t bytes_freed = 0;
 		for (auto &i : text)
