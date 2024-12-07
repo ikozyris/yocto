@@ -47,8 +47,9 @@ unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 			to = prop;
 			cchar_t tmp;
 			setcchar(&tmp, L">", A_STANDOUT, COLOR_BLACK, nullptr);
+			int prevx = getcurx(text_win); // in case x != 0 (mvprint_line)
 			mvwins_wch(text_win, getcury(text_win), maxx - 1, &tmp);
-			wmove(text_win, getcury(text_win), 0);
+			wmove(text_win, getcury(text_win), prevx);
 		} else
 			to = buffer.len;
 	}

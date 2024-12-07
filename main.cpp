@@ -206,8 +206,9 @@ loop:
 			break;
 
 		case SAVE:
-			s2[0] = 0;
 			save();
+			s2[0] = 0; // no new char has been inserted since last save
+			argc = 3;
 			break;
 
 		case 27: { // ALT or ESC
@@ -251,11 +252,12 @@ loop:
 			break;
 
 		case EXIT:
-			if (s2[0] != 0 || argc < 2 || text.size() % 2 == 1 /*allocations are multiples of 2*/) {
-				char *in = input_header("Unsaved changes, proceed? (y,n) ");
-				s[3] = in[0];
+			// has char been inserted, new file, allocations are multiples of 2
+			if (s2[0] != 0 || argc < 2 || text.size() % 2 == 1) {
+				char *in = input_header("Unsaved changes, exit? (y/n) ");
+				flag = in[0]; // tmp var to free branchlessly
 				free(in);
-				if (s[3] != 'y') {
+				if (flag != 'y') {
 					reset_header();
 					wmove(text_win, y, x);
 					break;
@@ -276,8 +278,11 @@ loop:
 			if (x == maxx - 1) { // cut line
 				cut.push_back({maxx - 1, ofx});
 				clearline;
-				mvprint_line(y, 1, *it, ofx, 0);
+				ofx += maxx - 1;
+				print_line(*it, ofx, 0);
 				wmove(text_win, y, x = 0);
+				wrefresh(text_win);
+				rx = x + ofx;
 			} if (it->buffer[it->gpe + 1] == '\t') { // next character is newline
 				waddnwstr(text_win, s, 1);
 				if (x % 8 >= 7)
