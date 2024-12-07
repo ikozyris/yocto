@@ -42,7 +42,7 @@ unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 	if (buffer.len <= 1)
 		return 0;
 	if (to == 0) {
-		unsigned prop = dchar2bytes(maxx - 1, from, buffer);
+		unsigned prop = dchar2bytes(maxx - 1 - from, from, buffer);
 		if (prop < buffer.len - 1) {
 			to = prop;
 			cchar_t tmp;

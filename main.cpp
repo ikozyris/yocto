@@ -200,11 +200,13 @@ loop:
 				print_text(y);
 				wmove(text_win, y, x);
 			} else if (rx + 1 < it->len) {
-				wdelch(text_win);
 				// or mblen(it->buffer + it->gpe + 1, 3);
 				unsigned len = it->buffer[it->gpe + 1] < 0 ? 2 : 1;
 				mveras(*it, rx + len);
 				ofx += len - 1;
+				wclrtoeol(text_win);
+				mvprint_line(y, x, *it, x, 0);
+				wmove(text_win, y, x);
 			}
 			break;
 
