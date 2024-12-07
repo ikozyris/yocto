@@ -74,6 +74,24 @@ void print_text(unsigned line)
 	}
 }
 
+// search for str in buf, return <position, color(position;s)>
+vector<pair<unsigned, chtype>> search(const gap_buf &buf, const char *str, unsigned len)
+{
+	unsigned j = 0;
+	vector<pair<unsigned, chtype>> matches;
+	for (unsigned i = 0; i < buf.len; ++i) {
+		for (j = 0; j <= len; ++j)
+			if (at(buf, i + j) != str[j])
+				break;
+		if (j == len) {
+			chtype tmp = PAIR_NUMBER(winch(text_win) & A_COLOR);
+			matches.push_back({i, tmp});
+			i += len;
+		}
+	}
+	return matches; // copy elision
+}
+
 // save buffer to global filename, if empty ask for it on header
 void save()
 {

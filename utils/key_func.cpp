@@ -105,6 +105,25 @@ void command()
 			print_text(0);
 			advance(it, ofy - ry);
 		}
+	} else if (strcmp(tmp, "search") == 0) {
+		free(tmp);
+		tmp = input_header("token: ");
+		unsigned tmp_len = strlen(tmp);
+		vector<pair<unsigned, chtype>> matches = search(*it, tmp, tmp_len);
+		snprintf(tmp, 128, "%lu matches", matches.size());
+		print2header(tmp, 1);
+		for (unsigned i = 0; i < matches.size(); ++i) { // highlight all
+			wmove(text_win, y, matches[i].first);
+			wchgat(text_win, tmp_len, A_STANDOUT, matches[i].second, 0);
+		}
+		wrefresh(text_win);
+		curs_set(0);
+		wgetch(text_win);
+		for (unsigned i = 0; i < matches.size(); ++i) { // go through each one
+			wmove(text_win, y, matches[i].first);
+			wchgat(text_win, tmp_len, 0, matches[i].second, 0);
+		}
+		curs_set(1);
 	} else
 		print2header("command not found", 3);
 	free(tmp);

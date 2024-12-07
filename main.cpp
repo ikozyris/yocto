@@ -3,7 +3,7 @@
 
 list<gap_buf> text(4);
 list<gap_buf>::iterator it;
-vector<pair<unsigned, unsigned>> cut(4);
+vector<pair<unsigned, unsigned>> cut;
 WINDOW *header_win, *ln_win, *text_win;
 wchar_t s[4];
 char s2[4], *filename;
@@ -245,6 +245,7 @@ loop:
 		case 27: { // ALT or ESC
 			wtimeout(text_win, 1000);
 			int ch = wgetch(text_win);
+			wtimeout(text_win, -1);
 			if (ch == INFO)
 				stats();
 			else if (ch == CMD)
@@ -263,7 +264,6 @@ loop:
 				wclear(text_win);
 				goto read;
 			}
-			wtimeout(text_win, -1);
 			wmove(text_win, y, x);
 			break;
 		}
