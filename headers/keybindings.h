@@ -20,3 +20,4 @@
 #define KEY_TAB		9
 #define CMD		'c'
 #define SWITCH		'r'
+#define DELLINE		ctrl('K')

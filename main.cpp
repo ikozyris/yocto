@@ -210,6 +210,22 @@ loop:
 			}
 			break;
 
+		case DELLINE:
+			if (curnum > 0 && text.size() > 2) {
+				curnum--;
+				txt_cpt--;
+				list<gap_buf>::iterator curln = it;
+				++it;
+				text.erase(curln);
+				print_text(y);
+				wmove(text_win, y, 0);
+			} else { // clear line buffer
+				it->gps = 0; it->gpe = it->cpt - 2;
+				it->len = 1; it->buffer[it->cpt - 1] = 0;
+				clearline;
+			}
+			break;
+
 		case ENTER:
 			enter();
 			break;
