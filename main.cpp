@@ -1,7 +1,7 @@
 #include "utils/headers/key_func.h"
 #include "headers/keybindings.h"
 
-list<gap_buf> text(4);
+list<gap_buf> text(2);
 list<gap_buf>::iterator it;
 vector<pair<unsigned, unsigned>> cut;
 WINDOW *header_win, *ln_win, *text_win;
@@ -240,6 +240,8 @@ loop:
 			save();
 			s2[0] = 0; // no new char has been inserted since last save
 			argc = 3;
+			if (text.size() % 2 == 1)
+				text.resize(text.size() + 1);
 			break;
 
 		case 27: { // ALT or ESC
