@@ -61,15 +61,14 @@ read:
 		filename = (char*)malloc(sizeof(char) * 128);
 		strcpy(filename, argv[1]);
 		FILE *fi = fopen(filename, "r");
+#ifdef HIGHLIGHT
+		eligible = isc(argv[1]); // syntax highlighting
+#endif
 		if (fi == NULL) {
 			print2header("New file", 1);
 			goto loop;
 		}
-#ifdef HIGHLIGHT
-		eligible = isc(argv[1]); // syntax highlighting
-#endif
 		read_fread(fi);
-		print_text(0);
 		fclose(fi);
 	}
 loop:
@@ -77,6 +76,7 @@ loop:
 	// all functions think there is a newline at EOL, emulate it
 	if (at(*it, it->len) != '\n')
 		apnd_c(*it, 0);
+	print_text(0);
 	it = text.begin();
 	while (1) {
 		getyx(text_win, y, x);
@@ -204,7 +204,7 @@ loop:
 				mveras(*it, rx + len);
 				ofx += len - 1;
 				wclrtoeol(text_win);
-				mvprint_line(y, x, *it, x, 0);
+				mvprint_line(y, x, *it, rx, 0);
 				wmove(text_win, y, x);
 			}
 			break;
@@ -225,6 +225,7 @@ loop:
 			break;
 
 		case ENTER:
+			highlight(y);
 			enter();
 			break;
 
