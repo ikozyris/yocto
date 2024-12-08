@@ -57,30 +57,26 @@ void command()
 		print2header(buffer, 1);
 	} else if (strcmp(tmp, "usage") == 0) {
 		size_t pid = 0;
-		// stores each word in status file
-		char buffer[1024] = "";
 
 		// Linux-only
 		FILE *file = fopen("/proc/self/status", "r");
-		while (fscanf(file, " %1023s", buffer) == 1)
-			if (strcmp(buffer, "Pid:") == 0) {
+		while (fscanf(file, " %127s", tmp) == 1)
+			if (strcmp(tmp, "Pid:") == 0) {
 				fscanf(file, " %lu", &pid);
 				break;
 			}
 		fclose(file);
 		char ram_usg[24];
 		hrsize(memusg() * 1000, ram_usg, 24);
-		sprintf(buffer, "RAM: %s PID: %lu", ram_usg, pid);
+		sprintf(tmp, "RAM: %s PID: %lu", ram_usg, pid);
 		clear_header();
-		print2header(buffer, 1);
+		print2header(tmp, 1);
 	} else if (strcmp(tmp, "stats") == 0)
 		stats();
-	else if (strcmp(tmp, "run") == 0) {
-		char *_tmp = input_header("Enter command: ");
+	else if (strncmp(tmp, "run", 3) == 0) {
 		clear();
 		refresh();
-		int res = system(_tmp);
-		free(_tmp);
+		int res = system(tmp + 4);
 		printw("\nreturned: %d", res);
 
 		getch();
@@ -93,11 +89,9 @@ void command()
 		wmove(text_win, y, x);
 	} else if (strcmp(tmp, "help")  == 0)
 		print2header("resetheader, shrink, usage, stats, run, scroll", 1);
-	else if (strcmp(tmp, "scroll") == 0) {
-		char *in = input_header("Scroll to line: ");
+	else if (strncmp(tmp, "scroll", 6) == 0) {
 		unsigned a;
-		sscanf(in, "%u", &a);
-		free(in);
+		sscanf(tmp + 7, "%u", &a);
 		if (a <= curnum) {
 			ofy = a - 1;
 			print_lines();
@@ -105,11 +99,9 @@ void command()
 			print_text(0);
 			advance(it, ofy - ry);
 		}
-	} else if (strcmp(tmp, "search") == 0) {
-		free(tmp);
-		tmp = input_header("token: ");
-		unsigned tmp_len = strlen(tmp);
-		vector<pair<unsigned, chtype>> matches = search(*it, tmp, tmp_len);
+	} else if (strncmp(tmp, "search", 6) == 0) {
+		unsigned tmp_len = strlen(tmp + 7);
+		vector<pair<unsigned, chtype>> matches = search(*it, tmp + 7, tmp_len);
 		snprintf(tmp, 128, "%lu matches", matches.size());
 		print2header(tmp, 1);
 		for (unsigned i = 0; i < matches.size(); ++i) { // highlight all
