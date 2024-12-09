@@ -72,11 +72,11 @@ read:
 		fclose(fi);
 	}
 loop:
-	wmove(text_win, 0, 0);
 	// all functions think there is a newline at EOL, emulate it
 	if (at(*it, it->len) != '\n')
 		apnd_c(*it, 0);
 	print_text(0);
+	wmove(text_win, 0, 0);
 	it = text.begin();
 	while (1) {
 		getyx(text_win, y, x);

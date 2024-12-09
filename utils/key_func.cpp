@@ -80,15 +80,9 @@ void command()
 		printw("\nreturned: %d", res);
 
 		getch();
-		reset_header();
-		print_text(0);
-		print_lines();
-		wnoutrefresh(ln_win);
-		wnoutrefresh(header_win);
-		doupdate();
-		wmove(text_win, y, x);
+		reset_view();
 	} else if (strcmp(tmp, "help")  == 0)
-		print2header("resetheader, shrink, usage, stats, run, scroll", 1);
+		print2header("resetheader, shrink, usage, stats, run [cmd], scroll [line], search [token]", 1);
 	else if (strncmp(tmp, "scroll", 6) == 0) {
 		unsigned a;
 		sscanf(tmp + 7, "%u", &a);
@@ -102,7 +96,7 @@ void command()
 	} else if (strncmp(tmp, "search", 6) == 0) {
 		unsigned tmp_len = strlen(tmp + 7);
 		vector<pair<unsigned, chtype>> matches = search(*it, tmp + 7, tmp_len);
-		snprintf(tmp, 128, "%lu matches", matches.size());
+		snprintf(tmp, 128, "%lu matches     ", matches.size());
 		print2header(tmp, 1);
 		for (unsigned i = 0; i < matches.size(); ++i) { // highlight all
 			wmove(text_win, y, matches[i].first);
