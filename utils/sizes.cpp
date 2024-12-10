@@ -80,12 +80,23 @@ unsigned dchar2bytes(unsigned dx, unsigned from, const gap_buf &buf)
 	return i;
 }
 
+// count multi-byte characters in string
+unsigned mbcnt(const char *str, unsigned len)
+{
+	unsigned count = 0; // multi-byte char
+	for (unsigned i = 0; i < len && str[i] != 0; ++i)
+		if (str[i] < 0)
+			count++;
+	return count / 2; // only 2-byte multibyte chars are supported
+}
+
 // offset until pos bytes from i bytes in buf
 long calc_offset_act(unsigned pos, unsigned i, const gap_buf &buf)
 {
 	unsigned x = 0;
 	while (i < pos)
 		get_off(x, i, buf);
+	flag = x;
 	return (long)i - (long)x;
 }
 

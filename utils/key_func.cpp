@@ -96,10 +96,15 @@ void command()
 	} else if (strncmp(tmp, "search", 6) == 0) {
 		unsigned tmp_len = strlen(tmp + 7);
 		vector<pair<unsigned, chtype>> matches = search(*it, tmp + 7, tmp_len);
+		tmp_len -= mbcnt(tmp + 7, tmp_len); // get displayed characters
 		snprintf(tmp, 128, "%lu matches     ", matches.size());
 		print2header(tmp, 1);
+		unsigned off = 0, previ = 0;
 		for (unsigned i = 0; i < matches.size(); ++i) { // highlight all
-			wmove(text_win, y, matches[i].first);
+			calc_offset_act(matches[i].first, previ, *it);
+			previ = matches[i].first;
+			matches[i].first = off += flag;
+			wmove(text_win, y, off);
 			wchgat(text_win, tmp_len, A_STANDOUT, matches[i].second, 0);
 		}
 		wrefresh(text_win);

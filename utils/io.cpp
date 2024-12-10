@@ -119,9 +119,8 @@ void read_fgets(FILE *fi)
 	while ((fgets_unlocked(tmp, SZ, fi))) {
 		apnd_s(*it, tmp);
 		if (it->buffer[it->len - 1] == '\n') { [[unlikely]]
-			if (++curnum >= text.size()) { [[unlikely]]
+			if (++curnum >= text.size()) [[unlikely]]
 				text.resize(text.size() * 2);
-			}
 			++it;
 		}
 	}
@@ -136,9 +135,8 @@ void read_fread(FILE *fi)
 		while ((res = whereis(tmp + j, '\n')) > 0) {
 			apnd_s(*it, tmp + j, res);
 			j += res;
-			if (++curnum >= text.size()) {
+			if (++curnum >= text.size())
 				text.resize(text.size() * 2);
-			}
 			++it;
 		}
 		// if last character is not a newline
