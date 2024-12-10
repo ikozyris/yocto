@@ -42,12 +42,12 @@ unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 	if (buffer.len <= 1)
 		return 0;
 	if (to == 0) {
-		unsigned prop = dchar2bytes(maxx - 1 - from, from, buffer);
+		int prevx = getcurx(text_win); // in case x != 0 (mvprint_line)
+		unsigned prop = dchar2bytes(maxx - 1 - prevx, from, buffer);
 		if (prop < buffer.len - 1) {
 			to = prop;
 			cchar_t tmp;
 			setcchar(&tmp, L">", A_STANDOUT, COLOR_BLACK, nullptr);
-			int prevx = getcurx(text_win); // in case x != 0 (mvprint_line)
 			mvwins_wch(text_win, getcury(text_win), maxx - 1, &tmp);
 			wmove(text_win, getcury(text_win), prevx);
 		} else
@@ -57,6 +57,7 @@ unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 	if (lnbuf[rlen - 1] == '\n' || lnbuf[rlen - 1] == '\t')
 		--rlen;
 	waddnstr(text_win, lnbuf, rlen);
+	wclrtoeol(text_win);
 	return rlen;
 }
 

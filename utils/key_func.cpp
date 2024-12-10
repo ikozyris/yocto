@@ -99,22 +99,19 @@ void command()
 		tmp_len -= mbcnt(tmp + 7, tmp_len); // get displayed characters
 		snprintf(tmp, 128, "%lu matches     ", matches.size());
 		print2header(tmp, 1);
-		unsigned off = 0, previ = 0;
+		unsigned dx = 0, previ = 0;
 		for (unsigned i = 0; i < matches.size(); ++i) { // highlight all
 			calc_offset_act(matches[i].first, previ, *it);
 			previ = matches[i].first;
-			matches[i].first = off += flag;
-			wmove(text_win, y, off);
+			matches[i].first = dx += flag;
+			if (dx > maxx)
+				mvprint_line(y, 0, *it, previ - previ % maxx, 0);
+			wmove(text_win, y, dx % maxx);
 			wchgat(text_win, tmp_len, A_STANDOUT, matches[i].second, 0);
+			if (wgetch(text_win) == 27) // escape
+				break;
 		}
-		wrefresh(text_win);
-		curs_set(0);
-		wgetch(text_win);
-		for (unsigned i = 0; i < matches.size(); ++i) { // go through each one
-			wmove(text_win, y, matches[i].first);
-			wchgat(text_win, tmp_len, 0, matches[i].second, 0);
-		}
-		curs_set(1);
+		mvprint_line(y, 0, *it, 0, 0);
 	} else
 		print2header("command not found", 3);
 	free(tmp);
