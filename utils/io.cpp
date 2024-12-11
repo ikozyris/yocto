@@ -81,13 +81,13 @@ vector<pair<unsigned, chtype>> search(const gap_buf &buf, const char *str, unsig
 	unsigned j = 0;
 	vector<pair<unsigned, chtype>> matches;
 	for (unsigned i = 0; i < buf.len; ++i) {
-		for (j = 0; j <= len; ++j)
+		for (j = 0; j < len; ++j)
 			if (at(buf, i + j) != str[j])
 				break;
 		if (j == len) {
 			chtype tmp = PAIR_NUMBER(winch(text_win) & A_COLOR);
 			matches.push_back({i, tmp});
-			i += len;
+			i += len - 1;
 		}
 	}
 	return matches; // copy elision

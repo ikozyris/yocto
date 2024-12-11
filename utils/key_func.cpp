@@ -93,25 +93,31 @@ void command()
 			print_text(0);
 			advance(it, ofy - ry);
 		}
-	} else if (strncmp(tmp, "search", 6) == 0) {
-		unsigned tmp_len = strlen(tmp + 7);
-		vector<pair<unsigned, chtype>> matches = search(*it, tmp + 7, tmp_len);
-		tmp_len -= mbcnt(tmp + 7, tmp_len); // get displayed characters
+	} else if (strncmp(tmp, "find", 4) == 0) {
+		unsigned tmp_len = strlen(tmp + 5);
+		vector<pair<unsigned, chtype>> matches = search(*it, tmp + 5, tmp_len);
+		tmp_len -= mbcnt(tmp + 5, tmp_len); // get displayed characters
 		snprintf(tmp, 128, "%lu matches     ", matches.size());
 		print2header(tmp, 1);
-		unsigned dx = 0, previ = 0;
+		curs_set(0);
+		unsigned dx = 0, previ = 0, prevpr = 0;
 		for (unsigned i = 0; i < matches.size(); ++i) { // highlight all
 			calc_offset_act(matches[i].first, previ, *it);
 			previ = matches[i].first;
-			matches[i].first = dx += flag;
-			if (dx > maxx)
-				mvprint_line(y, 0, *it, previ - previ % maxx, 0);
-			wmove(text_win, y, dx % maxx);
+			dx += flag;
+			if (dx >= maxx - 1 + prevpr) {
+				if (wgetch(text_win) == 27) // escape
+					goto clr_high;
+				prevpr = previ - previ % (maxx - 1);
+				mvprint_line(y, 0, *it, prevpr, 0);
+			}
+			wmove(text_win, y, dx % (maxx - 1));
 			wchgat(text_win, tmp_len, A_STANDOUT, matches[i].second, 0);
-			if (wgetch(text_win) == 27) // escape
-				break;
 		}
+		wgetch(text_win); // escape
+clr_high:
 		mvprint_line(y, 0, *it, 0, 0);
+		curs_set(1);
 	} else
 		print2header("command not found", 3);
 	free(tmp);
