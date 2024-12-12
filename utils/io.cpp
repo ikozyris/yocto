@@ -75,18 +75,17 @@ void print_text(unsigned line)
 	}
 }
 
-// search for str in buf, return <position, color(position;s)>
-vector<pair<unsigned, chtype>> search(const gap_buf &buf, const char *str, unsigned len)
+// search for str in buf, return position
+vector<unsigned> search(const gap_buf &buf, const char *str, unsigned len)
 {
 	unsigned j = 0;
-	vector<pair<unsigned, chtype>> matches;
+	vector<unsigned> matches;
 	for (unsigned i = 0; i < buf.len; ++i) {
 		for (j = 0; j < len; ++j)
 			if (at(buf, i + j) != str[j])
 				break;
 		if (j == len) {
-			chtype tmp = PAIR_NUMBER(winch(text_win) & A_COLOR);
-			matches.push_back({i, tmp});
+			matches.push_back(i);
 			i += len - 1;
 		}
 	}
