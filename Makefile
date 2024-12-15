@@ -29,7 +29,8 @@ SRCS = main.cpp \
 	screen/highlight.cpp \
 	screen/init.cpp \
 	utils/sizes.cpp \
-	utils/gapbuffer.cpp
+	utils/gapbuffer.cpp \
+	utils/search.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

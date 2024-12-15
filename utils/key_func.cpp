@@ -94,31 +94,7 @@ void command()
 			advance(it, ofy - ry);
 		}
 	} else if (strncmp(tmp, "find", 4) == 0) {
-		unsigned tmp_len = strlen(tmp + 5);
-		vector<unsigned> matches = search(*it, tmp + 5, tmp_len);
-		tmp_len -= mbcnt(tmp + 5, tmp_len); // get displayed characters
-		snprintf(tmp, 128, "%lu matches     ", matches.size());
-		print2header(tmp, 1);
-		curs_set(0);
-		unsigned dx = 0, previ = 0, prevpr = 0;
-		for (unsigned i = 0; i < matches.size(); ++i) { // highlight all
-			calc_offset_act(matches[i], previ, *it);
-			previ = matches[i];
-			dx += flag;
-			if (dx >= maxx - 1 + prevpr) {
-				if (wgetch(text_win) == 27) // escape
-					goto clr_high;
-				prevpr = previ - previ % (maxx - 1);
-				mvprint_line(y, 0, *it, prevpr, 0);
-			}
-			wmove(text_win, y, dx % (maxx - 1));
-			wchgat(text_win, tmp_len, A_STANDOUT, 0, 0);
-		}
-		wgetch(text_win); // escape
-clr_high:
-		mvprint_line(y, 0, *it, 0, 0);
-		highlight(y);
-		curs_set(1);
+		find((const char*)tmp + 5);
 	} else
 		print2header("command not found", 3);
 	free(tmp);

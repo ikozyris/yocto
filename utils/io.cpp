@@ -42,7 +42,7 @@ unsigned print_line(const gap_buf &buffer, unsigned from, unsigned to)
 	if (buffer.len <= 1)
 		return 0;
 	if (to == 0) {
-		int prevx = getcurx(text_win); // in case x != 0 (mvprint_line)
+		unsigned prevx = getcurx(text_win); // in case x != 0 (mvprint_line)
 		unsigned prop = dchar2bytes(maxx - 1 - prevx, from, buffer);
 		if (prop < buffer.len - 1) {
 			to = prop;
@@ -73,23 +73,6 @@ void print_text(unsigned line)
 		mvprint_line(ty, 0, *iter, 0, 0);
 		highlight(ty);
 	}
-}
-
-// search for str in buf, return position
-vector<unsigned> search(const gap_buf &buf, const char *str, unsigned len)
-{
-	unsigned j = 0;
-	vector<unsigned> matches;
-	for (unsigned i = 0; i < buf.len; ++i) {
-		for (j = 0; j < len; ++j)
-			if (at(buf, i + j) != str[j])
-				break;
-		if (j == len) {
-			matches.push_back(i);
-			i += len - 1;
-		}
-	}
-	return matches; // copy elision
 }
 
 // save buffer to global filename, if empty ask for it on header

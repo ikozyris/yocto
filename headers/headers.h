@@ -4,5 +4,8 @@
 #include <locale.h>	// for setting locale
 #include <list>
 #include <vector>
+#include <thread>
+#include <algorithm>
+#include <execution>
 #include <bit>	// for __bit_ceil (cntlz)
 using namespace std;

@@ -1,4 +1,5 @@
 #pragma once
+#include "search.h"
 #include "io.h"
 
 void stats(); // print statistics in header
