@@ -82,7 +82,7 @@ void command()
 		getch();
 		reset_view();
 	} else if (strcmp(tmp, "help")  == 0)
-		print2header("resetheader, shrink, usage, stats, run [cmd], scroll [line], search [token]", 1);
+		print2header("resetheader, shrink, usage, stats, run [cmd], scroll [line], find [token]", 1);
 	else if (strncmp(tmp, "scroll", 6) == 0) {
 		unsigned a;
 		sscanf(tmp + 7, "%u", &a);

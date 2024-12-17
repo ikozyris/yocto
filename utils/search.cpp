@@ -34,7 +34,7 @@ clr_high:
 unsigned *_badchar(const char *str, unsigned short len)
 {
 	unsigned *badchar = (unsigned*)malloc(256 * sizeof(unsigned));
-	for (unsigned i = 0; i < 256; ++i)
+	for (unsigned i = 0; i < 256; ++i) // BMH table
 		badchar[i] = len;
 	for (unsigned i = 0; i < len; i++)
 		badchar[(unsigned char)str[i]] = len - i - 1;
@@ -55,23 +55,25 @@ unsigned *_goodsuffix(const char *str, unsigned short len)
 		pos[i] = j + 1;
 	}
 
-	for (unsigned i = 0; i < len; i++)
+	gs[0] = len;
+	for (unsigned i = 1; i < len; i++)
 		gs[i] = len - pos[i];
 
-	// Apply the Galil rule
+	// Galil rule
 	for (unsigned i = len - 1; i > 0; i--) {
 		if (str[i] != str[pos[i]])
 			gs[i] = len - i;
 		else
 			gs[i] = gs[pos[i]];
 	}
-	gs[0] = len;
 	free(pos);
 	return gs;
 }
-vector<unsigned> bm_search(const gap_buf &buf, const char *str, unsigned short len) {
+
+vector<unsigned> bm_search(const gap_buf &buf, const char *str, unsigned short len)
+{
 	vector<unsigned> matches;
-	// Preprocess the str to create the bad character table
+	// heuristics
 	unsigned *badchar = _badchar(str, len);
 	unsigned *goodsuffix = _goodsuffix(str, len);
 
@@ -97,7 +99,7 @@ vector<unsigned> mergei(const vector<vector<unsigned>> &indices)
 {
 	vector<unsigned> matches;
 	matches.reserve(indices[0].size());
-	for (const auto& vec : indices)
+	for (const auto &vec : indices)
 		matches.insert(matches.end(), vec.begin(), vec.end());
 	return matches;
 }
@@ -129,7 +131,7 @@ vector<unsigned> mt_search(const gap_buf &buf, char ch)
 	// last thread does the remaining (until buf.len)
 	threads.emplace_back(searchch, ref(buf), ch, (nthreads - 1) * chunk, buf.len, ref(indices[nthreads - 1]));
 
-	for (auto& thread : threads)
+	for (auto &thread : threads)
 		if (thread.joinable())
 			thread.join();
 
@@ -141,10 +143,10 @@ vector<unsigned> mt_search(const gap_buf &buf, char ch)
 vector<unsigned> search(const gap_buf &buf, const char *str, unsigned short len)
 {
 	vector<unsigned> matches;
-	if (len == 1) {
-		//searchch(buf, str[0], 0, buf.len, matches);
+	if (len == 1)
 		matches = mt_search(buf, str[0]);
-	} else
+		//searchch(buf, str[0], 0, buf.len, matches);
+	else
 		matches = bm_search(buf, str, len);
 
 	return matches;
