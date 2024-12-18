@@ -103,7 +103,7 @@ long calc_offset_act(unsigned pos, unsigned i, const gap_buf &buf)
 // currently on a tab; go to previous char
 unsigned prevdchar()
 {
-	long prev_ofx = calc_offset_dis(x - 7, *it);
+	long prev_ofx = calc_offset_dis(x - 8, *it);
 	long diff = prev_ofx - ofx;
 	wmove(text_win, y, x - diff - 1);
 	return diff;
