@@ -155,7 +155,7 @@ loop:
 			break;
 
 		case BACKSPACE:
-			if (x != 0) {
+			if (x > 0) {
 				eras(*it);
 				if (it->buffer[it->gps] == '\t') {
 					wmove(text_win, y, x - 1);
@@ -167,7 +167,10 @@ loop:
 					wmove(text_win, y, x);
 				} else
 					mvwdelch(text_win, y, x - 1);
-			} else if (y != 0 && cut.empty()) { // x = 0; merge lines
+			} else if (!cut.empty()) {
+				eras(*it);
+				left();
+			} else if (y != 0) { // x = 0 && cut.empty(); merge lines
 				list<gap_buf>::iterator curln = it;
 				--it;
 				mv_curs(*it, it->len); // delete \n
@@ -179,9 +182,6 @@ loop:
 				--curnum;
 				print_text(y - 1);
 				wmove(text_win, y - 1, tmp);
-			} else {
-				eras(*it);
-				left();
 			}
 			break;
 
