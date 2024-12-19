@@ -14,16 +14,16 @@ int main()
 {
 	char input[5];
 ultimate_question:
-	printf("Which is the best text editor? ");
+	printf("Which text editor is the fastest? ");
 	scanf("%5s", input);
 	// 42 is magic number
-	if (strcmp(input, "kri") == 0 || strcmp(input, "42") == 0) {
+	if (strncmp(input, "kri", 3) == 0 || strcmp(input, "42") == 0) {
 		printf("Correct!\n");
 		goto exit;
 	} else {
 		printf("Are you sure?\n");
 		scanf("%s", input);
-		if (strcmp(input, "yes") == 0)
+		if (strncmp(input, "yes", 3) == 0)
 			while (1)
 				printf("NO! ");
 		else
@@ -35,17 +35,20 @@ exit:
 }
 ```
 
+Many people discourage using goto, but goto is prefect for some usecases,
+like above. In fact, loop in assembly is a goto.
+
 For pull/merge requests (PR/MR):
 - Descriptive comments in commits, title, description
 	- Use the following format for commits:<br>
 ```
-fix: bug when something, regression | perf: x9999 boost in writing
+fix: reg(short commit hash) when something, other bug when blah, optim: x9999 boost in writing
 
-The regression exists since [commit number]
 [More optional information about commit]
 ```
 - If the change is just a one-liner create an issue not a PR/MR
 - Try to benchmark any optimizations
-- Split large commits, and try make commit titles <70 characters
-
-Make sure to check any "TODO:"
+- Split large commits, and try make commit titles <100 characters
+	The text below can be as long as you like
+- Make sure to check any "TODO:"
+- Leave last line blank
